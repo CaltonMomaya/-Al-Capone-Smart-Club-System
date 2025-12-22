@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Al Capone Club - Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-color: #000000;
+            --secondary-color: #ffffff;
+            --accent-color: #333333;
+        }
+
+        body {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: row;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Left Section */
+        .left-section {
+            flex: 1;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(50, 50, 50, 0.8));
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-display-area {
+            text-align: center;
+            width: 100%;
+            height: 30vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 8rem;
+            animation: logoSlideDown 1s ease 0.5s forwards;
+        }
+
+        .club-logo {
+            max-width: 80%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .logo-placeholder {
+            width: 80%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.5rem;
+        }
+
+        .club-info {
+            text-align: center;
+            max-width: 500px;
+            margin-top: 1.5rem;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            opacity: 0;
+            animation: fadeIn 1s 0.5s forwards;
+        }
+
+        /* Right Section */
+        .right-section {
+            flex: 1;
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 400px;
+            padding: 2rem;
+            background-color: var(--secondary-color);
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 2;
+        }
+
+        .form-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--accent-color);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 0.8rem;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .tab.active {
+            color: var(--secondary-color);
+            background-color: var(--primary-color);
+        }
+
+        .tab:not(.active):hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .form {
+            display: none;
+        }
+
+        .form.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid var(--accent-color);
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.8rem;
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .forgot-password {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .forgot-password a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .forgot-password a:hover {
+            color: var(--primary-color);
+            text-decoration: underline;
+        }
+
+        /* Background Pattern */
+        .pattern {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0.05;
+            background-image: 
+                radial-gradient(circle at 25% 25%, var(--primary-color) 2px, transparent 2px),
+                radial-gradient(circle at 75% 75%, var(--primary-color) 2px, transparent 2px);
+            background-size: 50px 50px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes logoSlideDown {
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .left-section {
+                padding-top: 4rem;
+                justify-content: flex-start;
+            }
+
+            .logo-display-area {
+                height: 25vh;
+                margin-top: 5rem;
+            }
+
+            .club-info {
+                font-size: 1rem;
+                margin-top: 1.5rem;
+            }
+
+            .form-container {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .left-section {
+                padding-top: 3rem;
+            }
+            
+            .logo-display-area {
+                height: 20vh;
+                margin-top: 4rem;
+            }
+            
+            .form-title {
+                font-size: 1.5rem;
+            }
+
+            .form-container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Left Section with Logo Only -->
+        <div class="left-section">
+            <div class="logo-display-area">
+                <div class="logo-placeholder" id="main-logo-placeholder">AL CAPONE CLUB LOGO</div>
+                <img id="main-logo" class="club-logo" src="" alt="Al Capone Club Logo">
+            </div>
+            
+            <div class="club-info">
+                Experience the most exclusive club in Nairobi. Where luxury meets sophistication and every night is an unforgettable experience.
+            </div>
+        </div>
+
+        <!-- Right Section with Login/Register Forms -->
+        <div class="right-section">
+            <div class="pattern"></div>
+            <div class="form-container">
+                <div class="tabs">
+                    <div class="tab active" data-tab="signin">Sign In</div>
+                    <div class="tab" data-tab="signup">Sign Up</div>
+                </div>
+
+                <!-- Sign In Form -->
+                <form class="form active" id="signin-form">
+                    <h2 class="form-title">Member Access</h2>
+                    <div class="input-group">
+                        <label for="signin-username">Username</label>
+                        <input type="text" id="signin-username" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="signin-password">Password</label>
+                        <input type="password" id="signin-password" required>
+                    </div>
+                    <button type="submit" class="btn">Enter Club</button>
+                    <div class="forgot-password">
+                        <a href="#">Forgot Password?</a>
+                    </div>
+                </form>
+
+                <!-- Sign Up Form -->
+                <form class="form" id="signup-form">
+                    <h2 class="form-title">Join The Club</h2>
+                    <div class="input-group">
+                        <label for="signup-username">Username</label>
+                        <input type="text" id="signup-username" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="signup-email">Email</label>
+                        <input type="email" id="signup-email" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="signup-password">Password</label>
+                        <input type="password" id="signup-password" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="signup-confirm">Confirm Password</label>
+                        <input type="password" id="signup-confirm" required>
+                    </div>
+                    <button type="submit" class="btn">Become a Member</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs and forms
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.form').forEach(f => f.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                tab.classList.add('active');
+                
+                // Show corresponding form
+                const tabId = tab.getAttribute('data-tab');
+                document.getElementById(`${tabId}-form`).classList.add('active');
+            });
+        });
+
+        // Form submission handling
+        document.getElementById('signin-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const username = document.getElementById('signin-username').value;
+            const password = document.getElementById('signin-password').value;
+            
+            // Simple validation
+            if (!username.trim() || !password.trim()) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            // Show loading state
+            const submitBtn = this.querySelector('.btn');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Entering Club...';
+            submitBtn.disabled = true;
+            
+            // Simulate authentication process (1 second delay)
+            setTimeout(() => {
+                // Redirect to insideclub.html
+                window.location.href = 'insideclub.html';
+                
+                // Reset button (in case redirect fails)
+                setTimeout(() => {
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                }, 2000);
+            }, 1000);
+        });
+
+        document.getElementById('signup-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const username = document.getElementById('signup-username').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const confirmPassword = document.getElementById('signup-confirm').value;
+            
+            // Validation
+            if (!username.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+            
+            if (password.length < 6) {
+                alert('Password must be at least 6 characters long');
+                return;
+            }
+            
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('Please enter a valid email address');
+                return;
+            }
+            
+            // Show loading state
+            const submitBtn = this.querySelector('.btn');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Creating Account...';
+            submitBtn.disabled = true;
+            
+            // Simulate registration process (1.5 seconds delay)
+            setTimeout(() => {
+                // Show success message
+                alert(`Welcome to Al Capone Club, ${username}! Your membership has been approved.`);
+                
+                // Redirect to insideclub.html
+                window.location.href = 'insideclub.html';
+                
+                // Reset button (in case redirect fails)
+                setTimeout(() => {
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                }, 2000);
+            }, 1500);
+        });
+
+        // Load your logo from the specified path
+        window.addEventListener('DOMContentLoaded', function() {
+            const mainLogo = document.getElementById('main-logo');
+            const mainLogoPlaceholder = document.getElementById('main-logo-placeholder');
+            
+            // Try to load your logo from the specified path
+            mainLogo.src = 'images/logo.png';
+            mainLogo.onload = function() {
+                mainLogo.style.display = 'block';
+                mainLogoPlaceholder.style.display = 'none';
+            };
+            mainLogo.onerror = function() {
+                console.log('Logo not found at images/logo.png');
+                // You can keep the placeholder or try a different path
+                // mainLogo.src = 'logo.png'; // Try root directory
+            };
+        });
+
+        // Optional: Add form validation styling
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', function() {
+                if (this.value.trim() === '') {
+                    this.style.borderColor = '#ff4444';
+                } else {
+                    this.style.borderColor = 'var(--accent-color)';
+                }
+            });
+            
+            input.addEventListener('blur', function() {
+                if (this.value.trim() === '' && this.hasAttribute('required')) {
+                    this.style.borderColor = '#ff4444';
+                }
+            });
+        });
+
+        // Optional: Demo mode for testing
+        // Add ?demo=true to URL to auto-fill forms for testing
+        window.addEventListener('load', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('demo') === 'true') {
+                // Auto-fill forms with demo data
+                document.getElementById('signin-username').value = 'demo_user';
+                document.getElementById('signin-password').value = 'password123';
+                
+                document.getElementById('signup-username').value = 'new_member';
+                document.getElementById('signup-email').value = 'member@alcaponeclub.com';
+                document.getElementById('signup-password').value = 'password123';
+                document.getElementById('signup-confirm').value = 'password123';
+                
+                console.log('Demo mode: Forms pre-filled. Click "Enter Club" to go to insideclub.html');
+            }
+        });
+    </script>
+</body>
+</html>

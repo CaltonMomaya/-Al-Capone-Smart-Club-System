@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Al Capone Club - Bar Menu</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-color: #1a1a1a;
+            --secondary-color: #f5f5f5;
+            --accent-color: #8B4513;
+            --highlight-color: #D4AF37;
+            --button-color: #2c2c2c;
+            --button-hover: #3a3a3a;
+            --danger-color: #c62828;
+            --success-color: #2e7d32;
+            --cart-color: #1e3a5f;
+        }
+
+        body {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(139, 69, 19, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 85% 30%, rgba(212, 175, 55, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 50% 80%, rgba(139, 69, 19, 0.05) 0%, transparent 20%);
+        }
+
+        /* Container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header Section */
+        .header {
+            text-align: center;
+            padding: 1rem 0;
+            position: relative;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+            margin-bottom: 1rem;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .logout-button {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+
+        .logout-button:hover {
+            background-color: #b71c1c;
+            transform: translateY(-2px);
+        }
+
+        .logo-area {
+            margin-bottom: 1rem;
+        }
+
+        .logo-placeholder {
+            width: 200px;
+            height: 100px;
+            margin: 0 auto;
+            background-color: rgba(139, 69, 19, 0.2);
+            border: 2px dashed rgba(212, 175, 55, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: rgba(245, 245, 245, 0.7);
+            font-size: 1.2rem;
+        }
+
+        .header-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--highlight-color);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .header-subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--secondary-color);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+        }
+
+        /* Table Number Display */
+        .table-number-display {
+            background-color: rgba(212, 175, 55, 0.1);
+            border: 2px solid var(--highlight-color);
+            border-radius: 8px;
+            padding: 10px 20px;
+            margin: 0 auto 1.5rem;
+            max-width: 300px;
+            text-align: center;
+        }
+
+        .table-label {
+            font-size: 0.9rem;
+            color: #ccc;
+            margin-bottom: 5px;
+        }
+
+        .table-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--highlight-color);
+        }
+
+        /* Shopping Cart Section */
+        .cart-section {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .cart-button {
+            background-color: var(--cart-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .cart-button:hover {
+            background-color: #2a4a7a;
+            transform: scale(1.1);
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--danger-color);
+            color: white;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .cart-panel {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 380px;
+            height: 100vh;
+            background-color: rgba(30, 30, 30, 0.98);
+            z-index: 1001;
+            transition: right 0.3s ease;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .cart-panel.active {
+            right: 0;
+        }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--highlight-color);
+        }
+
+        .cart-title {
+            font-size: 1.5rem;
+            color: var(--highlight-color);
+        }
+
+        .close-cart {
+            background: none;
+            border: none;
+            color: var(--secondary-color);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .cart-items {
+            margin-bottom: 2rem;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .cart-item-info h4 {
+            margin-bottom: 0.3rem;
+            color: var(--highlight-color);
+        }
+
+        .cart-item-price {
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+
+        .cart-item-quantity {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quantity-btn {
+            background-color: var(--button-color);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .quantity {
+            font-weight: bold;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .remove-item {
+            background: none;
+            border: none;
+            color: var(--danger-color);
+            cursor: pointer;
+            font-size: 1.2rem;
+            margin-left: 10px;
+        }
+
+        .cart-total {
+            font-size: 1.3rem;
+            font-weight: bold;
+            text-align: right;
+            margin-bottom: 1.5rem;
+            padding-top: 1rem;
+            border-top: 2px solid var(--highlight-color);
+            color: var(--highlight-color);
+        }
+
+        .checkout-button {
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 15px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            width: 100%;
+        }
+
+        .checkout-button:hover {
+            background-color: #1b5e20;
+            transform: translateY(-2px);
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 2rem;
+            color: #888;
+            font-style: italic;
+        }
+
+        /* Menu Section */
+        .menu-section {
+            padding: 2rem 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .menu-title {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: var(--highlight-color);
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .menu-title:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: var(--accent-color);
+        }
+
+        .buttons-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .menu-button {
+            background-color: var(--button-color);
+            color: var(--secondary-color);
+            border: none;
+            border-radius: 8px;
+            padding: 1.5rem 1rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            min-height: 140px;
+        }
+
+        .menu-button:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, transparent 0%, rgba(212, 175, 55, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .menu-button:hover {
+            background-color: var(--button-hover);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .menu-button:hover:before {
+            opacity: 1;
+        }
+
+        .menu-button i {
+            font-size: 2rem;
+            margin-bottom: 0.8rem;
+            color: var(--highlight-color);
+        }
+
+        .button-text {
+            font-size: 1rem;
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        /* Category Page Styles */
+        .back-button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            margin-bottom: 2rem;
+        }
+
+        .back-button:hover {
+            background-color: #6d3510;
+            transform: translateY(-2px);
+        }
+
+        .drink-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .drink-card {
+            background-color: rgba(42, 42, 42, 0.9);
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .drink-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(212, 175, 55, 0.5);
+        }
+
+        .drink-name {
+            font-size: 1.5rem;
+            color: var(--highlight-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .drink-description {
+            color: #ccc;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .drink-price {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 1rem;
+        }
+
+        .add-to-cart-button {
+            background-color: var(--highlight-color);
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .add-to-cart-button:hover {
+            background-color: #c9a52c;
+            transform: translateY(-2px);
+        }
+
+        /* Checkout Page Styles */
+        .checkout-container {
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: rgba(42, 42, 42, 0.9);
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .checkout-title {
+            font-size: 1.8rem;
+            color: var(--highlight-color);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .checkout-summary {
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .summary-header {
+            color: var(--highlight-color);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px solid var(--highlight-color);
+            color: var(--highlight-color);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 5px;
+            border: 1px solid #555;
+            background-color: #333;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--highlight-color);
+        }
+
+        .table-number-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .table-number-input .form-input {
+            flex: 1;
+        }
+
+        .table-number-input span {
+            color: var(--highlight-color);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .pay-button {
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 15px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .pay-button:hover {
+            background-color: #1b5e20;
+            transform: translateY(-2px);
+        }
+
+        .mpesa-logo {
+            display: block;
+            margin: 0 auto 1.5rem;
+            width: 150px;
+            height: auto;
+        }
+
+        /* Order Success Modal */
+        .success-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .success-modal.active {
+            display: flex;
+        }
+
+        .success-content {
+            background-color: var(--primary-color);
+            padding: 2.5rem;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            border: 3px solid var(--highlight-color);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            color: var(--success-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .success-title {
+            font-size: 2rem;
+            color: var(--highlight-color);
+            margin-bottom: 1rem;
+        }
+
+        .success-message {
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .success-details {
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .success-details p {
+            margin-bottom: 0.5rem;
+        }
+
+        .close-success {
+            background-color: var(--highlight-color);
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 30px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .close-success:hover {
+            background-color: #c9a52c;
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+            color: var(--secondary-color);
+            opacity: 0.7;
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .header-title {
+                font-size: 2rem;
+            }
+            
+            .header-subtitle {
+                font-size: 1rem;
+            }
+            
+            .buttons-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .menu-button {
+                padding: 1.2rem 0.8rem;
+                font-size: 1rem;
+                min-height: 120px;
+            }
+            
+            .menu-button i {
+                font-size: 1.8rem;
+            }
+            
+            .drink-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .checkout-container {
+                padding: 1.5rem;
+            }
+            
+            .cart-panel {
+                width: 100%;
+                right: -100%;
+            }
+            
+            .cart-section {
+                top: 10px;
+                right: 10px;
+            }
+            
+            .success-content {
+                padding: 1.5rem;
+            }
+            
+            .success-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .buttons-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-title {
+                font-size: 1.8rem;
+            }
+            
+            .menu-title {
+                font-size: 1.6rem;
+            }
+            
+            .header-top {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .table-number-display {
+                padding: 8px 15px;
+                max-width: 250px;
+            }
+            
+            .table-number {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header">
+            <div class="header-top">
+                <div></div> <!-- Empty div for spacing -->
+                <button class="logout-button" id="logout-button">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+            
+            <div class="logo-area">
+                <div class="logo-placeholder" id="logo-placeholder">AL CAPONE CLUB</div>
+                <img id="club-logo" class="club-logo" src="images/logo.png" alt="Al Capone Club Logo" style="max-width: 200px; height: auto;">
+            </div>
+            
+            <!-- Table Number Display -->
+            <div class="table-number-display">
+                <div class="table-label">You are ordering from</div>
+                <div class="table-number">Table <span id="current-table-number">-</span></div>
+            </div>
+            
+            <h1 class="header-title">Premium Bar Selection</h1>
+            <p class="header-subtitle">Indulge in our exquisite collection of fine spirits, crafted cocktails, and premium beverages</p>
+        </div>
+
+        <!-- Shopping Cart Section -->
+        <div class="cart-section">
+            <button class="cart-button" id="cart-button">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-count" id="cart-count">0</span>
+            </button>
+            
+            <div class="cart-panel" id="cart-panel">
+                <div class="cart-header">
+                    <h3 class="cart-title">Your Order</h3>
+                    <button class="close-cart" id="close-cart">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="cart-items" id="cart-items">
+                    <!-- Cart items will be added here dynamically -->
+                    <div class="empty-cart" id="empty-cart">
+                        <p>Your cart is empty</p>
+                    </div>
+                </div>
+                
+                <div class="cart-total" id="cart-total">
+                    Total: Ksh 0
+                </div>
+                
+                <button class="checkout-button" id="checkout-button">
+                    <i class="fas fa-lock"></i> Proceed to Checkout
+                </button>
+            </div>
+        </div>
+
+        <!-- Menu Section -->
+        <div class="menu-section" id="menu-section">
+            <h2 class="menu-title">Our Drink Categories</h2>
+            <div class="buttons-container">
+                <button class="menu-button" data-category="cocktails">
+                    <i class="fas fa-cocktail"></i>
+                    <span class="button-text">Cocktails</span>
+                </button>
+                <button class="menu-button" data-category="mocktails">
+                    <i class="fas fa-seedling"></i>
+                    <span class="button-text">Mocktails</span>
+                </button>
+                <button class="menu-button" data-category="soft-drinks">
+                    <i class="fas fa-glass-whiskey"></i>
+                    <span class="button-text">Soft Drinks</span>
+                </button>
+                <button class="menu-button" data-category="champagne">
+                    <i class="fas fa-wine-glass-alt"></i>
+                    <span class="button-text">Champagne & Sparkling Wine</span>
+                </button>
+                <button class="menu-button" data-category="shooters">
+                    <i class="fas fa-glass-cheers"></i>
+                    <span class="button-text">Shooters & Liquors</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Order Success Modal -->
+        <div class="success-modal" id="success-modal">
+            <div class="success-content">
+                <div class="success-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h2 class="success-title">Payment Successful!</h2>
+                <div class="success-message">
+                    Your order has been placed successfully. Your drinks will be delivered to your table shortly.
+                </div>
+                <div class="success-details" id="success-details">
+                    <!-- Order details will be inserted here -->
+                </div>
+                <button class="close-success" id="close-success">Continue Shopping</button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Al Capone Club &copy; 2025 | Exclusive Members Only</p>
+        </div>
+    </div>
+
+    <script>
+        // Drink data for each category
+        const drinkData = {
+            cocktails: [
+                { id: 1, name: "Old Fashioned", description: "Classic bourbon cocktail with sugar, bitters, and orange peel", price: 1200 },
+                { id: 2, name: "Moscow Mule", description: "Vodka, ginger beer, and lime juice served in a copper mug", price: 1100 },
+                { id: 3, name: "Margarita", description: "Tequila, lime juice, and triple sec with salt rim", price: 1000 },
+                { id: 4, name: "Negroni", description: "Gin, sweet vermouth, and Campari with orange peel", price: 1300 },
+                { id: 5, name: "Mojito", description: "White rum, mint, lime juice, sugar, and soda water", price: 950 },
+                { id: 6, name: "Whiskey Sour", description: "Whiskey, lemon juice, and simple syrup with egg white", price: 1150 }
+            ],
+            mocktails: [
+                { id: 1, name: "Virgin Mojito", description: "Mint, lime juice, sugar, and soda water", price: 500 },
+                { id: 2, name: "Berry Blast", description: "Mixed berries, lime juice, and soda water", price: 550 },
+                { id: 3, name: "Sunset Cooler", description: "Orange juice, grenadine, and ginger ale", price: 450 },
+                { id: 4, name: "Tropical Breeze", description: "Pineapple juice, coconut cream, and lime", price: 600 },
+                { id: 5, name: "Cucumber Mint Sparkler", description: "Cucumber, mint, lime, and soda water", price: 500 }
+            ],
+            "soft-drinks": [
+                { id: 1, name: "Coca-Cola", description: "Classic cola served chilled", price: 200 },
+                { id: 2, name: "Sprite", description: "Lemon-lime soda served chilled", price: 200 },
+                { id: 3, name: "Fanta Orange", description: "Orange flavored soda", price: 200 },
+                { id: 4, name: "Ginger Ale", description: "Refreshing ginger flavored soda", price: 250 },
+                { id: 5, name: "Tonic Water", description: "Classic tonic water with quinine", price: 250 }
+            ],
+            champagne: [
+                { id: 1, name: "Dom Pérignon", description: "Vintage Champagne, France", price: 25000 },
+                { id: 2, name: "Veuve Clicquot", description: "Yellow Label Brut, France", price: 12000 },
+                { id: 3, name: "Moët & Chandon", description: "Imperial Brut, France", price: 10000 },
+                { id: 4, name: "Prosecco", description: "Italian sparkling wine", price: 6000 },
+                { id: 5, name: "Cava", description: "Spanish sparkling wine", price: 5000 }
+            ],
+            shooters: [
+                { id: 1, name: "B-52", description: "Kahlua, Baileys, and Grand Marnier", price: 800 },
+                { id: 2, name: "Tequila Shot", description: "100% agave tequila with salt and lime", price: 700 },
+                { id: 3, name: "Jägerbomb", description: "Jägermeister and Red Bull", price: 900 },
+                { id: 4, name: "Kamikaze", description: "Vodka, triple sec, and lime juice", price: 750 },
+                { id: 5, name: "Fireball", description: "Cinnamon whiskey shooter", price: 650 }
+            ]
+        };
+
+        // Shopping Cart
+        let shoppingCart = [];
+        let tableNumber = localStorage.getItem('alCaponeTableNumber') || "12"; // Default to table 12
+        
+        // Initialize cart from localStorage
+        function initCart() {
+            const savedCart = localStorage.getItem('alCaponeCart');
+            if (savedCart) {
+                shoppingCart = JSON.parse(savedCart);
+                updateCartDisplay();
+            }
+            
+            // Set table number
+            document.getElementById('current-table-number').textContent = tableNumber;
+        }
+        
+        // Save cart to localStorage
+        function saveCart() {
+            localStorage.setItem('alCaponeCart', JSON.stringify(shoppingCart));
+        }
+        
+        // Update cart display
+        function updateCartDisplay() {
+            const cartCount = document.getElementById('cart-count');
+            const cartItems = document.getElementById('cart-items');
+            const cartTotal = document.getElementById('cart-total');
+            const emptyCart = document.getElementById('empty-cart');
+            
+            // Update cart count
+            const totalItems = shoppingCart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCount.textContent = totalItems;
+            
+            // Update cart items
+            cartItems.innerHTML = '';
+            
+            if (shoppingCart.length === 0) {
+                emptyCart.style.display = 'block';
+                cartTotal.innerHTML = 'Total: Ksh 0';
+                return;
+            }
+            
+            emptyCart.style.display = 'none';
+            
+            let totalPrice = 0;
+            
+            shoppingCart.forEach((item, index) => {
+                totalPrice += item.price * item.quantity;
+                
+                const cartItem = document.createElement('div');
+                cartItem.className = 'cart-item';
+                cartItem.innerHTML = `
+                    <div class="cart-item-info">
+                        <h4>${item.name}</h4>
+                        <div class="cart-item-price">Ksh ${item.price.toLocaleString()} each</div>
+                    </div>
+                    <div class="cart-item-quantity">
+                        <button class="quantity-btn decrease-quantity" data-index="${index}">-</button>
+                        <span class="quantity">${item.quantity}</span>
+                        <button class="quantity-btn increase-quantity" data-index="${index}">+</button>
+                        <button class="remove-item" data-index="${index}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                cartItems.appendChild(cartItem);
+            });
+            
+            // Update total
+            cartTotal.innerHTML = `Total: Ksh ${totalPrice.toLocaleString()}`;
+            
+            // Add event listeners for cart controls
+            document.querySelectorAll('.decrease-quantity').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = parseInt(e.target.dataset.index);
+                    if (shoppingCart[index].quantity > 1) {
+                        shoppingCart[index].quantity--;
+                        saveCart();
+                        updateCartDisplay();
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.increase-quantity').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = parseInt(e.target.dataset.index);
+                    shoppingCart[index].quantity++;
+                    saveCart();
+                    updateCartDisplay();
+                });
+            });
+            
+            document.querySelectorAll('.remove-item').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = parseInt(e.target.closest('.remove-item').dataset.index);
+                    shoppingCart.splice(index, 1);
+                    saveCart();
+                    updateCartDisplay();
+                });
+            });
+        }
+        
+        // Add item to cart
+        function addToCart(drink, category) {
+            const existingItem = shoppingCart.find(item => item.id === drink.id && item.category === category);
+            
+            if (existingItem) {
+                existingItem.quantity++;
+            } else {
+                shoppingCart.push({
+                    id: drink.id,
+                    name: drink.name,
+                    price: drink.price,
+                    category: category,
+                    quantity: 1
+                });
+            }
+            
+            saveCart();
+            updateCartDisplay();
+            
+            // Show confirmation
+            showNotification(`${drink.name} added to cart!`);
+        }
+        
+        // Show notification
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background-color: var(--highlight-color);
+                color: #000;
+                padding: 15px 25px;
+                border-radius: 5px;
+                font-weight: bold;
+                z-index: 10000;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+                animation: slideIn 0.3s ease;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 2000);
+        }
+        
+        // Logout functionality - redirects to index.html
+        document.getElementById('logout-button').addEventListener('click', () => {
+            // Clear cart data
+            localStorage.removeItem('alCaponeCart');
+            // Redirect to login page
+            window.location.href = 'index.html';
+        });
+        
+        // Cart button functionality
+        document.getElementById('cart-button').addEventListener('click', () => {
+            document.getElementById('cart-panel').classList.add('active');
+        });
+        
+        document.getElementById('close-cart').addEventListener('click', () => {
+            document.getElementById('cart-panel').classList.remove('active');
+        });
+        
+        // Checkout button functionality
+        document.getElementById('checkout-button').addEventListener('click', () => {
+            if (shoppingCart.length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+            
+            showCheckoutPage();
+        });
+        
+        // Close success modal
+        document.getElementById('close-success').addEventListener('click', () => {
+            document.getElementById('success-modal').classList.remove('active');
+        });
+        
+        // Button click functionality
+        document.querySelectorAll('.menu-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const category = button.getAttribute('data-category');
+                showCategoryPage(category);
+            });
+        });
+        
+        // Show category page with drink list
+        function showCategoryPage(category) {
+            const menuSection = document.getElementById('menu-section');
+            const categoryNames = {
+                'cocktails': 'Cocktails',
+                'mocktails': 'Mocktails',
+                'soft-drinks': 'Soft Drinks',
+                'champagne': 'Champagne & Sparkling Wine',
+                'shooters': 'Shooters & Liquors'
+            };
+            
+            // Create drink list HTML
+            let drinksHTML = '';
+            drinkData[category].forEach(drink => {
+                drinksHTML += `
+                    <div class="drink-card">
+                        <h3 class="drink-name">${drink.name}</h3>
+                        <p class="drink-description">${drink.description}</p>
+                        <div class="drink-price">Ksh ${drink.price.toLocaleString()}</div>
+                        <button class="add-to-cart-button" data-drink-id="${drink.id}" data-category="${category}">
+                            <i class="fas fa-cart-plus"></i> Add to Cart
+                        </button>
+                    </div>
+                `;
+            });
+            
+            // Update the menu section to show category drinks
+            menuSection.innerHTML = `
+                <button class="back-button" id="back-button">
+                    <i class="fas fa-arrow-left"></i> Back to Categories
+                </button>
+                <h2 class="menu-title">${categoryNames[category]}</h2>
+                <div class="drink-list">
+                    ${drinksHTML}
+                </div>
+            `;
+            
+            // Add event listener to back button
+            document.getElementById('back-button').addEventListener('click', () => {
+                location.reload(); // Reload page to show main menu
+            });
+            
+            // Add event listeners to add to cart buttons
+            document.querySelectorAll('.add-to-cart-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const drinkId = parseInt(e.target.getAttribute('data-drink-id'));
+                    const category = e.target.getAttribute('data-category');
+                    const drink = drinkData[category].find(d => d.id === drinkId);
+                    addToCart(drink, category);
+                });
+            });
+        }
+        
+        // Show checkout page with M-Pesa form
+        function showCheckoutPage() {
+            const menuSection = document.getElementById('menu-section');
+            
+            // Calculate total
+            const totalPrice = shoppingCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            // Create cart summary HTML
+            let cartSummaryHTML = '';
+            shoppingCart.forEach(item => {
+                cartSummaryHTML += `
+                    <div class="summary-item">
+                        <span>${item.name} x${item.quantity}</span>
+                        <span>Ksh ${(item.price * item.quantity).toLocaleString()}</span>
+                    </div>
+                `;
+            });
+            
+            menuSection.innerHTML = `
+                <button class="back-button" id="back-to-cart">
+                    <i class="fas fa-arrow-left"></i> Back to Cart
+                </button>
+                <div class="checkout-container">
+                    <h2 class="checkout-title">Secure M-Pesa Checkout</h2>
+                    
+                    <div class="checkout-summary">
+                        <div class="summary-header">Order Summary</div>
+                        ${cartSummaryHTML}
+                        <div class="summary-total">
+                            <span>Total Amount:</span>
+                            <span>Ksh ${totalPrice.toLocaleString()}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="checkout-summary">
+                        <div class="summary-header">Delivery Information</div>
+                        <div class="summary-item">
+                            <span>Table Number:</span>
+                            <span><strong>Table ${tableNumber}</strong></span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Service Type:</span>
+                            <span>Table Delivery</span>
+                        </div>
+                    </div>
+                    
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/M-PESA_LOGO-01.svg/2560px-M-PESA_LOGO-01.svg.png" alt="M-Pesa Logo" class="mpesa-logo" height="40">
+                    
+                    <form id="mpesa-form">
+                        <div class="form-group">
+                            <label class="form-label" for="table-number">Table Number</label>
+                            <div class="table-number-input">
+                                <span>Table</span>
+                                <input type="number" id="table-number" class="form-input" value="${tableNumber}" min="1" max="50" required>
+                            </div>
+                            <small style="color: #aaa; display: block; margin-top: 5px;">Enter your table number for delivery</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="phone">M-Pesa Phone Number</label>
+                            <input type="tel" id="phone" class="form-input" placeholder="07XX XXX XXX" required>
+                            <small style="color: #aaa; display: block; margin-top: 5px;">Enter the phone number registered with M-Pesa</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="name">Full Name</label>
+                            <input type="text" id="name" class="form-input" placeholder="Enter your full name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="email">Email Address (Optional)</label>
+                            <input type="email" id="email" class="form-input" placeholder="Enter your email for receipt">
+                        </div>
+                        
+                        <button type="submit" class="pay-button">
+                            <i class="fas fa-lock"></i> Pay Ksh ${totalPrice.toLocaleString()} via M-Pesa
+                        </button>
+                    </form>
+                </div>
+            `;
+            
+            // Add event listener to back button
+            document.getElementById('back-to-cart').addEventListener('click', () => {
+                // Close checkout and show cart
+                menuSection.innerHTML = '';
+                location.reload();
+            });
+            
+            // Handle form submission
+            document.getElementById('mpesa-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                processPayment(totalPrice);
+            });
+            
+            // Close cart panel if open
+            document.getElementById('cart-panel').classList.remove('active');
+        }
+        
+        // Process payment (simulated)
+        function processPayment(totalPrice) {
+            const phone = document.getElementById('phone').value;
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const tableNumberInput = document.getElementById('table-number').value;
+            
+            // Update table number
+            tableNumber = tableNumberInput;
+            localStorage.setItem('alCaponeTableNumber', tableNumber);
+            document.getElementById('current-table-number').textContent = tableNumber;
+            
+            // Validate inputs
+            if (!phone.match(/^07[0-9]{8}$/)) {
+                alert('Please enter a valid M-Pesa phone number (format: 07XXXXXXXX)');
+                return;
+            }
+            
+            if (tableNumberInput < 1 || tableNumberInput > 50) {
+                alert('Please enter a valid table number (1-50)');
+                return;
+            }
+            
+            if (!name.trim()) {
+                alert('Please enter your full name');
+                return;
+            }
+            
+            // Simulate payment processing
+            const processingMsg = `Processing M-Pesa payment of Ksh ${totalPrice.toLocaleString()}...\n\nA prompt has been sent to ${phone}. Please enter your M-Pesa PIN to complete the transaction.`;
+            
+            // Show processing alert
+            alert(processingMsg);
+            
+            // In a real application, you would make an API call to M-Pesa here
+            
+            // Simulate successful payment after 3 seconds
+            setTimeout(() => {
+                showSuccessModal(totalPrice, name, phone, tableNumber, email);
+                
+                // Clear cart after successful payment
+                shoppingCart = [];
+                saveCart();
+                updateCartDisplay();
+            }, 3000);
+        }
+        
+        // Show success modal
+        function showSuccessModal(totalPrice, name, phone, tableNumber, email) {
+            const successDetails = document.getElementById('success-details');
+            
+            // Create order items list
+            let orderItemsHTML = shoppingCart.map(item => 
+                `<p>• ${item.name} x${item.quantity} - Ksh ${(item.price * item.quantity).toLocaleString()}</p>`
+            ).join('');
+            
+            successDetails.innerHTML = `
+                <p><strong>Order Reference:</strong> AC-${Date.now().toString().slice(-8)}</p>
+                <p><strong>Customer Name:</strong> ${name}</p>
+                <p><strong>Table Number:</strong> ${tableNumber}</p>
+                <p><strong>M-Pesa Number:</strong> ${phone}</p>
+                ${email ? `<p><strong>Email:</strong> ${email}</p>` : ''}
+                <p><strong>Order Items:</strong></p>
+                ${orderItemsHTML}
+                <p><strong>Total Amount:</strong> Ksh ${totalPrice.toLocaleString()}</p>
+                <p><strong>Payment Status:</strong> <span style="color: #4CAF50;">Confirmed ✓</span></p>
+                <p><strong>Delivery Status:</strong> Preparing your order...</p>
+            `;
+            
+            // Show success modal
+            document.getElementById('success-modal').classList.add('active');
+        }
+        
+        // Initialize the page
+        window.addEventListener('DOMContentLoaded', function() {
+            // Initialize cart
+            initCart();
+            
+            // Add CSS for notifications
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { top: -50px; opacity: 0; }
+                    to { top: 20px; opacity: 1; }
+                }
+                @keyframes slideOut {
+                    from { top: 20px; opacity: 1; }
+                    to { top: -50px; opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Try to load your logo
+            const clubLogo = document.getElementById('club-logo');
+            const logoPlaceholder = document.getElementById('logo-placeholder');
+            
+            if (clubLogo.complete && clubLogo.naturalHeight !== 0) {
+                clubLogo.style.display = 'block';
+                logoPlaceholder.style.display = 'none';
+            } else {
+                clubLogo.onload = function() {
+                    clubLogo.style.display = 'block';
+                    logoPlaceholder.style.display = 'none';
+                };
+                clubLogo.onerror = function() {
+                    console.log('Logo not found at images/logo.png');
+                };
+            }
+        });
+    </script>
+</body>
+</html>

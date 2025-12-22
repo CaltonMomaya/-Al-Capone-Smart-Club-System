@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Al Capone Club - Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-color: #000000;
+            --secondary-color: #ffffff;
+            --accent-color: #333333;
+        }
+
+        body {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: row;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Left Section */
+        .left-section {
+            flex: 1;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(50, 50, 50, 0.8));
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-display-area {
+            text-align: center;
+            width: 100%;
+            height: 30vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 8rem;
+            animation: logoSlideDown 1s ease 0.5s forwards;
+        }
+
+        .club-logo {
+            max-width: 80%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .logo-placeholder {
+            width: 80%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.5rem;
+        }
+
+        .club-info {
+            text-align: center;
+            max-width: 500px;
+            margin-top: 1.5rem;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            opacity: 0;
+            animation: fadeIn 1s 0.5s forwards;
+        }
+
+        /* Right Section */
+        .right-section {
+            flex: 1;
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 400px;
+            padding: 2rem;
+            background-color: var(--secondary-color);
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 2;
+        }
+
+        .form-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--accent-color);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 0.8rem;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .tab.active {
+            color: var(--secondary-color);
+            background-color: var(--primary-color);
+        }
+
+        .tab:not(.active):hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .form {
+            display: none;
+        }
+
+        .form.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid var(--accent-color);
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.8rem;
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-secondary {
+            background-color: var(--accent-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #444444;
+        }
+
+        .forgot-password {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .forgot-password a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .forgot-password a:hover {
+            color: var(--primary-color);
+            text-decoration: underline;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            opacity: 1;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--accent-color);
+            transition: color 0.3s ease;
+        }
+
+        .close-modal:hover {
+            color: var(--primary-color);
+        }
+
+        .masked-email {
+            background-color: rgba(0, 0, 0, 0.05);
+            padding: 1rem;
+            border-radius: 5px;
+            text-align: center;
+            margin: 1rem 0;
+            font-family: monospace;
+            letter-spacing: 1px;
+        }
+
+        .otp-container {
+            display: none;
+            margin-top: 1rem;
+        }
+
+        .otp-inputs {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .otp-input {
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: 2px solid var(--accent-color);
+            border-radius: 5px;
+        }
+
+        .otp-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .timer {
+            text-align: center;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--accent-color);
+        }
+
+        .resend-otp {
+            text-align: center;
+            margin-top: 0.5rem;
+        }
+
+        .resend-otp a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .resend-otp a:hover {
+            text-decoration: underline;
+        }
+
+        /* Background Pattern */
+        .pattern {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0.05;
+            background-image: 
+                radial-gradient(circle at 25% 25%, var(--primary-color) 2px, transparent 2px),
+                radial-gradient(circle at 75% 75%, var(--primary-color) 2px, transparent 2px);
+            background-size: 50px 50px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes logoSlideDown {
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .left-section {
+                padding-top: 4rem;
+                justify-content: flex-start;
+            }
+
+            .logo-display-area {
+                height: 25vh;
+                margin-top: 5rem;
+            }
+
+            .club-info {
+                font-size: 1rem;
+                margin-top: 1.5rem;
+            }
+
+            .form-container {
+                padding: 1.5rem;
+            }
+
+            .otp-input {
+                width: 40px;
+                height: 40px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .left-section {
+                padding-top: 3rem;
+            }
+            
+            .logo-display-area {
+                height: 20vh;
+                margin-top: 4rem;
+            }
+            
+            .form-title {
+                font-size: 1.5rem;
+            }
+
+            .form-container {
+                padding: 1rem;
+            }
+
+            .modal-content {
+                padding: 1.5rem;
+            }
+
+            .otp-input {
+                width: 35px;
+                height: 35px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Left Section with Logo Only -->
+        <div class="left-section">
+            <div class="logo-display-area">
+                <div class="logo-placeholder" id="main-logo-placeholder">AL CAPONE CLUB LOGO</div>
+                <img id="main-logo" class="club-logo" src="" alt="Al Capone Club Logo">
+            </div>
+            
+            <div class="club-info">
+                Experience the most exclusive club in Nairobi. Where luxury meets sophistication and every night is an unforgettable experience.
+            </div>
+        </div>
+
+        <!-- Right Section with Login/Register Forms -->
+        <div class="right-section">
+            <div class="pattern"></div>
+            <div class="form-container">
+                <div class="tabs">
+                    <div class="tab active" data-tab="signin">Sign In</div>
+                    <div class="tab" data-tab="signup">Sign Up</div>
+                </div>
+
+                <!-- Sign In Form -->
+                <form class="form active" id="signin-form">
+                    <h2 class="form-title">Member Access</h2>
+                    <div class="input-group">
+                        <label for="signin-username">Username</label>
+                        <input type="text" id="signin-username" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="signin-password">Password</label>
+                        <input type="password" id="signin-password" required>
+                    </div>
+                    <button type="submit" class="btn">Enter Club</button>
+                    <div class="forgot-password">
+                        <a href="#" id="forgot-password-link">Forgot Password?</a>
+                    </div>
+                </form>
+
+                <!-- Sign Up Form -->
+                <form class="form" id="signup-form">
+                    <h2 class="form-title">Join The Club</h2>
+                    <div class="input-group">
+                        <label for="signup-username">Username</label>
+                        <input type="text" id="signup-username" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="signup-email">Email</label>
+                        <input type="email" id="signup-email" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="signup-phone">Phone Number</label>
+                        <input type="tel" id="signup-phone" placeholder="+254 XXX XXX XXX" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="signup-password">Password</label>
+                        <input type="password" id="signup-password" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="signup-confirm">Confirm Password</label>
+                        <input type="password" id="signup-confirm" required>
+                    </div>
+                    <button type="submit" class="btn">Become a Member</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div class="modal" id="forgot-password-modal">
+        <div class="modal-content">
+            <button class="close-modal" id="close-forgot-modal">&times;</button>
+            <h2 class="modal-title">Reset Password</h2>
+            
+            <div id="email-display-section">
+                <p>We will send an OTP to your registered email:</p>
+                <div class="masked-email" id="masked-email">e****@*****.com</div>
+                <button type="button" class="btn" id="send-otp-btn">Send OTP</button>
+            </div>
+            
+            <div class="otp-container" id="otp-section">
+                <p>Enter the 6-digit OTP sent to your email:</p>
+                <div class="otp-inputs">
+                    <input type="text" class="otp-input" maxlength="1" data-index="0">
+                    <input type="text" class="otp-input" maxlength="1" data-index="1">
+                    <input type="text" class="otp-input" maxlength="1" data-index="2">
+                    <input type="text" class="otp-input" maxlength="1" data-index="3">
+                    <input type="text" class="otp-input" maxlength="1" data-index="4">
+                    <input type="text" class="otp-input" maxlength="1" data-index="5">
+                </div>
+                <div class="timer" id="otp-timer">OTP expires in: 05:00</div>
+                <div class="resend-otp" id="resend-otp-container" style="display: none;">
+                    <a href="#" id="resend-otp-link">Resend OTP</a>
+                </div>
+                <button type="button" class="btn" id="verify-otp-btn" disabled>Verify OTP</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Store registered users data
+        let registeredUsers = JSON.parse(localStorage.getItem('alCaponeClubUsers')) || [];
+        let currentForgotPasswordEmail = '';
+        let otpGenerated = '';
+        let otpTimer = null;
+        let timeLeft = 300; // 5 minutes in seconds
+
+        // Tab switching functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs and forms
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.form').forEach(f => f.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                tab.classList.add('active');
+                
+                // Show corresponding form
+                const tabId = tab.getAttribute('data-tab');
+                document.getElementById(`${tabId}-form`).classList.add('active');
+            });
+        });
+
+        // Forgot Password Modal
+        document.getElementById('forgot-password-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('signin-username').value || 
+                          (registeredUsers.length > 0 ? registeredUsers[0].email : '');
+            
+            if (!email) {
+                alert('Please enter your username/email first, or sign up for an account.');
+                return;
+            }
+            
+            // Find user by username or email
+            const user = registeredUsers.find(u => u.username === email || u.email === email);
+            
+            if (!user) {
+                alert('No account found with that username/email. Please sign up first.');
+                return;
+            }
+            
+            currentForgotPasswordEmail = user.email;
+            maskEmail(user.email);
+            document.getElementById('forgot-password-modal').classList.add('active');
+        });
+
+        // Close modal
+        document.getElementById('close-forgot-modal').addEventListener('click', function() {
+            document.getElementById('forgot-password-modal').classList.remove('active');
+            resetOTPForm();
+        });
+
+        // Mask email function
+        function maskEmail(email) {
+            const [localPart, domain] = email.split('@');
+            const maskedLocal = localPart.charAt(0) + '*'.repeat(Math.max(0, localPart.length - 2)) + 
+                                (localPart.length > 1 ? localPart.charAt(localPart.length - 1) : '');
+            const [domainName, domainExt] = domain.split('.');
+            const maskedDomain = '*'.repeat(domainName.length) + '.' + domainExt;
+            
+            document.getElementById('masked-email').textContent = `${maskedLocal}@${maskedDomain}`;
+        }
+
+        // Send OTP
+        document.getElementById('send-otp-btn').addEventListener('click', function() {
+            // Generate random 6-digit OTP
+            otpGenerated = Math.floor(100000 + Math.random() * 900000).toString();
+            
+            // In a real app, you would send this OTP to the user's email
+            console.log(`OTP for ${currentForgotPasswordEmail}: ${otpGenerated}`);
+            
+            // Show OTP section
+            document.getElementById('email-display-section').style.display = 'none';
+            document.getElementById('otp-section').style.display = 'block';
+            
+            // Start timer
+            startOTPTimer();
+            
+            // Focus first OTP input
+            document.querySelector('.otp-input').focus();
+        });
+
+        // Start OTP timer
+        function startOTPTimer() {
+            timeLeft = 300; // Reset to 5 minutes
+            updateTimerDisplay();
+            
+            otpTimer = setInterval(function() {
+                timeLeft--;
+                updateTimerDisplay();
+                
+                if (timeLeft <= 0) {
+                    clearInterval(otpTimer);
+                    document.getElementById('verify-otp-btn').disabled = true;
+                    document.getElementById('resend-otp-container').style.display = 'block';
+                }
+            }, 1000);
+        }
+
+        // Update timer display
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('otp-timer').textContent = 
+                `OTP expires in: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // OTP input handling
+        document.querySelectorAll('.otp-input').forEach(input => {
+            input.addEventListener('input', function() {
+                const index = parseInt(this.getAttribute('data-index'));
+                const value = this.value;
+                
+                // Move to next input if value entered
+                if (value && index < 5) {
+                    document.querySelector(`.otp-input[data-index="${index + 1}"]`).focus();
+                }
+                
+                // Check if all OTP digits are entered
+                checkOTPComplete();
+            });
+            
+            input.addEventListener('keydown', function(e) {
+                const index = parseInt(this.getAttribute('data-index'));
+                
+                // Move to previous input on backspace if current is empty
+                if (e.key === 'Backspace' && !this.value && index > 0) {
+                    document.querySelector(`.otp-input[data-index="${index - 1}"]`).focus();
+                }
+            });
+        });
+
+        // Check if OTP is complete
+        function checkOTPComplete() {
+            const otpInputs = document.querySelectorAll('.otp-input');
+            let complete = true;
+            let enteredOTP = '';
+            
+            otpInputs.forEach(input => {
+                enteredOTP += input.value;
+                if (!input.value) complete = false;
+            });
+            
+            document.getElementById('verify-otp-btn').disabled = !complete;
+        }
+
+        // Verify OTP
+        document.getElementById('verify-otp-btn').addEventListener('click', function() {
+            const otpInputs = document.querySelectorAll('.otp-input');
+            let enteredOTP = '';
+            
+            otpInputs.forEach(input => {
+                enteredOTP += input.value;
+            });
+            
+            if (enteredOTP === otpGenerated) {
+                clearInterval(otpTimer);
+                alert('OTP verified successfully! You can now reset your password. Please sign in again.');
+                document.getElementById('forgot-password-modal').classList.remove('active');
+                resetOTPForm();
+                
+                // In a real app, you would redirect to password reset page
+                // For now, just show success and go back to sign in
+                document.querySelector('[data-tab="signin"]').click();
+            } else {
+                alert('Invalid OTP. Please try again.');
+                // Clear OTP inputs
+                document.querySelectorAll('.otp-input').forEach(input => {
+                    input.value = '';
+                });
+                document.querySelector('.otp-input').focus();
+                document.getElementById('verify-otp-btn').disabled = true;
+            }
+        });
+
+        // Resend OTP
+        document.getElementById('resend-otp-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Generate new OTP
+            otpGenerated = Math.floor(100000 + Math.random() * 900000).toString();
+            console.log(`New OTP for ${currentForgotPasswordEmail}: ${otpGenerated}`);
+            
+            // Clear OTP inputs
+            document.querySelectorAll('.otp-input').forEach(input => {
+                input.value = '';
+            });
+            
+            // Reset and start timer
+            clearInterval(otpTimer);
+            startOTPTimer();
+            
+            // Hide resend link
+            document.getElementById('resend-otp-container').style.display = 'none';
+            
+            // Focus first OTP input
+            document.querySelector('.otp-input').focus();
+            document.getElementById('verify-otp-btn').disabled = true;
+        });
+
+        // Reset OTP form
+        function resetOTPForm() {
+            document.getElementById('email-display-section').style.display = 'block';
+            document.getElementById('otp-section').style.display = 'none';
+            document.querySelectorAll('.otp-input').forEach(input => {
+                input.value = '';
+            });
+            clearInterval(otpTimer);
+            document.getElementById('resend-otp-container').style.display = 'none';
+            otpGenerated = '';
+            timeLeft = 300;
+        }
+
+        // Form submission handling
+        document.getElementById('signin-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const username = document.getElementById('signin-username').value;
+            const password = document.getElementById('signin-password').value;
+            
+            // Simple validation
+            if (!username.trim() || !password.trim()) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            // Check if user exists
+            const user = registeredUsers.find(u => 
+                (u.username === username || u.email === username) && u.password === password);
+            
+            if (!user) {
+                alert('Invalid username/email or password. Please try again or sign up.');
+                return;
+            }
+            
+            // Show loading state
+            const submitBtn = this.querySelector('.btn');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Entering Club...';
+            submitBtn.disabled = true;
+            
+            // Simulate authentication process (1 second delay)
+            setTimeout(() => {
+                // Redirect to insideclub.html
+                window.location.href = 'insideclub.html';
+                
+                // Reset button (in case redirect fails)
+                setTimeout(() => {
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                }, 2000);
+            }, 1000);
+        });
+
+        document.getElementById('signup-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const username = document.getElementById('signup-username').value;
+            const email = document.getElementById('signup-email').value;
+            const phone = document.getElementById('signup-phone').value;
+            const password = document.getElementById('signup-password').value;
+            const confirmPassword = document.getElementById('signup-confirm').value;
+            
+            // Validation
+            if (!username.trim() || !email.trim() || !phone.trim() || !password.trim() || !confirmPassword.trim()) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+            
+            if (password.length < 6) {
+                alert('Password must be at least 6 characters long');
+                return;
+            }
+            
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('Please enter a valid email address');
+                return;
+            }
+            
+            // Phone validation (basic)
+            if (phone.length < 10) {
+                alert('Please enter a valid phone number');
+                return;
+            }
+            
+            // Check if username or email already exists
+            if (registeredUsers.some(u => u.username === username)) {
+                alert('Username already taken. Please choose another one.');
+                return;
+            }
+            
+            if (registeredUsers.some(u => u.email === email)) {
+                alert('Email already registered. Please use another email or sign in.');
+                return;
+            }
+            
+            // Save user to localStorage
+            const newUser = {
+                username,
+                email,
+                phone,
+                password,
+                joinedDate: new Date().toISOString()
+            };
+            
+            registeredUsers.push(newUser);
+            localStorage.setItem('alCaponeClubUsers', JSON.stringify(registeredUsers));
+            
+            // Show loading state
+            const submitBtn = this.querySelector('.btn');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Creating Account...';
+            submitBtn.disabled = true;
+            
+            // Simulate registration process (1.5 seconds delay)
+            setTimeout(() => {
+                // Show success message
+                alert(`Welcome to Al Capone Club, ${username}! Your membership has been approved.`);
+                
+                // Redirect to insideclub.html
+                window.location.href = 'insideclub.html';
+                
+                // Reset button (in case redirect fails)
+                setTimeout(() => {
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                }, 2000);
+            }, 1500);
+        });
+
+        // Load your logo from the specified path
+        window.addEventListener('DOMContentLoaded', function() {
+            const mainLogo = document.getElementById('main-logo');
+            const mainLogoPlaceholder = document.getElementById('main-logo-placeholder');
+            
+            // Try to load your logo from the specified path
+            mainLogo.src = 'images/logo.png';
+            mainLogo.onload = function() {
+                mainLogo.style.display = 'block';
+                mainLogoPlaceholder.style.display = 'none';
+            };
+            mainLogo.onerror = function() {
+                console.log('Logo not found at images/logo.png');
+                // You can keep the placeholder or try a different path
+                // mainLogo.src = 'logo.png'; // Try root directory
+            };
+        });
+
+        // Optional: Add form validation styling
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', function() {
+                if (this.value.trim() === '') {
+                    this.style.borderColor = '#ff4444';
+                } else {
+                    this.style.borderColor = 'var(--accent-color)';
+                }
+            });
+            
+            input.addEventListener('blur', function() {
+                if (this.value.trim() === '' && this.hasAttribute('required')) {
+                    this.style.borderColor = '#ff4444';
+                }
+            });
+        });
+
+        // Optional: Demo mode for testing
+        // Add ?demo=true to URL to auto-fill forms for testing
+        window.addEventListener('load', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('demo') === 'true') {
+                // Auto-fill forms with demo data
+                document.getElementById('signin-username').value = 'demo_user';
+                document.getElementById('signin-password').value = 'password123';
+                
+                document.getElementById('signup-username').value = 'new_member';
+                document.getElementById('signup-email').value = 'member@alcaponeclub.com';
+                document.getElementById('signup-phone').value = '+254 712 345 678';
+                document.getElementById('signup-password').value = 'password123';
+                document.getElementById('signup-confirm').value = 'password123';
+                
+                console.log('Demo mode: Forms pre-filled. Click "Enter Club" to go to insideclub.html');
+            }
+        });
+    </script>
+</body>
+</html>

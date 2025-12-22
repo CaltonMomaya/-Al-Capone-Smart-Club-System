@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>WaiterBay - Al Capone Club Orders</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary-color: #1a1a1a;
+            --secondary-color: #f5f5f5;
+            --accent-color: #8B4513;
+            --highlight-color: #D4AF37;
+            --button-color: #2c2c2c;
+            --button-hover: #3a3a3a;
+            --pending-color: #c99c33;
+            --delivered-color: #2e8b57;
+            --table-odd: rgba(139, 69, 19, 0.05);
+            --table-even: rgba(212, 175, 55, 0.05);
+            --occupied-color: #8B4513;
+            --vacant-color: #2e8b57;
+        }
+
+        body {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(139, 69, 19, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 85% 30%, rgba(212, 175, 55, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 50% 80%, rgba(139, 69, 19, 0.05) 0%, transparent 20%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header Section */
+        .header {
+            text-align: center;
+            padding: 1rem;
+            position: relative;
+            border-bottom: 2px solid var(--accent-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .logo-area {
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .club-logo {
+            max-width: 150px;
+            height: auto;
+        }
+
+        .logo-placeholder {
+            width: 150px;
+            height: 75px;
+            background-color: rgba(139, 69, 19, 0.2);
+            border: 2px dashed rgba(212, 175, 55, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: rgba(245, 245, 245, 0.7);
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 8px;
+        }
+
+        .header-title {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--highlight-color);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            word-wrap: break-word;
+        }
+
+        .header-subtitle {
+            font-size: clamp(0.9rem, 2vw, 1.2rem);
+            margin-bottom: 1rem;
+            color: var(--secondary-color);
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.5;
+            padding: 0 0.5rem;
+        }
+
+        /* Main Content Layout */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            flex-grow: 1;
+            margin-bottom: 2rem;
+        }
+
+        /* Tablet and larger screens */
+        @media (min-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* Desktop screens */
+        @media (min-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr 450px;
+            }
+        }
+
+        /* Landscape orientation adjustments */
+        @media (orientation: landscape) and (max-height: 600px) {
+            .header {
+                padding: 0.5rem;
+                margin-bottom: 1rem;
+            }
+            
+            .logo-area {
+                margin-bottom: 0.5rem;
+            }
+            
+            .header-title {
+                font-size: 1.5rem;
+                margin-bottom: 0.25rem;
+            }
+            
+            .header-subtitle {
+                font-size: 0.9rem;
+                margin-bottom: 0.5rem;
+            }
+        }
+
+        /* Orders Section */
+        .orders-section {
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 1.25rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+        }
+
+        .section-title {
+            font-size: clamp(1.3rem, 3vw, 1.8rem);
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            color: var(--highlight-color);
+            position: relative;
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-color), transparent);
+        }
+
+        .orders-count {
+            font-size: 0.9rem;
+            background-color: var(--accent-color);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            color: white;
+            white-space: nowrap;
+        }
+
+        /* Orders Table */
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            font-size: clamp(0.8rem, 2vw, 1rem);
+        }
+
+        .orders-table th {
+            background-color: var(--button-color);
+            color: var(--highlight-color);
+            text-align: left;
+            padding: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--accent-color);
+            white-space: nowrap;
+        }
+
+        .orders-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .orders-table tr:nth-child(odd) {
+            background-color: var(--table-odd);
+        }
+
+        .orders-table tr:nth-child(even) {
+            background-color: var(--table-even);
+        }
+
+        .orders-table tr:hover {
+            background-color: rgba(212, 175, 55, 0.1);
+        }
+
+        .order-id {
+            font-weight: 600;
+            color: var(--highlight-color);
+            word-break: break-all;
+        }
+
+        .table-number {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .order-items {
+            max-width: 300px;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px dotted rgba(255, 255, 255, 0.2);
+            flex-wrap: wrap;
+        }
+
+        .order-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .item-name {
+            flex-grow: 1;
+            min-width: 120px;
+            word-break: break-word;
+        }
+
+        .item-quantity {
+            background-color: var(--button-color);
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            margin-left: 0.5rem;
+            white-space: nowrap;
+        }
+
+        .status-pending {
+            color: var(--pending-color);
+            font-weight: 600;
+        }
+
+        .status-delivered {
+            color: var(--delivered-color);
+            font-weight: 600;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            min-width: 100px;
+            font-size: 0.9rem;
+            touch-action: manipulation;
+        }
+
+        .btn-deliver {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .btn-deliver:hover,
+        .btn-deliver:focus {
+            background-color: #a0522d;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-deliver:active {
+            transform: translateY(0);
+        }
+
+        .btn-deliver:disabled {
+            background-color: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Overview Section */
+        .overview-section {
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 1.25rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            height: fit-content;
+            overflow: hidden;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 480px) {
+            .stats-container {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+        }
+
+        .stat-card {
+            background-color: var(--button-color);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            background-color: var(--button-hover);
+        }
+
+        .stat-value {
+            font-size: clamp(1.8rem, 5vw, 2.5rem);
+            font-weight: 700;
+            color: var(--highlight-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: rgba(245, 245, 245, 0.8);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Table Arrangement with Mockups */
+        .table-arrangement {
+            margin-top: 1.5rem;
+        }
+
+        .table-arrangement h3 {
+            font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+            margin-bottom: 1rem;
+            color: var(--highlight-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .table-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 1rem;
+            justify-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .table-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 0.75rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .table-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                gap: 0.5rem;
+            }
+        }
+
+        /* Portrait mode adjustments */
+        @media (orientation: portrait) and (max-width: 768px) {
+            .table-grid {
+                grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            }
+        }
+
+        /* Landscape mode adjustments for tablets */
+        @media (orientation: landscape) and (max-height: 768px) {
+            .table-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                gap: 0.5rem;
+            }
+            
+            .table-mockup {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .table-top {
+                width: 60px;
+                height: 60px;
+            }
+        }
+
+        /* Table Mockup Styling */
+        .table-mockup {
+            width: 120px;
+            height: 120px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        @media (max-width: 768px) {
+            .table-mockup {
+                width: 100px;
+                height: 100px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .table-mockup {
+                width: 90px;
+                height: 90px;
+            }
+        }
+
+        .table-mockup:hover {
+            transform: scale(1.05);
+        }
+
+        .table-mockup:active {
+            transform: scale(0.95);
+        }
+
+        .table-mockup.occupied .table-top {
+            background-color: var(--occupied-color);
+            box-shadow: 0 4px 8px rgba(139, 69, 19, 0.3);
+        }
+
+        .table-mockup.vacant .table-top {
+            background-color: var(--vacant-color);
+            box-shadow: 0 4px 8px rgba(46, 139, 87, 0.3);
+        }
+
+        /* Table Top */
+        .table-top {
+            width: 70px;
+            height: 70px;
+            background-color: var(--accent-color);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s ease;
+            transform: rotate(45deg);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .table-top {
+                width: 60px;
+                height: 60px;
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .table-top {
+                width: 50px;
+                height: 50px;
+                font-size: 0.9rem;
+            }
+        }
+
+        .table-number-display {
+            transform: rotate(-45deg);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Chairs around the table */
+        .chair {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background-color: var(--button-color);
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .chair {
+                width: 14px;
+                height: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .chair {
+                width: 12px;
+                height: 12px;
+            }
+        }
+
+        .table-mockup.occupied .chair {
+            background-color: #6b3a10;
+        }
+
+        .table-mockup.vacant .chair {
+            background-color: #247a48;
+        }
+
+        /* Position chairs around the table */
+        .chair-1 { top: 0; left: 50%; transform: translateX(-50%); } /* Top */
+        .chair-2 { top: 50%; right: 0; transform: translateY(-50%); } /* Right */
+        .chair-3 { bottom: 0; left: 50%; transform: translateX(-50%); } /* Bottom */
+        .chair-4 { top: 50%; left: 0; transform: translateY(-50%); } /* Left */
+
+        /* Table Info */
+        .table-info {
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+
+        .table-status {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0.15rem 0.5rem;
+            border-radius: 10px;
+            display: inline-block;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .occupied-status {
+            background-color: rgba(139, 69, 19, 0.6);
+            color: #ffcc99;
+        }
+
+        .vacant-status {
+            background-color: rgba(46, 139, 87, 0.6);
+            color: #a3ffd0;
+        }
+
+        /* Table Details */
+        .table-details {
+            font-size: 0.65rem;
+            color: rgba(245, 245, 245, 0.7);
+            margin-top: 0.2rem;
+            white-space: nowrap;
+        }
+
+        /* Table Types */
+        .table-type-indicator {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+            color: white;
+            z-index: 3;
+        }
+
+        .vip-table .table-type-indicator {
+            background-color: var(--highlight-color);
+        }
+
+        .booth-table .table-type-indicator {
+            background-color: #9b59b6;
+        }
+
+        .regular-table .table-type-indicator {
+            background-color: #3498db;
+        }
+
+        /* Table Highlight for Orders */
+        .has-order {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 8px rgba(212, 175, 55, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(212, 175, 55, 0);
+            }
+        }
+
+        .table-mockup.has-order {
+            position: relative;
+        }
+
+        .order-indicator {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            width: 18px;
+            height: 18px;
+            background-color: var(--pending-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+            color: white;
+            font-weight: bold;
+            z-index: 4;
+            border: 2px solid var(--primary-color);
+        }
+
+        @media (max-width: 480px) {
+            .order-indicator {
+                width: 16px;
+                height: 16px;
+                font-size: 0.5rem;
+                top: -4px;
+                right: -4px;
+            }
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 1rem;
+            margin-top: auto;
+            color: var(--secondary-color);
+            opacity: 0.7;
+            font-size: 0.8rem;
+            border-top: 1px solid rgba(139, 69, 19, 0.3);
+        }
+
+        /* Empty State */
+        .empty-orders {
+            text-align: center;
+            padding: 2rem;
+            color: rgba(245, 245, 245, 0.6);
+        }
+
+        .empty-orders i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+            font-size: 0.75rem;
+        }
+
+        @media (max-width: 768px) {
+            .legend {
+                gap: 0.75rem;
+            }
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.75rem;
+            color: rgba(245, 245, 245, 0.8);
+            white-space: nowrap;
+        }
+
+        .legend-color {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+        }
+
+        .legend-occupied {
+            background-color: var(--occupied-color);
+        }
+
+        .legend-vacant {
+            background-color: var(--vacant-color);
+        }
+
+        .legend-vip {
+            background-color: var(--highlight-color);
+        }
+
+        .legend-booth {
+            background-color: #9b59b6;
+        }
+
+        /* Responsive Table Styles */
+        @media (max-width: 768px) {
+            .orders-table {
+                display: block;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                white-space: nowrap;
+            }
+            
+            .orders-table thead {
+                display: none;
+            }
+            
+            .orders-table tr {
+                display: block;
+                margin-bottom: 1rem;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 8px;
+                padding: 1rem;
+                background-color: rgba(0, 0, 0, 0.2);
+            }
+            
+            .orders-table td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.5rem 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            }
+            
+            .orders-table td:before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: var(--highlight-color);
+                margin-right: 1rem;
+                min-width: 80px;
+                text-transform: uppercase;
+                font-size: 0.8rem;
+            }
+            
+            .orders-table td:last-child {
+                border-bottom: none;
+            }
+            
+            .order-items {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .order-item {
+                width: 100%;
+            }
+        }
+
+        /* Mobile-specific adjustments */
+        @media (max-width: 480px) {
+            .container {
+                padding: 0.75rem;
+            }
+            
+            .orders-section,
+            .overview-section {
+                padding: 1rem;
+                border-radius: 10px;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .order-id {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Very small phones */
+        @media (max-width: 360px) {
+            .header-title {
+                font-size: 1.3rem;
+            }
+            
+            .section-title {
+                font-size: 1.1rem;
+            }
+            
+            .table-mockup {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .table-top {
+                width: 45px;
+                height: 45px;
+            }
+            
+            .table-status {
+                font-size: 0.6rem;
+            }
+        }
+
+        /* High-resolution displays */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .table-top,
+            .chair {
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                background-color: white;
+                color: black;
+            }
+            
+            .container {
+                max-width: 100%;
+                padding: 0;
+            }
+            
+            .btn,
+            .table-mockup {
+                display: none !important;
+            }
+            
+            .orders-table {
+                width: 100%;
+                border: 1px solid #ccc;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header">
+            <div class="logo-area">
+                <div class="logo-placeholder" id="logo-placeholder">WAITERBAY</div>
+                <img id="club-logo" class="club-logo" src="" alt="Al Capone Club Logo">
+            </div>
+            <h1 class="header-title">WaiterBay - Order Management</h1>
+            <p class="header-subtitle">Track and manage all club orders in real-time. Mark orders as delivered and monitor table occupancy.</p>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Orders Section -->
+            <div class="orders-section">
+                <div class="section-title">
+                    <span>Current Orders</span>
+                    <div class="orders-count" id="orders-count">5 Orders</div>
+                </div>
+                
+                <div class="orders-container">
+                    <table class="orders-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Table</th>
+                                <th>Items</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-body">
+                            <!-- Orders will be populated here by JavaScript -->
+                        </tbody>
+                    </table>
+                    
+                    <div id="empty-orders-message" class="empty-orders" style="display: none;">
+                        <i class="fas fa-glass-cheers"></i>
+                        <h3>No Pending Orders</h3>
+                        <p>All orders have been delivered. Check back later for new orders.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Overview Section -->
+            <div class="overview-section">
+                <div class="section-title">
+                    <span>Club Overview</span>
+                </div>
+                
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-tables">12</div>
+                        <div class="stat-label">Total Tables</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="occupied-tables">8</div>
+                        <div class="stat-label">Occupied Tables</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="pending-orders">5</div>
+                        <div class="stat-label">Pending Orders</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="delivered-today">23</div>
+                        <div class="stat-label">Delivered Today</div>
+                    </div>
+                </div>
+                
+                <div class="table-arrangement">
+                    <h3><i class="fas fa-chair"></i> Table Arrangement</h3>
+                    <div class="table-grid" id="table-grid">
+                        <!-- Table mockups will be populated here by JavaScript -->
+                    </div>
+                    
+                    <div class="legend">
+                        <div class="legend-item">
+                            <div class="legend-color legend-occupied"></div>
+                            <span>Occupied</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color legend-vacant"></div>
+                            <span>Vacant</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color legend-vip"></div>
+                            <span>VIP Table</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color legend-booth"></div>
+                            <span>Booth</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Al Capone Club &copy; 2025 | WaiterBay Order Management System v2.0</p>
+        </div>
+    </div>
+
+    <script>
+        // Initial orders data
+        const initialOrders = [
+            {
+                id: "CAP-1025",
+                table: 3,
+                items: [
+                    { name: "Old Fashioned", quantity: 2 },
+                    { name: "Whiskey Sour", quantity: 1 },
+                    { name: "Sparkling Water", quantity: 1 }
+                ],
+                status: "pending",
+                time: "8:30 PM"
+            },
+            {
+                id: "CAP-1026",
+                table: 7,
+                items: [
+                    { name: "Mojito", quantity: 3 },
+                    { name: "Margarita", quantity: 2 }
+                ],
+                status: "pending",
+                time: "8:45 PM"
+            },
+            {
+                id: "CAP-1027",
+                table: 12,
+                items: [
+                    { name: "Champagne Bottle", quantity: 1 },
+                    { name: "Cheese Platter", quantity: 1 }
+                ],
+                status: "pending",
+                time: "9:05 PM"
+            },
+            {
+                id: "CAP-1028",
+                table: 5,
+                items: [
+                    { name: "Manhattan", quantity: 2 },
+                    { name: "Gin & Tonic", quantity: 2 },
+                    { name: "Club Soda", quantity: 1 }
+                ],
+                status: "pending",
+                time: "9:15 PM"
+            },
+            {
+                id: "CAP-1029",
+                table: 9,
+                items: [
+                    { name: "Vodka Shot", quantity: 4 },
+                    { name: "Beer", quantity: 2 }
+                ],
+                status: "pending",
+                time: "9:20 PM"
+            }
+        ];
+
+        // Table arrangement data with enhanced details
+        const tables = [
+            { id: 1, status: "occupied", type: "vip", seats: 4, hasOrder: true, orderCount: 2 },
+            { id: 2, status: "vacant", type: "regular", seats: 2, hasOrder: false, orderCount: 0 },
+            { id: 3, status: "occupied", type: "regular", seats: 4, hasOrder: true, orderCount: 1 },
+            { id: 4, status: "occupied", type: "booth", seats: 6, hasOrder: false, orderCount: 0 },
+            { id: 5, status: "occupied", type: "regular", seats: 4, hasOrder: true, orderCount: 1 },
+            { id: 6, status: "vacant", type: "regular", seats: 2, hasOrder: false, orderCount: 0 },
+            { id: 7, status: "occupied", type: "vip", seats: 4, hasOrder: true, orderCount: 1 },
+            { id: 8, status: "occupied", type: "regular", seats: 4, hasOrder: false, orderCount: 0 },
+            { id: 9, status: "occupied", type: "booth", seats: 6, hasOrder: true, orderCount: 1 },
+            { id: 10, status: "vacant", type: "regular", seats: 2, hasOrder: false, orderCount: 0 },
+            { id: 11, status: "occupied", type: "regular", seats: 4, hasOrder: false, orderCount: 0 },
+            { id: 12, status: "occupied", type: "vip", seats: 4, hasOrder: true, orderCount: 1 }
+        ];
+
+        // Global orders array that we'll modify
+        let orders = [...initialOrders];
+        let deliveredCount = 0;
+
+        // DOM elements
+        const ordersBody = document.getElementById('orders-body');
+        const emptyOrdersMessage = document.getElementById('empty-orders-message');
+        const ordersCount = document.getElementById('orders-count');
+        const tableGrid = document.getElementById('table-grid');
+        const pendingOrdersElement = document.getElementById('pending-orders');
+        const occupiedTablesElement = document.getElementById('occupied-tables');
+        const deliveredTodayElement = document.getElementById('delivered-today');
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            renderOrders();
+            renderTableMockups();
+            updateStats();
+            setupResponsiveTable();
+            
+            // Load logo
+            const clubLogo = document.getElementById('club-logo');
+            const logoPlaceholder = document.getElementById('logo-placeholder');
+            
+            clubLogo.src = 'images/logo.png';
+            clubLogo.onload = function() {
+                clubLogo.style.display = 'block';
+                logoPlaceholder.style.display = 'none';
+            };
+            clubLogo.onerror = function() {
+                console.log('Logo not found at images/logo.png');
+            };
+            
+            // Handle orientation changes
+            window.addEventListener('orientationchange', function() {
+                setTimeout(function() {
+                    renderTableMockups();
+                    updateTableLayout();
+                }, 100);
+            });
+            
+            // Handle window resize
+            window.addEventListener('resize', debounce(function() {
+                updateTableLayout();
+            }, 250));
+        });
+
+        // Setup responsive table for mobile
+        function setupResponsiveTable() {
+            const tableCells = document.querySelectorAll('.orders-table td');
+            const tableHeaders = document.querySelectorAll('.orders-table th');
+            
+            if (window.innerWidth <= 768) {
+                tableHeaders.forEach((header, index) => {
+                    tableCells.forEach(cell => {
+                        if (cell.parentElement.children[index] === cell) {
+                            cell.setAttribute('data-label', header.textContent);
+                        }
+                    });
+                });
+            }
+        }
+
+        // Update table layout based on screen size
+        function updateTableLayout() {
+            setupResponsiveTable();
+            
+            // Adjust table grid columns for different orientations
+            const container = document.querySelector('.table-grid');
+            const isMobile = window.innerWidth <= 480;
+            const isLandscape = window.innerWidth > window.innerHeight;
+            
+            if (isMobile) {
+                if (isLandscape) {
+                    // Mobile landscape
+                    container.style.gridTemplateColumns = 'repeat(auto-fill, minmax(90px, 1fr))';
+                } else {
+                    // Mobile portrait
+                    container.style.gridTemplateColumns = 'repeat(auto-fill, minmax(100px, 1fr))';
+                }
+            }
+        }
+
+        // Render orders to the table
+        function renderOrders() {
+            if (orders.length === 0) {
+                ordersBody.innerHTML = '';
+                emptyOrdersMessage.style.display = 'block';
+                ordersCount.textContent = '0 Orders';
+                return;
+            }
+            
+            emptyOrdersMessage.style.display = 'none';
+            ordersCount.textContent = `${orders.length} Order${orders.length !== 1 ? 's' : ''}`;
+            
+            let ordersHTML = '';
+            orders.forEach(order => {
+                const itemsHTML = order.items.map(item => 
+                    `<div class="order-item">
+                        <span class="item-name">${item.name}</span>
+                        <span class="item-quantity">x${item.quantity}</span>
+                    </div>`
+                ).join('');
+                
+                ordersHTML += `
+                <tr>
+                    <td class="order-id">${order.id}</td>
+                    <td><div class="table-number">${order.table}</div></td>
+                    <td class="order-items">${itemsHTML}</td>
+                    <td class="status-${order.status}">${order.status.toUpperCase()}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-deliver" onclick="deliverOrder('${order.id}')" ${order.status === 'delivered' ? 'disabled' : ''}>
+                                <i class="fas fa-check-circle"></i> ${order.status === 'delivered' ? 'Delivered' : 'Mark Delivered'}
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                `;
+            });
+            
+            ordersBody.innerHTML = ordersHTML;
+            setupResponsiveTable();
+        }
+
+        // Render table mockups
+        function renderTableMockups() {
+            let tableHTML = '';
+            tables.forEach(table => {
+                const typeIcon = table.type === 'vip' ? 'fas fa-crown' : 
+                                 table.type === 'booth' ? 'fas fa-couch' : 'fas fa-chair';
+                const typeText = table.type === 'vip' ? 'VIP' : 
+                                 table.type === 'booth' ? 'Booth' : 'Regular';
+                
+                tableHTML += `
+                <div class="table-mockup ${table.status} ${table.type}-table ${table.hasOrder ? 'has-order' : ''}" 
+                     onclick="showTableDetails(${table.id})">
+                    ${table.hasOrder ? `<div class="order-indicator">${table.orderCount}</div>` : ''}
+                    <div class="table-type-indicator">
+                        <i class="${typeIcon}"></i>
+                    </div>
+                    <div class="table-top">
+                        <div class="table-number-display">${table.id}</div>
+                    </div>
+                    <div class="chair chair-1"></div>
+                    <div class="chair chair-2"></div>
+                    <div class="chair chair-3"></div>
+                    <div class="chair chair-4"></div>
+                    ${table.seats > 4 ? `<div class="chair chair-5" style="top: 10px; left: 10px; width: 15px; height: 15px;"></div>` : ''}
+                    ${table.seats > 4 ? `<div class="chair chair-6" style="top: 10px; right: 10px; width: 15px; height: 15px;"></div>` : ''}
+                    <div class="table-info">
+                        <div class="table-status ${table.status}-status">
+                            ${table.status.toUpperCase()}
+                        </div>
+                        <div class="table-details">
+                            ${typeText} • ${table.seats} seats
+                        </div>
+                    </div>
+                </div>
+                `;
+            });
+            
+            tableGrid.innerHTML = tableHTML;
+        }
+
+        // Show table details when clicked
+        function showTableDetails(tableId) {
+            const table = tables.find(t => t.id === tableId);
+            if (!table) return;
+            
+            const tableOrders = orders.filter(order => order.table === tableId && order.status === 'pending');
+            let orderDetails = '';
+            
+            if (tableOrders.length > 0) {
+                orderDetails = `<p><strong>Pending Orders:</strong></p><ul>`;
+                tableOrders.forEach(order => {
+                    orderDetails += `<li>${order.id}: ${order.items.map(item => `${item.name} (x${item.quantity})`).join(', ')}</li>`;
+                });
+                orderDetails += `</ul>`;
+            } else {
+                orderDetails = `<p>No pending orders for this table.</p>`;
+            }
+            
+            const message = `
+                <div style="text-align: left;">
+                    <h3 style="color: var(--highlight-color); margin-bottom: 10px;">Table ${tableId} Details</h3>
+                    <p><strong>Status:</strong> <span class="${table.status}-status">${table.status.toUpperCase()}</span></p>
+                    <p><strong>Type:</strong> ${table.type === 'vip' ? 'VIP' : table.type === 'booth' ? 'Booth' : 'Regular'}</p>
+                    <p><strong>Seats:</strong> ${table.seats}</p>
+                    ${orderDetails}
+                    <p style="margin-top: 15px; font-size: 0.9rem; color: rgba(245,245,245,0.7);">
+                        <i class="fas fa-info-circle"></i> Click on orders above to mark as delivered.
+                    </p>
+                </div>
+            `;
+            
+            // Create a custom alert/modal
+            showTableModal(message);
+        }
+
+        // Custom modal for table details
+        function showTableModal(content) {
+            // Remove existing modal if any
+            const existingModal = document.getElementById('table-details-modal');
+            if (existingModal) {
+                document.body.removeChild(existingModal);
+            }
+            
+            // Create modal
+            const modal = document.createElement('div');
+            modal.id = 'table-details-modal';
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.9);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+                animation: fadeIn 0.3s ease;
+                padding: 1rem;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            `;
+            
+            // Modal content
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = `
+                background-color: var(--button-color);
+                border-radius: 12px;
+                padding: 1.5rem;
+                max-width: 500px;
+                width: 100%;
+                max-height: 90vh;
+                overflow-y: auto;
+                border: 2px solid var(--accent-color);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+                position: relative;
+                word-wrap: break-word;
+            `;
+            
+            // Close button
+            const closeButton = document.createElement('button');
+            closeButton.innerHTML = '<i class="fas fa-times"></i>';
+            closeButton.style.cssText = `
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                background: none;
+                border: none;
+                color: var(--secondary-color);
+                font-size: 1.2rem;
+                cursor: pointer;
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: background-color 0.3s ease;
+                touch-action: manipulation;
+                z-index: 1001;
+            `;
+            closeButton.onmouseover = function() {
+                this.style.backgroundColor = 'rgba(255,255,255,0.1)';
+            };
+            closeButton.onmouseout = function() {
+                this.style.backgroundColor = 'transparent';
+            };
+            closeButton.onclick = function() {
+                document.body.removeChild(modal);
+            };
+            closeButton.ontouchstart = function(e) {
+                e.preventDefault();
+                document.body.removeChild(modal);
+            };
+            
+            modalContent.innerHTML = content;
+            modalContent.appendChild(closeButton);
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+            
+            // Close modal when clicking outside content
+            modal.onclick = function(e) {
+                if (e.target === modal) {
+                    document.body.removeChild(modal);
+                }
+            };
+            
+            // Add animation keyframes if not already added
+            if (!document.querySelector('#modal-animations')) {
+                const style = document.createElement('style');
+                style.id = 'modal-animations';
+                style.textContent = `
+                    @keyframes fadeIn {
+                        from { opacity: 0; }
+                        to { opacity: 1; }
+                    }
+                    @keyframes slideIn {
+                        from { transform: translateY(-20px); opacity: 0; }
+                        to { transform: translateY(0); opacity: 1; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            // Add CSS for modal animation
+            modalContent.style.animation = 'slideIn 0.3s ease';
+        }
+
+        // Update statistics
+        function updateStats() {
+            // Update pending orders count
+            pendingOrdersElement.textContent = orders.filter(order => order.status === 'pending').length;
+            
+            // Update occupied tables count
+            const occupiedTables = tables.filter(table => table.status === 'occupied').length;
+            occupiedTablesElement.textContent = occupiedTables;
+            
+            // Update delivered today count
+            deliveredTodayElement.textContent = deliveredCount;
+        }
+
+        // Deliver an order
+        function deliverOrder(orderId) {
+            const orderIndex = orders.findIndex(order => order.id === orderId);
+            
+            if (orderIndex !== -1 && orders[orderIndex].status === 'pending') {
+                // Mark order as delivered
+                orders[orderIndex].status = 'delivered';
+                
+                // Update the delivered count
+                deliveredCount++;
+                
+                // Check if the table still has pending orders
+                const tableNumber = orders[orderIndex].table;
+                const tableHasPendingOrders = orders.some(order => 
+                    order.table === tableNumber && order.status === 'pending'
+                );
+                
+                // Update table status and order indicator
+                const tableIndex = tables.findIndex(table => table.id === tableNumber);
+                if (tableIndex !== -1) {
+                    // Update table's hasOrder status
+                    tables[tableIndex].hasOrder = tableHasPendingOrders;
+                    
+                    // Update order count
+                    if (tableHasPendingOrders) {
+                        const pendingCount = orders.filter(order => 
+                            order.table === tableNumber && order.status === 'pending'
+                        ).length;
+                        tables[tableIndex].orderCount = pendingCount;
+                    } else {
+                        tables[tableIndex].orderCount = 0;
+                        // If no pending orders, mark table as vacant after a delay
+                        setTimeout(() => {
+                            if (!orders.some(order => 
+                                order.table === tableNumber && order.status === 'pending'
+                            )) {
+                                tables[tableIndex].status = 'vacant';
+                                renderTableMockups();
+                            }
+                        }, 2000); // 2 second delay
+                    }
+                }
+                
+                // Re-render everything
+                renderOrders();
+                renderTableMockups();
+                updateStats();
+                
+                // Show a confirmation message
+                showNotification(`Order ${orderId} marked as delivered`);
+            }
+        }
+
+        // Show notification
+        function showNotification(message) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background-color: var(--accent-color);
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                z-index: 1000;
+                animation: slideIn 0.3s ease;
+                font-weight: 600;
+                max-width: 300px;
+                display: flex;
+                align-items: center;
+                gap: 0.8rem;
+                word-wrap: break-word;
+            `;
+            notification.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+            document.body.appendChild(notification);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+            
+            // Add keyframe animations
+            if (!document.querySelector('#notification-styles')) {
+                const style = document.createElement('style');
+                style.id = 'notification-styles';
+                style.textContent = `
+                    @keyframes slideIn {
+                        from { transform: translateX(100%); opacity: 0; }
+                        to { transform: translateX(0); opacity: 1; }
+                    }
+                    @keyframes slideOut {
+                        from { transform: translateX(0); opacity: 1; }
+                        to { transform: translateX(100%); opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+
+        // Debounce function for resize events
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Function to add a new order (for testing/demo purposes)
+        function addNewOrder() {
+            const availableTables = tables.filter(table => table.status === "vacant");
+            if (availableTables.length === 0) return;
+            
+            const randomTable = availableTables[Math.floor(Math.random() * availableTables.length)];
+            
+            const newOrder = {
+                id: `CAP-${Math.floor(1000 + Math.random() * 9000)}`,
+                table: randomTable.id,
+                items: [
+                    { name: "Negroni", quantity: Math.floor(Math.random() * 3) + 1 },
+                    { name: "Martini", quantity: Math.floor(Math.random() * 2) + 1 }
+                ],
+                status: "pending",
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+            
+            orders.push(newOrder);
+            
+            // Update table status
+            const tableIndex = tables.findIndex(table => table.id === randomTable.id);
+            if (tableIndex !== -1) {
+                tables[tableIndex].status = 'occupied';
+                tables[tableIndex].hasOrder = true;
+                tables[tableIndex].orderCount = 1;
+            }
+            
+            renderOrders();
+            renderTableMockups();
+            updateStats();
+            
+            showNotification(`New order received for Table ${randomTable.id}`);
+        }
+
+        // Simulate new orders for demo (every 30 seconds)
+        setInterval(() => {
+            // Only add new orders if we have less than 8 pending orders
+            const pendingOrders = orders.filter(order => order.status === 'pending').length;
+            if (pendingOrders < 8 && Math.random() > 0.7) {
+                addNewOrder();
+            }
+        }, 30000);
+    </script>
+</body>
+</html>
