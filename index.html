@@ -199,12 +199,21 @@
             transition: all 0.3s ease;
             text-transform: uppercase;
             letter-spacing: 1px;
+            position: relative;
+            min-height: 45px;
         }
 
-        .btn:hover {
+        .btn:hover:not(:disabled) {
             background-color: var(--accent-color);
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
         }
 
         .btn-secondary {
@@ -213,6 +222,34 @@
 
         .btn-secondary:hover {
             background-color: #444444;
+        }
+
+        .btn-text {
+            display: inline-block;
+            transition: opacity 0.3s ease;
+        }
+
+        .btn.loading .btn-text {
+            opacity: 0;
+        }
+
+        .spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .btn.loading .spinner {
+            opacity: 1;
         }
 
         .forgot-password {
@@ -288,65 +325,6 @@
             color: var(--primary-color);
         }
 
-        .masked-email {
-            background-color: rgba(0, 0, 0, 0.05);
-            padding: 1rem;
-            border-radius: 5px;
-            text-align: center;
-            margin: 1rem 0;
-            font-family: monospace;
-            letter-spacing: 1px;
-        }
-
-        .otp-container {
-            display: none;
-            margin-top: 1rem;
-        }
-
-        .otp-inputs {
-            display: flex;
-            justify-content: space-between;
-            gap: 0.5rem;
-            margin: 1rem 0;
-        }
-
-        .otp-input {
-            width: 50px;
-            height: 50px;
-            text-align: center;
-            font-size: 1.2rem;
-            font-weight: bold;
-            border: 2px solid var(--accent-color);
-            border-radius: 5px;
-        }
-
-        .otp-input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
-
-        .timer {
-            text-align: center;
-            margin-top: 0.5rem;
-            font-size: 0.9rem;
-            color: var(--accent-color);
-        }
-
-        .resend-otp {
-            text-align: center;
-            margin-top: 0.5rem;
-        }
-
-        .resend-otp a {
-            color: var(--primary-color);
-            text-decoration: none;
-            font-size: 0.9rem;
-        }
-
-        .resend-otp a:hover {
-            text-decoration: underline;
-        }
-
         /* Background Pattern */
         .pattern {
             position: absolute;
@@ -374,6 +352,11 @@
             }
         }
 
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
         /* Responsive Styles */
         @media (max-width: 768px) {
             .container {
@@ -398,11 +381,6 @@
             .form-container {
                 padding: 1.5rem;
             }
-
-            .otp-input {
-                width: 40px;
-                height: 40px;
-            }
         }
 
         @media (max-width: 480px) {
@@ -425,11 +403,6 @@
 
             .modal-content {
                 padding: 1.5rem;
-            }
-
-            .otp-input {
-                width: 35px;
-                height: 35px;
             }
         }
     </style>
@@ -461,14 +434,17 @@
                 <form class="form active" id="signin-form">
                     <h2 class="form-title">Member Access</h2>
                     <div class="input-group">
-                        <label for="signin-username">Username</label>
-                        <input type="text" id="signin-username" required>
+                        <label for="signin-email">Email</label>
+                        <input type="email" id="signin-email" required>
                     </div>
                     <div class="input-group">
                         <label for="signin-password">Password</label>
                         <input type="password" id="signin-password" required>
                     </div>
-                    <button type="submit" class="btn">Enter Club</button>
+                    <button type="submit" class="btn" id="signin-btn">
+                        <span class="spinner"></span>
+                        <span class="btn-text">Enter Club</span>
+                    </button>
                     <div class="forgot-password">
                         <a href="#" id="forgot-password-link">Forgot Password?</a>
                     </div>
@@ -497,7 +473,10 @@
                         <label for="signup-confirm">Confirm Password</label>
                         <input type="password" id="signup-confirm" required>
                     </div>
-                    <button type="submit" class="btn">Become a Member</button>
+                    <button type="submit" class="btn" id="signup-btn">
+                        <span class="spinner"></span>
+                        <span class="btn-text">Become a Member</span>
+                    </button>
                 </form>
             </div>
         </div>
@@ -510,373 +489,267 @@
             <h2 class="modal-title">Reset Password</h2>
             
             <div id="email-display-section">
-                <p>We will send an OTP to your registered email:</p>
-                <div class="masked-email" id="masked-email">e****@*****.com</div>
-                <button type="button" class="btn" id="send-otp-btn">Send OTP</button>
-            </div>
-            
-            <div class="otp-container" id="otp-section">
-                <p>Enter the 6-digit OTP sent to your email:</p>
-                <div class="otp-inputs">
-                    <input type="text" class="otp-input" maxlength="1" data-index="0">
-                    <input type="text" class="otp-input" maxlength="1" data-index="1">
-                    <input type="text" class="otp-input" maxlength="1" data-index="2">
-                    <input type="text" class="otp-input" maxlength="1" data-index="3">
-                    <input type="text" class="otp-input" maxlength="1" data-index="4">
-                    <input type="text" class="otp-input" maxlength="1" data-index="5">
+                <p>Enter your email address and we'll send you a password reset link:</p>
+                <div class="input-group">
+                    <label for="reset-email">Email</label>
+                    <input type="email" id="reset-email" required>
                 </div>
-                <div class="timer" id="otp-timer">OTP expires in: 05:00</div>
-                <div class="resend-otp" id="resend-otp-container" style="display: none;">
-                    <a href="#" id="resend-otp-link">Resend OTP</a>
-                </div>
-                <button type="button" class="btn" id="verify-otp-btn" disabled>Verify OTP</button>
+                <button type="button" class="btn" id="send-reset-link-btn">
+                    <span class="spinner"></span>
+                    <span class="btn-text">Send Reset Link</span>
+                </button>
             </div>
         </div>
     </div>
 
+    <!-- Load Supabase from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/dist/umd/supabase.min.js"></script>
+    
     <script>
-        // Store registered users data
-        let registeredUsers = JSON.parse(localStorage.getItem('alCaponeClubUsers')) || [];
-        let currentForgotPasswordEmail = '';
-        let otpGenerated = '';
-        let otpTimer = null;
-        let timeLeft = 300; // 5 minutes in seconds
-
-        // Tab switching functionality
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                // Remove active class from all tabs and forms
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.form').forEach(f => f.classList.remove('active'));
-                
-                // Add active class to clicked tab
-                tab.classList.add('active');
-                
-                // Show corresponding form
-                const tabId = tab.getAttribute('data-tab');
-                document.getElementById(`${tabId}-form`).classList.add('active');
-            });
-        });
-
-        // Forgot Password Modal
-        document.getElementById('forgot-password-link').addEventListener('click', function(e) {
-            e.preventDefault();
-            const email = document.getElementById('signin-username').value || 
-                          (registeredUsers.length > 0 ? registeredUsers[0].email : '');
+        // Wait for DOM to load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Supabase with error handling
+            let supabase;
             
-            if (!email) {
-                alert('Please enter your username/email first, or sign up for an account.');
+            try {
+                // ✅ USE YOUR EXACT SUPABASE CREDENTIALS
+                const supabaseUrl = "https://tfuwozhljthmxxcztfws.supabase.co";
+                const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRmdXdvemhsanRobXh4Y3p0ZndzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5OTA0NjEsImV4cCI6MjA4MTU2NjQ2MX0.7stJZibmLvBk0-oEQk6XSfjsfXaqYf9_O3308ZBOTjc";
+                
+                // Check if Supabase is loaded
+                if (typeof window.supabase === 'undefined') {
+                    console.error('Supabase library not loaded');
+                    alert('Error: Authentication service not available. Please refresh the page.');
+                    return;
+                }
+                
+                supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+                console.log("Supabase initialized successfully");
+                
+            } catch (error) {
+                console.error("Failed to initialize Supabase:", error);
+                alert('Authentication service temporarily unavailable. Please try again later.');
                 return;
             }
-            
-            // Find user by username or email
-            const user = registeredUsers.find(u => u.username === email || u.email === email);
-            
-            if (!user) {
-                alert('No account found with that username/email. Please sign up first.');
-                return;
-            }
-            
-            currentForgotPasswordEmail = user.email;
-            maskEmail(user.email);
-            document.getElementById('forgot-password-modal').classList.add('active');
-        });
 
-        // Close modal
-        document.getElementById('close-forgot-modal').addEventListener('click', function() {
-            document.getElementById('forgot-password-modal').classList.remove('active');
-            resetOTPForm();
-        });
-
-        // Mask email function
-        function maskEmail(email) {
-            const [localPart, domain] = email.split('@');
-            const maskedLocal = localPart.charAt(0) + '*'.repeat(Math.max(0, localPart.length - 2)) + 
-                                (localPart.length > 1 ? localPart.charAt(localPart.length - 1) : '');
-            const [domainName, domainExt] = domain.split('.');
-            const maskedDomain = '*'.repeat(domainName.length) + '.' + domainExt;
-            
-            document.getElementById('masked-email').textContent = `${maskedLocal}@${maskedDomain}`;
-        }
-
-        // Send OTP
-        document.getElementById('send-otp-btn').addEventListener('click', function() {
-            // Generate random 6-digit OTP
-            otpGenerated = Math.floor(100000 + Math.random() * 900000).toString();
-            
-            // In a real app, you would send this OTP to the user's email
-            console.log(`OTP for ${currentForgotPasswordEmail}: ${otpGenerated}`);
-            
-            // Show OTP section
-            document.getElementById('email-display-section').style.display = 'none';
-            document.getElementById('otp-section').style.display = 'block';
-            
-            // Start timer
-            startOTPTimer();
-            
-            // Focus first OTP input
-            document.querySelector('.otp-input').focus();
-        });
-
-        // Start OTP timer
-        function startOTPTimer() {
-            timeLeft = 300; // Reset to 5 minutes
-            updateTimerDisplay();
-            
-            otpTimer = setInterval(function() {
-                timeLeft--;
-                updateTimerDisplay();
-                
-                if (timeLeft <= 0) {
-                    clearInterval(otpTimer);
-                    document.getElementById('verify-otp-btn').disabled = true;
-                    document.getElementById('resend-otp-container').style.display = 'block';
-                }
-            }, 1000);
-        }
-
-        // Update timer display
-        function updateTimerDisplay() {
-            const minutes = Math.floor(timeLeft / 60);
-            const seconds = timeLeft % 60;
-            document.getElementById('otp-timer').textContent = 
-                `OTP expires in: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        }
-
-        // OTP input handling
-        document.querySelectorAll('.otp-input').forEach(input => {
-            input.addEventListener('input', function() {
-                const index = parseInt(this.getAttribute('data-index'));
-                const value = this.value;
-                
-                // Move to next input if value entered
-                if (value && index < 5) {
-                    document.querySelector(`.otp-input[data-index="${index + 1}"]`).focus();
-                }
-                
-                // Check if all OTP digits are entered
-                checkOTPComplete();
-            });
-            
-            input.addEventListener('keydown', function(e) {
-                const index = parseInt(this.getAttribute('data-index'));
-                
-                // Move to previous input on backspace if current is empty
-                if (e.key === 'Backspace' && !this.value && index > 0) {
-                    document.querySelector(`.otp-input[data-index="${index - 1}"]`).focus();
-                }
-            });
-        });
-
-        // Check if OTP is complete
-        function checkOTPComplete() {
-            const otpInputs = document.querySelectorAll('.otp-input');
-            let complete = true;
-            let enteredOTP = '';
-            
-            otpInputs.forEach(input => {
-                enteredOTP += input.value;
-                if (!input.value) complete = false;
-            });
-            
-            document.getElementById('verify-otp-btn').disabled = !complete;
-        }
-
-        // Verify OTP
-        document.getElementById('verify-otp-btn').addEventListener('click', function() {
-            const otpInputs = document.querySelectorAll('.otp-input');
-            let enteredOTP = '';
-            
-            otpInputs.forEach(input => {
-                enteredOTP += input.value;
-            });
-            
-            if (enteredOTP === otpGenerated) {
-                clearInterval(otpTimer);
-                alert('OTP verified successfully! You can now reset your password. Please sign in again.');
-                document.getElementById('forgot-password-modal').classList.remove('active');
-                resetOTPForm();
-                
-                // In a real app, you would redirect to password reset page
-                // For now, just show success and go back to sign in
-                document.querySelector('[data-tab="signin"]').click();
-            } else {
-                alert('Invalid OTP. Please try again.');
-                // Clear OTP inputs
-                document.querySelectorAll('.otp-input').forEach(input => {
-                    input.value = '';
+            // Tab switching functionality
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Remove active class from all tabs and forms
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.form').forEach(f => f.classList.remove('active'));
+                    
+                    // Add active class to clicked tab
+                    tab.classList.add('active');
+                    
+                    // Show corresponding form
+                    const tabId = tab.getAttribute('data-tab');
+                    document.getElementById(`${tabId}-form`).classList.add('active');
                 });
-                document.querySelector('.otp-input').focus();
-                document.getElementById('verify-otp-btn').disabled = true;
-            }
-        });
-
-        // Resend OTP
-        document.getElementById('resend-otp-link').addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            // Generate new OTP
-            otpGenerated = Math.floor(100000 + Math.random() * 900000).toString();
-            console.log(`New OTP for ${currentForgotPasswordEmail}: ${otpGenerated}`);
-            
-            // Clear OTP inputs
-            document.querySelectorAll('.otp-input').forEach(input => {
-                input.value = '';
             });
-            
-            // Reset and start timer
-            clearInterval(otpTimer);
-            startOTPTimer();
-            
-            // Hide resend link
-            document.getElementById('resend-otp-container').style.display = 'none';
-            
-            // Focus first OTP input
-            document.querySelector('.otp-input').focus();
-            document.getElementById('verify-otp-btn').disabled = true;
-        });
 
-        // Reset OTP form
-        function resetOTPForm() {
-            document.getElementById('email-display-section').style.display = 'block';
-            document.getElementById('otp-section').style.display = 'none';
-            document.querySelectorAll('.otp-input').forEach(input => {
-                input.value = '';
+            // Forgot Password Modal
+            document.getElementById('forgot-password-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('forgot-password-modal').classList.add('active');
             });
-            clearInterval(otpTimer);
-            document.getElementById('resend-otp-container').style.display = 'none';
-            otpGenerated = '';
-            timeLeft = 300;
-        }
 
-        // Form submission handling
-        document.getElementById('signin-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Get form values
-            const username = document.getElementById('signin-username').value;
-            const password = document.getElementById('signin-password').value;
-            
-            // Simple validation
-            if (!username.trim() || !password.trim()) {
-                alert('Please fill in all fields');
-                return;
-            }
-            
-            // Check if user exists
-            const user = registeredUsers.find(u => 
-                (u.username === username || u.email === username) && u.password === password);
-            
-            if (!user) {
-                alert('Invalid username/email or password. Please try again or sign up.');
-                return;
-            }
-            
-            // Show loading state
-            const submitBtn = this.querySelector('.btn');
-            const originalText = submitBtn.textContent;
-            submitBtn.textContent = 'Entering Club...';
-            submitBtn.disabled = true;
-            
-            // Simulate authentication process (1 second delay)
-            setTimeout(() => {
-                // Redirect to insideclub.html
-                window.location.href = 'insideclub.html';
-                
-                // Reset button (in case redirect fails)
-                setTimeout(() => {
-                    submitBtn.textContent = originalText;
-                    submitBtn.disabled = false;
-                }, 2000);
-            }, 1000);
-        });
+            // Close modal
+            document.getElementById('close-forgot-modal').addEventListener('click', function() {
+                document.getElementById('forgot-password-modal').classList.remove('active');
+            });
 
-        document.getElementById('signup-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Get form values
-            const username = document.getElementById('signup-username').value;
-            const email = document.getElementById('signup-email').value;
-            const phone = document.getElementById('signup-phone').value;
-            const password = document.getElementById('signup-password').value;
-            const confirmPassword = document.getElementById('signup-confirm').value;
-            
-            // Validation
-            if (!username.trim() || !email.trim() || !phone.trim() || !password.trim() || !confirmPassword.trim()) {
-                alert('Please fill in all fields');
-                return;
+            // Button loading state utility
+            function setButtonLoading(button, isLoading) {
+                if (isLoading) {
+                    button.classList.add('loading');
+                    button.disabled = true;
+                } else {
+                    button.classList.remove('loading');
+                    button.disabled = false;
+                }
             }
-            
-            if (password !== confirmPassword) {
-                alert('Passwords do not match!');
-                return;
-            }
-            
-            if (password.length < 6) {
-                alert('Password must be at least 6 characters long');
-                return;
-            }
-            
-            // Email validation
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                alert('Please enter a valid email address');
-                return;
-            }
-            
-            // Phone validation (basic)
-            if (phone.length < 10) {
-                alert('Please enter a valid phone number');
-                return;
-            }
-            
-            // Check if username or email already exists
-            if (registeredUsers.some(u => u.username === username)) {
-                alert('Username already taken. Please choose another one.');
-                return;
-            }
-            
-            if (registeredUsers.some(u => u.email === email)) {
-                alert('Email already registered. Please use another email or sign in.');
-                return;
-            }
-            
-            // Save user to localStorage
-            const newUser = {
-                username,
-                email,
-                phone,
-                password,
-                joinedDate: new Date().toISOString()
-            };
-            
-            registeredUsers.push(newUser);
-            localStorage.setItem('alCaponeClubUsers', JSON.stringify(registeredUsers));
-            
-            // Show loading state
-            const submitBtn = this.querySelector('.btn');
-            const originalText = submitBtn.textContent;
-            submitBtn.textContent = 'Creating Account...';
-            submitBtn.disabled = true;
-            
-            // Simulate registration process (1.5 seconds delay)
-            setTimeout(() => {
-                // Show success message
-                alert(`Welcome to Al Capone Club, ${username}! Your membership has been approved.`);
-                
-                // Redirect to insideclub.html
-                window.location.href = 'insideclub.html';
-                
-                // Reset button (in case redirect fails)
-                setTimeout(() => {
-                    submitBtn.textContent = originalText;
-                    submitBtn.disabled = false;
-                }, 2000);
-            }, 1500);
-        });
 
-        // Load your logo from the specified path
-        window.addEventListener('DOMContentLoaded', function() {
+            // Send password reset email
+            document.getElementById('send-reset-link-btn').addEventListener('click', async function() {
+                const email = document.getElementById('reset-email').value;
+                
+                if (!email) {
+                    alert('Please enter your email address');
+                    return;
+                }
+                
+                if (!supabase) {
+                    alert('Authentication service not available');
+                    return;
+                }
+                
+                const btn = this;
+                setButtonLoading(btn, true);
+                
+                try {
+                    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+                        redirectTo: window.location.origin + '/reset-password.html'
+                    });
+                    
+                    if (error) throw error;
+                    
+                    alert('Check your email for password reset instructions.');
+                    document.getElementById('forgot-password-modal').classList.remove('active');
+                    document.getElementById('reset-email').value = '';
+                    
+                } catch (error) {
+                    alert('Failed to send reset email: ' + error.message);
+                } finally {
+                    setButtonLoading(btn, false);
+                }
+            });
+
+            // ✅ Signup Form with Supabase Auth
+            document.getElementById('signup-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                if (!supabase) {
+                    alert('Authentication service not available');
+                    return;
+                }
+
+                const username = document.getElementById('signup-username').value;
+                const email = document.getElementById('signup-email').value;
+                const phone = document.getElementById('signup-phone').value;
+                const password = document.getElementById('signup-password').value;
+                const confirmPassword = document.getElementById('signup-confirm').value;
+
+                // Validation
+                if (!username.trim() || !email.trim() || !phone.trim() || !password.trim() || !confirmPassword.trim()) {
+                    alert('Please fill in all fields');
+                    return;
+                }
+
+                if (password !== confirmPassword) {
+                    alert('Passwords do not match!');
+                    return;
+                }
+
+                if (password.length < 6) {
+                    alert('Password must be at least 6 characters long');
+                    return;
+                }
+
+                const submitBtn = document.getElementById('signup-btn');
+                setButtonLoading(submitBtn, true);
+
+                try {
+                    console.log("Starting Supabase signup for:", email);
+                    
+                    // ✅ Supabase signup - creates user in Auth system
+                    const { data, error } = await supabase.auth.signUp({
+                        email: email,
+                        password: password,
+                        options: {
+                            data: { 
+                                username: username, 
+                                phone: phone 
+                            }
+                        }
+                    });
+
+                    if (error) {
+                        console.error("Signup error:", error);
+                        alert('Signup failed: ' + error.message);
+                        setButtonLoading(submitBtn, false);
+                        return;
+                    }
+
+                    console.log("Supabase signup successful:", data);
+                    
+                    // ✅ The trigger in Supabase will automatically create the user in the users table
+                    alert(`Welcome ${username}! Your account has been created successfully.`);
+                    
+                    // Store user info in localStorage for immediate access
+                    localStorage.setItem('alCaponeClubUser', JSON.stringify({
+                        username: username,
+                        email: email,
+                        phone: phone
+                    }));
+                    
+                    // Redirect to inside club
+                    setTimeout(() => {
+                        window.location.href = 'insideclub.html';
+                    }, 1000);
+
+                } catch (error) {
+                    console.error("Unexpected error:", error);
+                    alert('Error: ' + error.message);
+                    setButtonLoading(submitBtn, false);
+                }
+            });
+
+            // ✅ Signin Form with Supabase Auth
+            document.getElementById('signin-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                if (!supabase) {
+                    alert('Authentication service not available');
+                    return;
+                }
+
+                const email = document.getElementById('signin-email').value;
+                const password = document.getElementById('signin-password').value;
+
+                if (!email.trim() || !password.trim()) {
+                    alert('Please fill in all fields');
+                    return;
+                }
+
+                const submitBtn = document.getElementById('signin-btn');
+                setButtonLoading(submitBtn, true);
+
+                try {
+                    console.log("Starting Supabase login for:", email);
+                    
+                    // ✅ Supabase sign in
+                    const { data, error } = await supabase.auth.signInWithPassword({
+                        email: email,
+                        password: password
+                    });
+
+                    if (error) {
+                        console.error("Login error:", error);
+                        alert('Login failed: ' + error.message);
+                        setButtonLoading(submitBtn, false);
+                        return;
+                    }
+
+                    console.log("Supabase login successful:", data);
+                    
+                    // Get user info from metadata
+                    const username = data.user.user_metadata?.username || email.split('@')[0];
+                    const phone = data.user.user_metadata?.phone || '';
+                    
+                    // Store user info in localStorage
+                    localStorage.setItem('alCaponeClubUser', JSON.stringify({
+                        username: username,
+                        email: email,
+                        phone: phone,
+                        userId: data.user.id
+                    }));
+                    
+                    alert('Login successful! Welcome back.');
+                    
+                    // Redirect to inside club
+                    setTimeout(() => {
+                        window.location.href = 'insideclub.html';
+                    }, 1000);
+
+                } catch (error) {
+                    console.error("Unexpected error:", error);
+                    alert('Error: ' + error.message);
+                    setButtonLoading(submitBtn, false);
+                }
+            });
+
+            // Load your logo from the specified path
             const mainLogo = document.getElementById('main-logo');
             const mainLogoPlaceholder = document.getElementById('main-logo-placeholder');
             
@@ -888,44 +761,22 @@
             };
             mainLogo.onerror = function() {
                 console.log('Logo not found at images/logo.png');
-                // You can keep the placeholder or try a different path
-                // mainLogo.src = 'logo.png'; // Try root directory
             };
-        });
 
-        // Optional: Add form validation styling
-        document.querySelectorAll('input').forEach(input => {
-            input.addEventListener('input', function() {
-                if (this.value.trim() === '') {
-                    this.style.borderColor = '#ff4444';
-                } else {
-                    this.style.borderColor = 'var(--accent-color)';
-                }
-            });
-            
-            input.addEventListener('blur', function() {
-                if (this.value.trim() === '' && this.hasAttribute('required')) {
-                    this.style.borderColor = '#ff4444';
-                }
-            });
-        });
-
-        // Optional: Demo mode for testing
-        // Add ?demo=true to URL to auto-fill forms for testing
-        window.addEventListener('load', function() {
+            // Demo mode for testing
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('demo') === 'true') {
                 // Auto-fill forms with demo data
-                document.getElementById('signin-username').value = 'demo_user';
+                document.getElementById('signin-email').value = 'test@alcaponeclub.com';
                 document.getElementById('signin-password').value = 'password123';
                 
-                document.getElementById('signup-username').value = 'new_member';
-                document.getElementById('signup-email').value = 'member@alcaponeclub.com';
-                document.getElementById('signup-phone').value = '+254 712 345 678';
+                document.getElementById('signup-username').value = 'testuser';
+                document.getElementById('signup-email').value = 'test@example.com';
+                document.getElementById('signup-phone').value = '+254712345678';
                 document.getElementById('signup-password').value = 'password123';
                 document.getElementById('signup-confirm').value = 'password123';
                 
-                console.log('Demo mode: Forms pre-filled. Click "Enter Club" to go to insideclub.html');
+                console.log('Demo mode: Forms pre-filled');
             }
         });
     </script>
