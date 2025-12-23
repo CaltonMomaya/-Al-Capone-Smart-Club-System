@@ -340,6 +340,12 @@
             font-weight: 600;
         }
 
+        .category-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
         .subcategory-list {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr));
@@ -362,6 +368,14 @@
             font-weight: 500;
             color: #fff;
             font-size: clamp(0.85rem, 1.5vw, 0.95rem);
+        }
+
+        .add-category-form {
+            background: rgba(0, 0, 0, 0.3);
+            padding: clamp(1rem, 2vw, 1.5rem);
+            border-radius: clamp(4px, 0.5vw, 5px);
+            margin-top: 1rem;
+            border: 1px dashed rgba(212, 175, 55, 0.3);
         }
 
         /* Drink List */
@@ -514,6 +528,16 @@
 
         .btn-secondary:hover {
             background: #666;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #1b5e20;
+            transform: translateY(-2px);
         }
 
         .btn-danger {
@@ -761,8 +785,13 @@
                 align-items: stretch;
             }
             
-            .category-header button {
+            .category-actions {
                 width: 100%;
+                justify-content: stretch;
+            }
+            
+            .category-actions .btn {
+                flex: 1;
             }
         }
 
@@ -989,9 +1018,32 @@
                         <div class="category-section">
                             <div class="category-header">
                                 <h3 class="category-name">All Categories</h3>
+                                <div class="category-actions">
+                                    <button class="btn btn-success" id="show-add-form-btn">
+                                        <i class="fas fa-plus"></i> Add Category to List
+                                    </button>
+                                </div>
                             </div>
                             <div id="categories-list">
                                 <!-- Categories will be loaded here -->
+                            </div>
+                            
+                            <!-- Add Category Form (Initially Hidden) -->
+                            <div class="add-category-form" id="add-category-form" style="display: none;">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">New Category Name</label>
+                                        <input type="text" id="quick-category-name" class="form-input" placeholder="Enter category name">
+                                    </div>
+                                    <div class="form-group" style="display: flex; align-items: flex-end; gap: 10px;">
+                                        <button class="btn btn-primary" id="save-quick-category-btn">
+                                            <i class="fas fa-check"></i> Save
+                                        </button>
+                                        <button class="btn btn-secondary" id="cancel-quick-category-btn">
+                                            <i class="fas fa-times"></i> Cancel
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1129,6 +1181,18 @@
             document.getElementById('add-category-btn').addEventListener('click', addCategory);
             document.getElementById('add-subcategory-btn').addEventListener('click', addSubcategory);
 
+            // Quick add category form
+            document.getElementById('show-add-form-btn').addEventListener('click', function() {
+                document.getElementById('add-category-form').style.display = 'block';
+                document.getElementById('quick-category-name').focus();
+            });
+
+            document.getElementById('save-quick-category-btn').addEventListener('click', addQuickCategory);
+            document.getElementById('cancel-quick-category-btn').addEventListener('click', function() {
+                document.getElementById('add-category-form').style.display = 'none';
+                document.getElementById('quick-category-name').value = '';
+            });
+
             // Search and filter
             document.getElementById('search-drinks').addEventListener('input', filterDrinks);
             document.getElementById('filter-category').addEventListener('change', filterDrinks);
@@ -1154,6 +1218,9 @@
             // Load data if needed
             if (sectionId === 'manage-categories') {
                 displayCategories();
+                // Hide quick add form when switching to this section
+                document.getElementById('add-category-form').style.display = 'none';
+                document.getElementById('quick-category-name').value = '';
             }
         }
 
@@ -1600,10 +1667,54 @@
                 // Update UI
                 document.getElementById('new-category-name').value = '';
                 updateCategorySelects();
+                displayCategories();
                 showNotification('Category added successfully!', 'success');
                 
             } catch (error) {
                 console.error('Error adding category:', error);
+                showNotification('Failed to add category to database.', 'error');
+            }
+        }
+
+        async function addQuickCategory() {
+            const categoryName = document.getElementById('quick-category-name').value.trim().toLowerCase();
+            
+            if (!categoryName) {
+                showNotification('Please enter a category name', 'warning');
+                return;
+            }
+            
+            if (currentCategories[categoryName]) {
+                showNotification('Category already exists', 'warning');
+                return;
+            }
+            
+            // Add to local structure with N/A subcategory
+            currentCategories[categoryName] = ['N/A'];
+            
+            // Save to database
+            try {
+                const { error } = await supabase
+                    .from('drink_categories')
+                    .insert([
+                        { 
+                            main_category: categoryName,
+                            subcategory: 'N/A',
+                            is_active: true 
+                        }
+                    ]);
+                
+                if (error) throw error;
+                
+                // Update UI
+                document.getElementById('quick-category-name').value = '';
+                document.getElementById('add-category-form').style.display = 'none';
+                updateCategorySelects();
+                displayCategories();
+                showNotification('Category added successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Error adding quick category:', error);
                 showNotification('Failed to add category to database.', 'error');
             }
         }
@@ -1647,6 +1758,7 @@
                 // Update UI
                 document.getElementById('new-subcategory-name').value = '';
                 updateCategorySelects();
+                displayCategories();
                 showNotification('Subcategory added successfully!', 'success');
                 
             } catch (error) {
@@ -1664,12 +1776,17 @@
                 const displaySubcategories = currentCategories[category].filter(sub => sub !== 'N/A');
                 
                 html += `
-                    <div class="category-section" style="margin-bottom: 1rem;">
+                    <div class="category-section" style="margin-bottom: 1rem; background: rgba(0,0,0,0.4);">
                         <div class="category-header">
                             <h3 class="category-name" style="color: var(--highlight-color);">${category.charAt(0).toUpperCase() + category.slice(1)}</h3>
-                            <button class="btn btn-danger btn-small" onclick="deleteCategory('${category}')">
-                                <i class="fas fa-trash"></i> Delete Category
-                            </button>
+                            <div class="category-actions">
+                                <button class="btn btn-success btn-small" onclick="addSubcategoryToCategory('${category}')">
+                                    <i class="fas fa-plus"></i> Add Subcategory
+                                </button>
+                                <button class="btn btn-danger btn-small" onclick="deleteCategory('${category}')">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
                         </div>
                         ${displaySubcategories.length > 0 ? `
                         <div class="subcategory-list">
@@ -1683,9 +1800,12 @@
                             `).join('')}
                         </div>
                         ` : `
-                        <div style="text-align: center; padding: 1rem; color: #888;">
+                        <div style="text-align: center; padding: 1rem; color: #888; background: rgba(0,0,0,0.2); border-radius: 5px; margin-top: 0.5rem;">
                             <i class="fas fa-info-circle"></i>
                             <p>No subcategories (uses N/A)</p>
+                            <button class="btn btn-primary btn-small" onclick="addSubcategoryToCategory('${category}')" style="margin-top: 0.5rem;">
+                                <i class="fas fa-plus"></i> Add First Subcategory
+                            </button>
                         </div>
                         `}
                     </div>
@@ -1693,6 +1813,50 @@
             });
             
             container.innerHTML = html;
+        }
+
+        function addSubcategoryToCategory(categoryName) {
+            const subcategoryName = prompt(`Enter subcategory name for ${categoryName}:`);
+            
+            if (!subcategoryName || !subcategoryName.trim()) {
+                return;
+            }
+            
+            const trimmedName = subcategoryName.trim().toLowerCase();
+            
+            if (currentCategories[categoryName].includes(trimmedName)) {
+                showNotification('Subcategory already exists', 'warning');
+                return;
+            }
+            
+            // Add to local structure
+            currentCategories[categoryName].push(trimmedName);
+            
+            // Save to database
+            (async () => {
+                try {
+                    const { error } = await supabase
+                        .from('drink_categories')
+                        .insert([
+                            { 
+                                main_category: categoryName,
+                                subcategory: trimmedName,
+                                is_active: true 
+                            }
+                        ]);
+                    
+                    if (error) throw error;
+                    
+                    // Update UI
+                    updateCategorySelects();
+                    displayCategories();
+                    showNotification('Subcategory added successfully!', 'success');
+                    
+                } catch (error) {
+                    console.error('Error adding subcategory:', error);
+                    showNotification('Failed to add subcategory to database.', 'error');
+                }
+            })();
         }
 
         async function deleteCategory(categoryName) {
