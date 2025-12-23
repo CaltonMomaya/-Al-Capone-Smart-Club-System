@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>Al Capone Club - Bar Menu</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -11,6 +11,7 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         :root {
@@ -23,6 +24,7 @@
             --danger-color: #c62828;
             --success-color: #2e7d32;
             --cart-color: #1e3a5f;
+            --menu-bg: rgba(30, 30, 30, 0.98);
         }
 
         body {
@@ -34,6 +36,15 @@
                 radial-gradient(circle at 15% 50%, rgba(139, 69, 19, 0.1) 0%, transparent 20%),
                 radial-gradient(circle at 85% 30%, rgba(212, 175, 55, 0.1) 0%, transparent 20%),
                 radial-gradient(circle at 50% 80%, rgba(139, 69, 19, 0.05) 0%, transparent 20%);
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        html {
+            overflow-y: scroll;
         }
 
         /* Container */
@@ -42,6 +53,157 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
+            padding-top: 80px;
+            min-height: 100vh;
+        }
+
+        /* Hamburger Menu */
+        .hamburger-menu {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1002;
+            background: var(--highlight-color);
+            border: none;
+            border-radius: 8px;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-menu:hover {
+            background: #c9a52c;
+            transform: scale(1.05);
+        }
+
+        .hamburger-line {
+            width: 24px;
+            height: 3px;
+            background: #000;
+            margin: 3px 0;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 6px);
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -6px);
+        }
+
+        /* Side Menu */
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 280px;
+            height: 100vh;
+            background: var(--menu-bg);
+            z-index: 1001;
+            transition: left 0.3s ease;
+            padding: 80px 20px 20px;
+            overflow-y: auto;
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .side-menu.active {
+            left: 0;
+        }
+
+        .menu-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--highlight-color);
+        }
+
+        .menu-title {
+            font-size: 1.5rem;
+            color: var(--highlight-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .username-display {
+            color: #ccc;
+            font-size: 1rem;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            border-radius: 8px;
+            color: var(--secondary-color);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-align: left;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .menu-item i {
+            width: 20px;
+            color: var(--highlight-color);
+        }
+
+        .menu-item.logout {
+            background: rgba(198, 40, 40, 0.2);
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .menu-item.logout:hover {
+            background: rgba(198, 40, 40, 0.3);
+        }
+
+        .menu-item.active {
+            background: rgba(212, 175, 55, 0.2);
+            border-left: 4px solid var(--highlight-color);
+        }
+
+        /* Welcome Banner */
+        .welcome-banner {
+            text-align: center;
+            padding: 10px;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(90deg, rgba(139, 69, 19, 0.2), rgba(212, 175, 55, 0.2));
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--highlight-color);
+            animation: slideInRight 1s ease;
+            display: inline-block;
+        }
+
+        .username-highlight {
+            color: #fff;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
         }
 
         /* Header Section */
@@ -51,33 +213,6 @@
             position: relative;
             border-bottom: 1px solid rgba(212, 175, 55, 0.3);
             margin-bottom: 1rem;
-        }
-
-        .header-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .logout-button {
-            background-color: var(--danger-color);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 10px 20px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 600;
-        }
-
-        .logout-button:hover {
-            background-color: #b71c1c;
-            transform: translateY(-2px);
         }
 
         .logo-area {
@@ -98,7 +233,7 @@
         }
 
         .header-title {
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
             text-transform: uppercase;
@@ -108,7 +243,7 @@
         }
 
         .header-subtitle {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             margin-bottom: 1rem;
             color: var(--secondary-color);
             max-width: 600px;
@@ -122,22 +257,43 @@
             background-color: rgba(212, 175, 55, 0.1);
             border: 2px solid var(--highlight-color);
             border-radius: 8px;
-            padding: 10px 20px;
+            padding: 12px 20px;
             margin: 0 auto 1.5rem;
-            max-width: 300px;
+            max-width: 320px;
             text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
         }
 
         .table-label {
             font-size: 0.9rem;
             color: #ccc;
-            margin-bottom: 5px;
         }
 
         .table-number {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: bold;
             color: var(--highlight-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .edit-table-btn {
+            background: rgba(212, 175, 55, 0.2);
+            border: 1px solid var(--highlight-color);
+            color: var(--highlight-color);
+            border-radius: 5px;
+            padding: 5px 10px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .edit-table-btn:hover {
+            background: rgba(212, 175, 55, 0.3);
         }
 
         /* Shopping Cart Section */
@@ -153,9 +309,9 @@
             color: white;
             border: none;
             border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            font-size: 1.5rem;
+            width: 55px;
+            height: 55px;
+            font-size: 1.3rem;
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
@@ -177,9 +333,9 @@
             background-color: var(--danger-color);
             color: white;
             border-radius: 50%;
-            width: 25px;
-            height: 25px;
-            font-size: 0.9rem;
+            width: 22px;
+            height: 22px;
+            font-size: 0.8rem;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -192,7 +348,7 @@
             right: -400px;
             width: 380px;
             height: 100vh;
-            background-color: rgba(30, 30, 30, 0.98);
+            background-color: var(--menu-bg);
             z-index: 1001;
             transition: right 0.3s ease;
             padding: 20px;
@@ -262,8 +418,8 @@
             background-color: var(--button-color);
             color: white;
             border: none;
-            width: 30px;
-            height: 30px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             cursor: pointer;
             display: flex;
@@ -273,7 +429,7 @@
 
         .quantity {
             font-weight: bold;
-            min-width: 30px;
+            min-width: 25px;
             text-align: center;
         }
 
@@ -282,8 +438,8 @@
             border: none;
             color: var(--danger-color);
             cursor: pointer;
-            font-size: 1.2rem;
-            margin-left: 10px;
+            font-size: 1.1rem;
+            margin-left: 8px;
         }
 
         .cart-total {
@@ -301,12 +457,16 @@
             color: white;
             border: none;
             border-radius: 5px;
-            padding: 15px;
-            font-size: 1.2rem;
+            padding: 14px;
+            font-size: 1.1rem;
             cursor: pointer;
             transition: all 0.3s ease;
             font-weight: 600;
             width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
         }
 
         .checkout-button:hover {
@@ -327,9 +487,10 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-height: 50vh;
         }
 
-        .menu-title {
+        .section-title {
             font-size: 2rem;
             font-weight: 600;
             margin-bottom: 2rem;
@@ -339,7 +500,7 @@
             padding-bottom: 10px;
         }
 
-        .menu-title:after {
+        .section-title:after {
             content: '';
             position: absolute;
             bottom: 0;
@@ -352,8 +513,8 @@
 
         .buttons-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.2rem;
             width: 100%;
             max-width: 900px;
         }
@@ -363,8 +524,8 @@
             color: var(--secondary-color);
             border: none;
             border-radius: 8px;
-            padding: 1.5rem 1rem;
-            font-size: 1.2rem;
+            padding: 1.2rem 0.8rem;
+            font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -377,7 +538,7 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             position: relative;
             overflow: hidden;
-            min-height: 140px;
+            min-height: 120px;
         }
 
         .menu-button:before {
@@ -403,13 +564,13 @@
         }
 
         .menu-button i {
-            font-size: 2rem;
+            font-size: 1.8rem;
             margin-bottom: 0.8rem;
             color: var(--highlight-color);
         }
 
         .button-text {
-            font-size: 1rem;
+            font-size: 0.95rem;
             text-align: center;
             line-height: 1.3;
         }
@@ -438,15 +599,16 @@
 
         .drink-list {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.2rem;
             margin-top: 2rem;
+            width: 100%;
         }
 
         .drink-card {
             background-color: rgba(42, 42, 42, 0.9);
             border-radius: 10px;
-            padding: 1.5rem;
+            padding: 1.2rem;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             transition: transform 0.3s ease;
             border: 1px solid rgba(212, 175, 55, 0.2);
@@ -458,7 +620,7 @@
         }
 
         .drink-name {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             color: var(--highlight-color);
             margin-bottom: 0.5rem;
         }
@@ -466,11 +628,12 @@
         .drink-description {
             color: #ccc;
             margin-bottom: 1rem;
-            line-height: 1.5;
+            line-height: 1.4;
+            font-size: 0.95rem;
         }
 
         .drink-price {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-weight: bold;
             color: #fff;
             margin-bottom: 1rem;
@@ -481,7 +644,7 @@
             color: #000;
             border: none;
             border-radius: 5px;
-            padding: 10px 20px;
+            padding: 10px 15px;
             font-size: 1rem;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -496,6 +659,127 @@
         .add-to-cart-button:hover {
             background-color: #c9a52c;
             transform: translateY(-2px);
+        }
+
+        /* Orders Section */
+        .orders-section {
+            padding: 2rem 0;
+            min-height: 50vh;
+        }
+
+        .orders-tabs {
+            display: flex;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--highlight-color);
+            overflow-x: auto;
+            position: sticky;
+            top: 0;
+            background: var(--primary-color);
+            z-index: 10;
+            padding: 10px 0;
+        }
+
+        .orders-tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            color: #ccc;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            position: relative;
+        }
+
+        .orders-tab.active {
+            color: var(--highlight-color);
+        }
+
+        .orders-tab.active:after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--highlight-color);
+        }
+
+        .orders-tab:hover:not(.active) {
+            color: #fff;
+        }
+
+        .orders-list {
+            min-height: 300px;
+            overflow-y: visible;
+        }
+
+        .order-card {
+            background: rgba(42, 42, 42, 0.9);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--highlight-color);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .order-id {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--highlight-color);
+        }
+
+        .order-status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+
+        .status-delivered {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+        }
+
+        .order-details {
+            margin-bottom: 1rem;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .order-total {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            color: var(--highlight-color);
+            padding-top: 1rem;
+            border-top: 2px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .no-orders {
+            text-align: center;
+            padding: 3rem;
+            color: #888;
+            font-style: italic;
         }
 
         /* Checkout Page Styles */
@@ -623,10 +907,11 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
+            background-color: rgba(0, 0, 0, 0.95);
             z-index: 2000;
             justify-content: center;
             align-items: center;
+            padding: 20px;
         }
 
         .success-modal.active {
@@ -635,13 +920,15 @@
 
         .success-content {
             background-color: var(--primary-color);
-            padding: 2.5rem;
+            padding: 2rem;
             border-radius: 10px;
             max-width: 500px;
-            width: 90%;
+            width: 100%;
             text-align: center;
             border: 3px solid var(--highlight-color);
             box-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .success-icon {
@@ -651,7 +938,7 @@
         }
 
         .success-title {
-            font-size: 2rem;
+            font-size: 1.8rem;
             color: var(--highlight-color);
             margin-bottom: 1rem;
         }
@@ -667,6 +954,8 @@
             border-radius: 8px;
             margin-bottom: 1.5rem;
             text-align: left;
+            overflow-y: auto;
+            max-height: 200px;
         }
 
         .success-details p {
@@ -701,10 +990,134 @@
             border-top: 1px solid rgba(212, 175, 55, 0.2);
         }
 
+        /* Edit Table Modal */
+        .edit-table-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .edit-table-modal.active {
+            display: flex;
+        }
+
+        .edit-table-content {
+            background-color: var(--primary-color);
+            padding: 2rem;
+            border-radius: 10px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            border: 3px solid var(--highlight-color);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
+        }
+
+        .edit-table-title {
+            font-size: 1.8rem;
+            color: var(--highlight-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .edit-table-input {
+            width: 100%;
+            padding: 12px;
+            font-size: 1.5rem;
+            text-align: center;
+            background: #333;
+            border: 2px solid var(--highlight-color);
+            border-radius: 5px;
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .edit-table-input:focus {
+            outline: none;
+        }
+
+        .edit-table-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .edit-table-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .edit-table-btn.save {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .edit-table-btn.cancel {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .edit-table-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--highlight-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #c9a52c;
+        }
+
+        /* Animations */
+        @keyframes slideInRight {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
         /* Responsive Styles */
         @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+                padding-top: 70px;
+            }
+            
             .header-title {
-                font-size: 2rem;
+                font-size: 1.8rem;
             }
             
             .header-subtitle {
@@ -713,16 +1126,16 @@
             
             .buttons-container {
                 grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
             }
             
             .menu-button {
-                padding: 1.2rem 0.8rem;
-                font-size: 1rem;
-                min-height: 120px;
+                padding: 1rem 0.5rem;
+                min-height: 100px;
             }
             
             .menu-button i {
-                font-size: 1.8rem;
+                font-size: 1.5rem;
             }
             
             .drink-list {
@@ -739,8 +1152,20 @@
             }
             
             .cart-section {
-                top: 10px;
-                right: 10px;
+                top: 15px;
+                right: 15px;
+            }
+            
+            .hamburger-menu {
+                top: 15px;
+                left: 15px;
+                width: 45px;
+                height: 45px;
+            }
+            
+            .side-menu {
+                width: 85%;
+                left: -85%;
             }
             
             .success-content {
@@ -750,6 +1175,24 @@
             .success-title {
                 font-size: 1.5rem;
             }
+            
+            .table-number-display {
+                max-width: 100%;
+                padding: 10px 15px;
+            }
+            
+            .welcome-text {
+                font-size: 1rem;
+            }
+            
+            .orders-tabs {
+                padding: 8px 0;
+            }
+            
+            .orders-tab {
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
         }
 
         @media (max-width: 480px) {
@@ -758,90 +1201,166 @@
             }
             
             .header-title {
-                font-size: 1.8rem;
-            }
-            
-            .menu-title {
                 font-size: 1.6rem;
             }
             
-            .header-top {
-                flex-direction: column;
-                gap: 1rem;
+            .section-title {
+                font-size: 1.6rem;
             }
             
-            .table-number-display {
-                padding: 8px 15px;
-                max-width: 250px;
+            .menu-button {
+                padding: 0.8rem 0.5rem;
+                min-height: 90px;
+            }
+            
+            .menu-button i {
+                font-size: 1.3rem;
+            }
+            
+            .button-text {
+                font-size: 0.9rem;
             }
             
             .table-number {
-                font-size: 1.3rem;
+                font-size: 1.2rem;
+            }
+            
+            .cart-button {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+            
+            .hamburger-menu {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .hamburger-line {
+                width: 20px;
+                height: 2px;
+            }
+            
+            .orders-tab {
+                padding: 8px 12px;
+                font-size: 0.85rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header Section -->
-        <div class="header">
-            <div class="header-top">
-                <div></div> <!-- Empty div for spacing -->
-                <button class="logout-button" id="logout-button">
-                    <i class="fas fa-sign-out-alt"></i> Logout
+    <!-- Hamburger Menu Button -->
+    <button class="hamburger-menu" id="hamburger-menu">
+        <div class="hamburger-line"></div>
+        <div class="hamburger-line"></div>
+        <div class="hamburger-line"></div>
+    </button>
+
+    <!-- Side Menu -->
+    <div class="side-menu" id="side-menu">
+        <div class="menu-header">
+            <h3 class="menu-title">Menu</h3>
+            <div class="username-display" id="menu-username"></div>
+        </div>
+        
+        <button class="menu-item active" id="menu-drinks">
+            <i class="fas fa-glass-cheers"></i>
+            <span>Drinks Menu</span>
+        </button>
+        
+        <button class="menu-item" id="menu-pending-orders">
+            <i class="fas fa-clock"></i>
+            <span>Pending Orders</span>
+            <span class="cart-count" id="pending-count" style="margin-left: auto; margin-right: 10px;">0</span>
+        </button>
+        
+        <button class="menu-item" id="menu-delivered-orders">
+            <i class="fas fa-check-circle"></i>
+            <span>Delivered Orders</span>
+        </button>
+        
+        <button class="menu-item logout" id="menu-logout">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+        </button>
+    </div>
+
+    <!-- Edit Table Modal -->
+    <div class="edit-table-modal" id="edit-table-modal">
+        <div class="edit-table-content">
+            <h2 class="edit-table-title">Change Table Number</h2>
+            <input type="number" id="edit-table-input" class="edit-table-input" min="1" max="50" placeholder="Enter table number">
+            <div class="edit-table-buttons">
+                <button class="edit-table-btn save" id="save-table-btn">Save</button>
+                <button class="edit-table-btn cancel" id="cancel-table-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shopping Cart Section -->
+    <div class="cart-section">
+        <button class="cart-button" id="cart-button">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="cart-count" id="cart-count">0</span>
+        </button>
+        
+        <div class="cart-panel" id="cart-panel">
+            <div class="cart-header">
+                <h3 class="cart-title">Your Order</h3>
+                <button class="close-cart" id="close-cart">
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
             
+            <div class="cart-items" id="cart-items">
+                <div class="empty-cart" id="empty-cart">
+                    <p>Your cart is empty</p>
+                </div>
+            </div>
+            
+            <div class="cart-total" id="cart-total">
+                Total: Ksh 0
+            </div>
+            
+            <button class="checkout-button" id="checkout-button">
+                <i class="fas fa-lock"></i> Proceed to Checkout
+            </button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Welcome Banner -->
+        <div class="welcome-banner" id="welcome-banner">
+            <div class="welcome-text">
+                Welcome to Al Capone Thika Road, <span class="username-highlight" id="username-display">Guest</span>!
+            </div>
+        </div>
+
+        <!-- Header Section -->
+        <div class="header">
             <div class="logo-area">
                 <div class="logo-placeholder" id="logo-placeholder">AL CAPONE CLUB</div>
-                <img id="club-logo" class="club-logo" src="images/logo.png" alt="Al Capone Club Logo" style="max-width: 200px; height: auto;">
+                <img id="club-logo" class="club-logo" src="images/logo.png" alt="Al Capone Club Logo" style="display: none; max-width: 200px; height: auto;">
             </div>
             
             <!-- Table Number Display -->
             <div class="table-number-display">
                 <div class="table-label">You are ordering from</div>
-                <div class="table-number">Table <span id="current-table-number">-</span></div>
+                <div class="table-number">
+                    Table <span id="current-table-number">-</span>
+                    <button class="edit-table-btn" id="edit-table-btn">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </div>
             </div>
             
             <h1 class="header-title">Premium Bar Selection</h1>
             <p class="header-subtitle">Indulge in our exquisite collection of fine spirits, crafted cocktails, and premium beverages</p>
         </div>
 
-        <!-- Shopping Cart Section -->
-        <div class="cart-section">
-            <button class="cart-button" id="cart-button">
-                <i class="fas fa-shopping-cart"></i>
-                <span class="cart-count" id="cart-count">0</span>
-            </button>
-            
-            <div class="cart-panel" id="cart-panel">
-                <div class="cart-header">
-                    <h3 class="cart-title">Your Order</h3>
-                    <button class="close-cart" id="close-cart">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                
-                <div class="cart-items" id="cart-items">
-                    <!-- Cart items will be added here dynamically -->
-                    <div class="empty-cart" id="empty-cart">
-                        <p>Your cart is empty</p>
-                    </div>
-                </div>
-                
-                <div class="cart-total" id="cart-total">
-                    Total: Ksh 0
-                </div>
-                
-                <button class="checkout-button" id="checkout-button">
-                    <i class="fas fa-lock"></i> Proceed to Checkout
-                </button>
-            </div>
-        </div>
-
-        <!-- Menu Section -->
+        <!-- Menu Section (default) -->
         <div class="menu-section" id="menu-section">
-            <h2 class="menu-title">Our Drink Categories</h2>
+            <h2 class="section-title">Our Drink Categories</h2>
             <div class="buttons-container">
                 <button class="menu-button" data-category="cocktails">
                     <i class="fas fa-cocktail"></i>
@@ -863,6 +1382,21 @@
                     <i class="fas fa-glass-cheers"></i>
                     <span class="button-text">Shooters & Liquors</span>
                 </button>
+            </div>
+        </div>
+
+        <!-- Orders Section (hidden by default) -->
+        <div class="orders-section" id="orders-section" style="display: none;">
+            <div class="orders-tabs">
+                <button class="orders-tab active" data-tab="pending">Pending Orders</button>
+                <button class="orders-tab" data-tab="delivered">Delivered Orders</button>
+            </div>
+            
+            <div class="orders-list">
+                <!-- Orders will be loaded here dynamically -->
+                <div class="no-orders" id="no-orders">
+                    <p>No orders found</p>
+                </div>
             </div>
         </div>
 
@@ -889,8 +1423,18 @@
         </div>
     </div>
 
+    <!-- Load Supabase from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/dist/umd/supabase.min.js"></script>
+    
     <script>
-        // Drink data for each category
+        // Initialize Supabase
+        let supabase;
+        let currentUser = null;
+        let shoppingCart = [];
+        let tableNumber = "12"; // Default table number
+        let pendingOrdersCount = 0;
+
+        // Drink data
         const drinkData = {
             cocktails: [
                 { id: 1, name: "Old Fashioned", description: "Classic bourbon cocktail with sugar, bitters, and orange peel", price: 1200 },
@@ -930,39 +1474,201 @@
             ]
         };
 
-        // Shopping Cart
-        let shoppingCart = [];
-        let tableNumber = localStorage.getItem('alCaponeTableNumber') || "12"; // Default to table 12
-        
-        // Initialize cart from localStorage
-        function initCart() {
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Check if user is logged in
+            const userData = localStorage.getItem('alCaponeClubUser');
+            if (!userData) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            currentUser = JSON.parse(userData);
+            
+            // Initialize Supabase
+            try {
+                const supabaseUrl = "https://tfuwozhljthmxxcztfws.supabase.co";
+                const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRmdXdvemhsanRobXh4Y3p0ZndzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5OTA0NjEsImV4cCI6MjA4MTU2NjQ2MX0.7stJZibmLvBk0-oEQk6XSfjsfXaqYf9_O3308ZBOTjc";
+                
+                supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+                console.log("Supabase initialized");
+            } catch (error) {
+                console.error("Failed to initialize Supabase:", error);
+                alert('Service temporarily unavailable. Please try again later.');
+                return;
+            }
+
+            // Initialize UI
+            initUI();
+            initEventListeners();
+            loadUserData();
+            loadPendingOrdersCount();
+            
+            // Try to load logo
+            const clubLogo = document.getElementById('club-logo');
+            const logoPlaceholder = document.getElementById('logo-placeholder');
+            
+            clubLogo.onload = function() {
+                clubLogo.style.display = 'block';
+                logoPlaceholder.style.display = 'none';
+            };
+            clubLogo.onerror = function() {
+                console.log('Logo not found');
+            };
+            clubLogo.src = 'images/logo.png';
+        });
+
+        function initUI() {
+            // Set username
+            document.getElementById('username-display').textContent = currentUser.username || currentUser.email.split('@')[0];
+            document.getElementById('menu-username').textContent = currentUser.username || currentUser.email.split('@')[0];
+            
+            // Load table number
+            const savedTable = localStorage.getItem('alCaponeTableNumber');
+            if (savedTable) {
+                tableNumber = savedTable;
+            }
+            document.getElementById('current-table-number').textContent = tableNumber;
+            
+            // Load cart
             const savedCart = localStorage.getItem('alCaponeCart');
             if (savedCart) {
                 shoppingCart = JSON.parse(savedCart);
                 updateCartDisplay();
             }
+        }
+
+        function initEventListeners() {
+            // Hamburger menu
+            document.getElementById('hamburger-menu').addEventListener('click', toggleSideMenu);
             
-            // Set table number
-            document.getElementById('current-table-number').textContent = tableNumber;
+            // Side menu items
+            document.getElementById('menu-drinks').addEventListener('click', () => {
+                showDrinksMenu();
+                closeSideMenu();
+            });
+            
+            document.getElementById('menu-pending-orders').addEventListener('click', () => {
+                showOrders('pending');
+                closeSideMenu();
+            });
+            
+            document.getElementById('menu-delivered-orders').addEventListener('click', () => {
+                showOrders('delivered');
+                closeSideMenu();
+            });
+            
+            document.getElementById('menu-logout').addEventListener('click', logout);
+            
+            // Edit table
+            document.getElementById('edit-table-btn').addEventListener('click', showEditTableModal);
+            document.getElementById('save-table-btn').addEventListener('click', saveTableNumber);
+            document.getElementById('cancel-table-btn').addEventListener('click', hideEditTableModal);
+            
+            // Cart functionality
+            document.getElementById('cart-button').addEventListener('click', () => {
+                document.getElementById('cart-panel').classList.add('active');
+            });
+            
+            document.getElementById('close-cart').addEventListener('click', () => {
+                document.getElementById('cart-panel').classList.remove('active');
+            });
+            
+            document.getElementById('checkout-button').addEventListener('click', checkout);
+            
+            // Category buttons
+            document.querySelectorAll('.menu-button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const category = btn.getAttribute('data-category');
+                    showCategoryPage(category);
+                });
+            });
+            
+            // Orders tabs
+            document.querySelectorAll('.orders-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+                    document.querySelectorAll('.orders-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    showOrders(tabName);
+                });
+            });
+            
+            // Success modal
+            document.getElementById('close-success').addEventListener('click', () => {
+                document.getElementById('success-modal').classList.remove('active');
+                showDrinksMenu();
+            });
         }
-        
-        // Save cart to localStorage
-        function saveCart() {
-            localStorage.setItem('alCaponeCart', JSON.stringify(shoppingCart));
+
+        function toggleSideMenu() {
+            const menu = document.getElementById('side-menu');
+            const hamburger = document.getElementById('hamburger-menu');
+            menu.classList.toggle('active');
+            hamburger.classList.toggle('active');
         }
-        
-        // Update cart display
+
+        function closeSideMenu() {
+            document.getElementById('side-menu').classList.remove('active');
+            document.getElementById('hamburger-menu').classList.remove('active');
+        }
+
+        function showDrinksMenu() {
+            document.getElementById('menu-section').style.display = 'flex';
+            document.getElementById('orders-section').style.display = 'none';
+            document.getElementById('menu-drinks').classList.add('active');
+            document.getElementById('menu-pending-orders').classList.remove('active');
+            document.getElementById('menu-delivered-orders').classList.remove('active');
+        }
+
+        async function showOrders(type) {
+            document.getElementById('menu-section').style.display = 'none';
+            document.getElementById('orders-section').style.display = 'block';
+            document.getElementById('menu-drinks').classList.remove('active');
+            document.getElementById('menu-pending-orders').classList.remove('active');
+            document.getElementById('menu-delivered-orders').classList.remove('active');
+            
+            if (type === 'pending') {
+                document.getElementById('menu-pending-orders').classList.add('active');
+            } else {
+                document.getElementById('menu-delivered-orders').classList.add('active');
+            }
+            
+            await loadOrders(type);
+        }
+
+        function showEditTableModal() {
+            document.getElementById('edit-table-modal').classList.add('active');
+            document.getElementById('edit-table-input').value = tableNumber;
+            document.getElementById('edit-table-input').focus();
+        }
+
+        function hideEditTableModal() {
+            document.getElementById('edit-table-modal').classList.remove('active');
+        }
+
+        function saveTableNumber() {
+            const newTable = document.getElementById('edit-table-input').value;
+            if (newTable && newTable >= 1 && newTable <= 50) {
+                tableNumber = newTable;
+                localStorage.setItem('alCaponeTableNumber', tableNumber);
+                document.getElementById('current-table-number').textContent = tableNumber;
+                showNotification('Table number updated!');
+                hideEditTableModal();
+            } else {
+                alert('Please enter a valid table number (1-50)');
+            }
+        }
+
         function updateCartDisplay() {
             const cartCount = document.getElementById('cart-count');
             const cartItems = document.getElementById('cart-items');
             const cartTotal = document.getElementById('cart-total');
             const emptyCart = document.getElementById('empty-cart');
             
-            // Update cart count
             const totalItems = shoppingCart.reduce((sum, item) => sum + item.quantity, 0);
             cartCount.textContent = totalItems;
             
-            // Update cart items
             cartItems.innerHTML = '';
             
             if (shoppingCart.length === 0) {
@@ -972,7 +1678,6 @@
             }
             
             emptyCart.style.display = 'none';
-            
             let totalPrice = 0;
             
             shoppingCart.forEach((item, index) => {
@@ -997,13 +1702,12 @@
                 cartItems.appendChild(cartItem);
             });
             
-            // Update total
             cartTotal.innerHTML = `Total: Ksh ${totalPrice.toLocaleString()}`;
             
-            // Add event listeners for cart controls
+            // Add event listeners
             document.querySelectorAll('.decrease-quantity').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const index = parseInt(e.target.dataset.index);
+                btn.addEventListener('click', function() {
+                    const index = parseInt(this.dataset.index);
                     if (shoppingCart[index].quantity > 1) {
                         shoppingCart[index].quantity--;
                         saveCart();
@@ -1013,8 +1717,8 @@
             });
             
             document.querySelectorAll('.increase-quantity').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const index = parseInt(e.target.dataset.index);
+                btn.addEventListener('click', function() {
+                    const index = parseInt(this.dataset.index);
                     shoppingCart[index].quantity++;
                     saveCart();
                     updateCartDisplay();
@@ -1022,16 +1726,67 @@
             });
             
             document.querySelectorAll('.remove-item').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const index = parseInt(e.target.closest('.remove-item').dataset.index);
+                btn.addEventListener('click', function() {
+                    const index = parseInt(this.dataset.index);
                     shoppingCart.splice(index, 1);
                     saveCart();
                     updateCartDisplay();
                 });
             });
         }
-        
-        // Add item to cart
+
+        function saveCart() {
+            localStorage.setItem('alCaponeCart', JSON.stringify(shoppingCart));
+        }
+
+        function showCategoryPage(category) {
+            const menuSection = document.getElementById('menu-section');
+            const categoryNames = {
+                'cocktails': 'Cocktails',
+                'mocktails': 'Mocktails',
+                'soft-drinks': 'Soft Drinks',
+                'champagne': 'Champagne & Sparkling Wine',
+                'shooters': 'Shooters & Liquors'
+            };
+            
+            let drinksHTML = '';
+            drinkData[category].forEach(drink => {
+                drinksHTML += `
+                    <div class="drink-card">
+                        <h3 class="drink-name">${drink.name}</h3>
+                        <p class="drink-description">${drink.description}</p>
+                        <div class="drink-price">Ksh ${drink.price.toLocaleString()}</div>
+                        <button class="add-to-cart-button" data-drink-id="${drink.id}" data-category="${category}">
+                            <i class="fas fa-cart-plus"></i> Add to Cart
+                        </button>
+                    </div>
+                `;
+            });
+            
+            menuSection.innerHTML = `
+                <button class="back-button" id="back-button">
+                    <i class="fas fa-arrow-left"></i> Back to Categories
+                </button>
+                <h2 class="section-title">${categoryNames[category]}</h2>
+                <div class="drink-list">
+                    ${drinksHTML}
+                </div>
+            `;
+            
+            document.getElementById('back-button').addEventListener('click', () => {
+                location.reload();
+            });
+            
+            document.querySelectorAll('.add-to-cart-button').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const drinkId = parseInt(this.getAttribute('data-drink-id'));
+                    const category = this.getAttribute('data-category');
+                    const drink = drinkData[category].find(d => d.id === drinkId);
+                    addToCart(drink, category);
+                });
+            });
+        }
+
         function addToCart(drink, category) {
             const existingItem = shoppingCart.find(item => item.id === drink.id && item.category === category);
             
@@ -1049,140 +1804,17 @@
             
             saveCart();
             updateCartDisplay();
-            
-            // Show confirmation
             showNotification(`${drink.name} added to cart!`);
         }
-        
-        // Show notification
-        function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                background-color: var(--highlight-color);
-                color: #000;
-                padding: 15px 25px;
-                border-radius: 5px;
-                font-weight: bold;
-                z-index: 10000;
-                box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-                animation: slideIn 0.3s ease;
-            `;
-            notification.textContent = message;
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => {
-                    document.body.removeChild(notification);
-                }, 300);
-            }, 2000);
-        }
-        
-        // Logout functionality - redirects to index.html
-        document.getElementById('logout-button').addEventListener('click', () => {
-            // Clear cart data
-            localStorage.removeItem('alCaponeCart');
-            // Redirect to login page
-            window.location.href = 'index.html';
-        });
-        
-        // Cart button functionality
-        document.getElementById('cart-button').addEventListener('click', () => {
-            document.getElementById('cart-panel').classList.add('active');
-        });
-        
-        document.getElementById('close-cart').addEventListener('click', () => {
-            document.getElementById('cart-panel').classList.remove('active');
-        });
-        
-        // Checkout button functionality
-        document.getElementById('checkout-button').addEventListener('click', () => {
+
+        async function checkout() {
             if (shoppingCart.length === 0) {
                 alert('Your cart is empty!');
                 return;
             }
             
-            showCheckoutPage();
-        });
-        
-        // Close success modal
-        document.getElementById('close-success').addEventListener('click', () => {
-            document.getElementById('success-modal').classList.remove('active');
-        });
-        
-        // Button click functionality
-        document.querySelectorAll('.menu-button').forEach(button => {
-            button.addEventListener('click', () => {
-                const category = button.getAttribute('data-category');
-                showCategoryPage(category);
-            });
-        });
-        
-        // Show category page with drink list
-        function showCategoryPage(category) {
-            const menuSection = document.getElementById('menu-section');
-            const categoryNames = {
-                'cocktails': 'Cocktails',
-                'mocktails': 'Mocktails',
-                'soft-drinks': 'Soft Drinks',
-                'champagne': 'Champagne & Sparkling Wine',
-                'shooters': 'Shooters & Liquors'
-            };
-            
-            // Create drink list HTML
-            let drinksHTML = '';
-            drinkData[category].forEach(drink => {
-                drinksHTML += `
-                    <div class="drink-card">
-                        <h3 class="drink-name">${drink.name}</h3>
-                        <p class="drink-description">${drink.description}</p>
-                        <div class="drink-price">Ksh ${drink.price.toLocaleString()}</div>
-                        <button class="add-to-cart-button" data-drink-id="${drink.id}" data-category="${category}">
-                            <i class="fas fa-cart-plus"></i> Add to Cart
-                        </button>
-                    </div>
-                `;
-            });
-            
-            // Update the menu section to show category drinks
-            menuSection.innerHTML = `
-                <button class="back-button" id="back-button">
-                    <i class="fas fa-arrow-left"></i> Back to Categories
-                </button>
-                <h2 class="menu-title">${categoryNames[category]}</h2>
-                <div class="drink-list">
-                    ${drinksHTML}
-                </div>
-            `;
-            
-            // Add event listener to back button
-            document.getElementById('back-button').addEventListener('click', () => {
-                location.reload(); // Reload page to show main menu
-            });
-            
-            // Add event listeners to add to cart buttons
-            document.querySelectorAll('.add-to-cart-button').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const drinkId = parseInt(e.target.getAttribute('data-drink-id'));
-                    const category = e.target.getAttribute('data-category');
-                    const drink = drinkData[category].find(d => d.id === drinkId);
-                    addToCart(drink, category);
-                });
-            });
-        }
-        
-        // Show checkout page with M-Pesa form
-        function showCheckoutPage() {
-            const menuSection = document.getElementById('menu-section');
-            
-            // Calculate total
             const totalPrice = shoppingCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
             
-            // Create cart summary HTML
             let cartSummaryHTML = '';
             shoppingCart.forEach(item => {
                 cartSummaryHTML += `
@@ -1193,6 +1825,7 @@
                 `;
             });
             
+            const menuSection = document.getElementById('menu-section');
             menuSection.innerHTML = `
                 <button class="back-button" id="back-to-cart">
                     <i class="fas fa-arrow-left"></i> Back to Cart
@@ -1230,23 +1863,21 @@
                                 <span>Table</span>
                                 <input type="number" id="table-number" class="form-input" value="${tableNumber}" min="1" max="50" required>
                             </div>
-                            <small style="color: #aaa; display: block; margin-top: 5px;">Enter your table number for delivery</small>
                         </div>
                         
                         <div class="form-group">
                             <label class="form-label" for="phone">M-Pesa Phone Number</label>
-                            <input type="tel" id="phone" class="form-input" placeholder="07XX XXX XXX" required>
-                            <small style="color: #aaa; display: block; margin-top: 5px;">Enter the phone number registered with M-Pesa</small>
+                            <input type="tel" id="phone" class="form-input" placeholder="07XX XXX XXX" value="${currentUser.phone || ''}" required>
                         </div>
                         
                         <div class="form-group">
                             <label class="form-label" for="name">Full Name</label>
-                            <input type="text" id="name" class="form-input" placeholder="Enter your full name" required>
+                            <input type="text" id="name" class="form-input" value="${currentUser.username || currentUser.email.split('@')[0]}" required>
                         </div>
                         
                         <div class="form-group">
-                            <label class="form-label" for="email">Email Address (Optional)</label>
-                            <input type="email" id="email" class="form-input" placeholder="Enter your email for receipt">
+                            <label class="form-label" for="email">Email Address</label>
+                            <input type="email" id="email" class="form-input" value="${currentUser.email || ''}">
                         </div>
                         
                         <button type="submit" class="pay-button">
@@ -1256,43 +1887,26 @@
                 </div>
             `;
             
-            // Add event listener to back button
             document.getElementById('back-to-cart').addEventListener('click', () => {
-                // Close checkout and show cart
-                menuSection.innerHTML = '';
                 location.reload();
             });
             
-            // Handle form submission
-            document.getElementById('mpesa-form').addEventListener('submit', (e) => {
-                e.preventDefault();
-                processPayment(totalPrice);
-            });
-            
-            // Close cart panel if open
             document.getElementById('cart-panel').classList.remove('active');
+            
+            document.getElementById('mpesa-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await processPayment(totalPrice);
+            });
         }
-        
-        // Process payment (simulated)
-        function processPayment(totalPrice) {
+
+        async function processPayment(totalPrice) {
             const phone = document.getElementById('phone').value;
             const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
             const tableNumberInput = document.getElementById('table-number').value;
             
-            // Update table number
-            tableNumber = tableNumberInput;
-            localStorage.setItem('alCaponeTableNumber', tableNumber);
-            document.getElementById('current-table-number').textContent = tableNumber;
-            
-            // Validate inputs
             if (!phone.match(/^07[0-9]{8}$/)) {
                 alert('Please enter a valid M-Pesa phone number (format: 07XXXXXXXX)');
-                return;
-            }
-            
-            if (tableNumberInput < 1 || tableNumberInput > 50) {
-                alert('Please enter a valid table number (1-50)');
                 return;
             }
             
@@ -1301,87 +1915,223 @@
                 return;
             }
             
-            // Simulate payment processing
-            const processingMsg = `Processing M-Pesa payment of Ksh ${totalPrice.toLocaleString()}...\n\nA prompt has been sent to ${phone}. Please enter your M-Pesa PIN to complete the transaction.`;
+            // Update table number
+            tableNumber = tableNumberInput;
+            localStorage.setItem('alCaponeTableNumber', tableNumber);
+            document.getElementById('current-table-number').textContent = tableNumber;
             
-            // Show processing alert
-            alert(processingMsg);
+            // Create order ID
+            const orderId = 'AC-' + Date.now().toString().slice(-8);
             
-            // In a real application, you would make an API call to M-Pesa here
+            // Prepare order data
+            const orderData = {
+                order_id: orderId,
+                user_id: currentUser.userId || currentUser.email,
+                username: currentUser.username || currentUser.email.split('@')[0],
+                user_email: currentUser.email,
+                phone: phone,
+                table_number: tableNumber,
+                items: shoppingCart,
+                total_amount: totalPrice,
+                status: 'pending',
+                payment_method: 'M-Pesa',
+                created_at: new Date().toISOString()
+            };
             
-            // Simulate successful payment after 3 seconds
-            setTimeout(() => {
-                showSuccessModal(totalPrice, name, phone, tableNumber, email);
+            // Save order to Supabase
+            try {
+                const { data, error } = await supabase
+                    .from('orders')
+                    .insert([orderData]);
                 
-                // Clear cart after successful payment
-                shoppingCart = [];
-                saveCart();
-                updateCartDisplay();
-            }, 3000);
+                if (error) throw error;
+                
+                // Simulate M-Pesa payment
+                showNotification(`Processing M-Pesa payment of Ksh ${totalPrice.toLocaleString()}...`);
+                
+                setTimeout(() => {
+                    showSuccessModal(orderData);
+                    shoppingCart = [];
+                    saveCart();
+                    updateCartDisplay();
+                    loadPendingOrdersCount();
+                }, 3000);
+                
+            } catch (error) {
+                console.error('Error saving order:', error);
+                alert('Failed to process payment. Please try again.');
+            }
         }
-        
-        // Show success modal
-        function showSuccessModal(totalPrice, name, phone, tableNumber, email) {
+
+        function showSuccessModal(orderData) {
             const successDetails = document.getElementById('success-details');
             
-            // Create order items list
-            let orderItemsHTML = shoppingCart.map(item => 
+            let orderItemsHTML = orderData.items.map(item => 
                 `<p>• ${item.name} x${item.quantity} - Ksh ${(item.price * item.quantity).toLocaleString()}</p>`
             ).join('');
             
             successDetails.innerHTML = `
-                <p><strong>Order Reference:</strong> AC-${Date.now().toString().slice(-8)}</p>
-                <p><strong>Customer Name:</strong> ${name}</p>
-                <p><strong>Table Number:</strong> ${tableNumber}</p>
-                <p><strong>M-Pesa Number:</strong> ${phone}</p>
-                ${email ? `<p><strong>Email:</strong> ${email}</p>` : ''}
+                <p><strong>Order Reference:</strong> ${orderData.order_id}</p>
+                <p><strong>Customer Name:</strong> ${orderData.username}</p>
+                <p><strong>Table Number:</strong> ${orderData.table_number}</p>
+                <p><strong>M-Pesa Number:</strong> ${orderData.phone}</p>
+                ${orderData.user_email ? `<p><strong>Email:</strong> ${orderData.user_email}</p>` : ''}
                 <p><strong>Order Items:</strong></p>
                 ${orderItemsHTML}
-                <p><strong>Total Amount:</strong> Ksh ${totalPrice.toLocaleString()}</p>
+                <p><strong>Total Amount:</strong> Ksh ${orderData.total_amount.toLocaleString()}</p>
                 <p><strong>Payment Status:</strong> <span style="color: #4CAF50;">Confirmed ✓</span></p>
                 <p><strong>Delivery Status:</strong> Preparing your order...</p>
             `;
             
-            // Show success modal
             document.getElementById('success-modal').classList.add('active');
         }
-        
-        // Initialize the page
-        window.addEventListener('DOMContentLoaded', function() {
-            // Initialize cart
-            initCart();
+
+        async function loadOrders(type) {
+            const ordersList = document.querySelector('.orders-list');
+            const noOrders = document.getElementById('no-orders');
             
-            // Add CSS for notifications
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes slideIn {
-                    from { top: -50px; opacity: 0; }
-                    to { top: 20px; opacity: 1; }
+            ordersList.innerHTML = '';
+            
+            try {
+                const { data: orders, error } = await supabase
+                    .from('orders')
+                    .select('*')
+                    .eq('user_id', currentUser.userId || currentUser.email)
+                    .eq('status', type === 'pending' ? 'pending' : 'delivered')
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                if (!orders || orders.length === 0) {
+                    noOrders.style.display = 'block';
+                    return;
                 }
-                @keyframes slideOut {
-                    from { top: 20px; opacity: 1; }
-                    to { top: -50px; opacity: 0; }
-                }
-            `;
-            document.head.appendChild(style);
-            
-            // Try to load your logo
-            const clubLogo = document.getElementById('club-logo');
-            const logoPlaceholder = document.getElementById('logo-placeholder');
-            
-            if (clubLogo.complete && clubLogo.naturalHeight !== 0) {
-                clubLogo.style.display = 'block';
-                logoPlaceholder.style.display = 'none';
-            } else {
-                clubLogo.onload = function() {
-                    clubLogo.style.display = 'block';
-                    logoPlaceholder.style.display = 'none';
-                };
-                clubLogo.onerror = function() {
-                    console.log('Logo not found at images/logo.png');
-                };
+                
+                noOrders.style.display = 'none';
+                
+                orders.forEach(order => {
+                    let itemsHTML = '';
+                    order.items.forEach(item => {
+                        itemsHTML += `
+                            <div class="order-item">
+                                <span>${item.name} x${item.quantity}</span>
+                                <span>Ksh ${(item.price * item.quantity).toLocaleString()}</span>
+                            </div>
+                        `;
+                    });
+                    
+                    const orderCard = document.createElement('div');
+                    orderCard.className = 'order-card';
+                    orderCard.innerHTML = `
+                        <div class="order-header">
+                            <div class="order-id">${order.order_id}</div>
+                            <div class="order-status ${type === 'pending' ? 'status-pending' : 'status-delivered'}">
+                                ${type === 'pending' ? 'Preparing' : 'Delivered'}
+                            </div>
+                        </div>
+                        <div class="order-details">
+                            ${itemsHTML}
+                        </div>
+                        <div class="order-total">
+                            <span>Total:</span>
+                            <span>Ksh ${order.total_amount.toLocaleString()}</span>
+                        </div>
+                        <div style="margin-top: 10px; font-size: 0.9rem; color: #aaa;">
+                            Ordered on ${new Date(order.created_at).toLocaleDateString()} at ${new Date(order.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                        </div>
+                    `;
+                    ordersList.appendChild(orderCard);
+                });
+                
+            } catch (error) {
+                console.error('Error loading orders:', error);
+                ordersList.innerHTML = '<div class="no-orders"><p>Error loading orders</p></div>';
             }
-        });
+        }
+
+        async function loadPendingOrdersCount() {
+            try {
+                const { data: orders, error } = await supabase
+                    .from('orders')
+                    .select('*')
+                    .eq('user_id', currentUser.userId || currentUser.email)
+                    .eq('status', 'pending');
+                
+                if (!error && orders) {
+                    pendingOrdersCount = orders.length;
+                    document.getElementById('pending-count').textContent = pendingOrdersCount;
+                }
+            } catch (error) {
+                console.error('Error loading pending orders count:', error);
+            }
+        }
+
+        function loadUserData() {
+            // Try to get user data from Supabase auth
+            supabase.auth.getUser().then(({ data: { user } }) => {
+                if (user) {
+                    currentUser = {
+                        ...currentUser,
+                        userId: user.id,
+                        username: user.user_metadata?.username || currentUser.username,
+                        email: user.email || currentUser.email,
+                        phone: user.user_metadata?.phone || currentUser.phone
+                    };
+                    
+                    localStorage.setItem('alCaponeClubUser', JSON.stringify(currentUser));
+                    document.getElementById('username-display').textContent = currentUser.username || currentUser.email.split('@')[0];
+                    document.getElementById('menu-username').textContent = currentUser.username || currentUser.email.split('@')[0];
+                }
+            });
+        }
+
+        function logout() {
+            localStorage.removeItem('alCaponeClubUser');
+            localStorage.removeItem('alCaponeCart');
+            localStorage.removeItem('alCaponeTableNumber');
+            window.location.href = 'index.html';
+        }
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background-color: var(--highlight-color);
+                color: #000;
+                padding: 12px 20px;
+                border-radius: 5px;
+                font-weight: bold;
+                z-index: 10000;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+                animation: slideIn 0.3s ease;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 2000);
+        }
+
+        // Add CSS for notifications
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { top: -50px; opacity: 0; }
+                to { top: 20px; opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { top: 20px; opacity: 1; }
+                to { top: -50px; opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
