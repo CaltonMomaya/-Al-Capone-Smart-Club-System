@@ -1362,26 +1362,11 @@
         <div class="menu-section" id="menu-section">
             <h2 class="section-title">Our Drink Categories</h2>
             <div class="buttons-container">
-                <button class="menu-button" data-category="cocktails">
-                    <i class="fas fa-cocktail"></i>
-                    <span class="button-text">Cocktails</span>
-                </button>
-                <button class="menu-button" data-category="mocktails">
-                    <i class="fas fa-seedling"></i>
-                    <span class="button-text">Mocktails</span>
-                </button>
-                <button class="menu-button" data-category="soft-drinks">
-                    <i class="fas fa-glass-whiskey"></i>
-                    <span class="button-text">Soft Drinks</span>
-                </button>
-                <button class="menu-button" data-category="champagne">
-                    <i class="fas fa-wine-glass-alt"></i>
-                    <span class="button-text">Champagne & Sparkling Wine</span>
-                </button>
-                <button class="menu-button" data-category="shooters">
-                    <i class="fas fa-glass-cheers"></i>
-                    <span class="button-text">Shooters & Liquors</span>
-                </button>
+                <!-- Buttons will be loaded dynamically from database -->
+                <div class="loading-message" id="loading-message" style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: #888;">
+                    <i class="fas fa-spinner fa-spin fa-2x"></i>
+                    <p>Loading drink categories...</p>
+                </div>
             </div>
         </div>
 
@@ -1433,46 +1418,10 @@
         let shoppingCart = [];
         let tableNumber = "12"; // Default table number
         let pendingOrdersCount = 0;
-
-        // Drink data
-        const drinkData = {
-            cocktails: [
-                { id: 1, name: "Old Fashioned", description: "Classic bourbon cocktail with sugar, bitters, and orange peel", price: 1200 },
-                { id: 2, name: "Moscow Mule", description: "Vodka, ginger beer, and lime juice served in a copper mug", price: 1100 },
-                { id: 3, name: "Margarita", description: "Tequila, lime juice, and triple sec with salt rim", price: 1000 },
-                { id: 4, name: "Negroni", description: "Gin, sweet vermouth, and Campari with orange peel", price: 1300 },
-                { id: 5, name: "Mojito", description: "White rum, mint, lime juice, sugar, and soda water", price: 950 },
-                { id: 6, name: "Whiskey Sour", description: "Whiskey, lemon juice, and simple syrup with egg white", price: 1150 }
-            ],
-            mocktails: [
-                { id: 1, name: "Virgin Mojito", description: "Mint, lime juice, sugar, and soda water", price: 500 },
-                { id: 2, name: "Berry Blast", description: "Mixed berries, lime juice, and soda water", price: 550 },
-                { id: 3, name: "Sunset Cooler", description: "Orange juice, grenadine, and ginger ale", price: 450 },
-                { id: 4, name: "Tropical Breeze", description: "Pineapple juice, coconut cream, and lime", price: 600 },
-                { id: 5, name: "Cucumber Mint Sparkler", description: "Cucumber, mint, lime, and soda water", price: 500 }
-            ],
-            "soft-drinks": [
-                { id: 1, name: "Coca-Cola", description: "Classic cola served chilled", price: 200 },
-                { id: 2, name: "Sprite", description: "Lemon-lime soda served chilled", price: 200 },
-                { id: 3, name: "Fanta Orange", description: "Orange flavored soda", price: 200 },
-                { id: 4, name: "Ginger Ale", description: "Refreshing ginger flavored soda", price: 250 },
-                { id: 5, name: "Tonic Water", description: "Classic tonic water with quinine", price: 250 }
-            ],
-            champagne: [
-                { id: 1, name: "Dom Pérignon", description: "Vintage Champagne, France", price: 25000 },
-                { id: 2, name: "Veuve Clicquot", description: "Yellow Label Brut, France", price: 12000 },
-                { id: 3, name: "Moët & Chandon", description: "Imperial Brut, France", price: 10000 },
-                { id: 4, name: "Prosecco", description: "Italian sparkling wine", price: 6000 },
-                { id: 5, name: "Cava", description: "Spanish sparkling wine", price: 5000 }
-            ],
-            shooters: [
-                { id: 1, name: "B-52", description: "Kahlua, Baileys, and Grand Marnier", price: 800 },
-                { id: 2, name: "Tequila Shot", description: "100% agave tequila with salt and lime", price: 700 },
-                { id: 3, name: "Jägerbomb", description: "Jägermeister and Red Bull", price: 900 },
-                { id: 4, name: "Kamikaze", description: "Vodka, triple sec, and lime juice", price: 750 },
-                { id: 5, name: "Fireball", description: "Cinnamon whiskey shooter", price: 650 }
-            ]
-        };
+        
+        // Database-loaded drink data structure
+        let drinkData = {};
+        let drinkCategories = [];
 
         // Initialize the app
         document.addEventListener('DOMContentLoaded', async function() {
@@ -1485,22 +1434,30 @@
             
             currentUser = JSON.parse(userData);
             
-            // Initialize Supabase
+            // Initialize Supabase with your credentials
             try {
                 const supabaseUrl = "https://tfuwozhljthmxxcztfws.supabase.co";
                 const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRmdXdvemhsanRobXh4Y3p0ZndzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5OTA0NjEsImV4cCI6MjA4MTU2NjQ2MX0.7stJZibmLvBk0-oEQk6XSfjsfXaqYf9_O3308ZBOTjc";
                 
                 supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
                 console.log("Supabase initialized");
+                
+                // Initialize UI first
+                initUI();
+                initEventListeners();
+                
+                // Load drink data from database
+                await loadDrinkDataFromDatabase();
+                
             } catch (error) {
                 console.error("Failed to initialize Supabase:", error);
-                alert('Service temporarily unavailable. Please try again later.');
+                showNotification('Service temporarily unavailable. Please try again later.');
+                // Initialize UI even if database fails
+                initUI();
+                initEventListeners();
                 return;
             }
 
-            // Initialize UI
-            initUI();
-            initEventListeners();
             loadUserData();
             loadPendingOrdersCount();
             
@@ -1517,6 +1474,318 @@
             };
             clubLogo.src = 'images/logo.png';
         });
+
+        // Load drink data from Supabase database
+        async function loadDrinkDataFromDatabase() {
+            try {
+                console.log("Loading drink data from Supabase...");
+                
+                // Fetch all drinks from the 'drinks' table
+                const { data: drinks, error } = await supabase
+                    .from('drinks')
+                    .select('*')
+                    .order('category')
+                    .order('name');
+                
+                if (error) {
+                    console.error("Error loading drinks from database:", error);
+                    showNotification('Error loading menu. Please try again later.');
+                    showDefaultCategories();
+                    return;
+                }
+                
+                if (!drinks || drinks.length === 0) {
+                    console.warn("No drinks found in database");
+                    showNotification('No drinks found in database');
+                    showDefaultCategories();
+                    return;
+                }
+                
+                console.log(`Loaded ${drinks.length} drinks from database`);
+                
+                // Clear existing drink data
+                drinkData = {};
+                drinkCategories = [];
+                
+                // Group drinks by category
+                drinks.forEach(drink => {
+                    const category = drink.category.toLowerCase().trim();
+                    
+                    // Clean up category name
+                    let cleanCategory = category;
+                    
+                    // Map common category names
+                    if (category.includes('cocktail')) {
+                        cleanCategory = 'cocktails';
+                    } else if (category.includes('mocktail')) {
+                        cleanCategory = 'mocktails';
+                    } else if (category.includes('soft') || category.includes('soda') || category.includes('juice')) {
+                        cleanCategory = 'soft-drinks';
+                    } else if (category.includes('champagne') || category.includes('sparkling') || category.includes('wine')) {
+                        cleanCategory = 'champagne';
+                    } else if (category.includes('shooter') || category.includes('liquor') || category.includes('spirit')) {
+                        cleanCategory = 'shooters';
+                    }
+                    
+                    // Create category if it doesn't exist
+                    if (!drinkData[cleanCategory]) {
+                        drinkData[cleanCategory] = [];
+                        drinkCategories.push(cleanCategory);
+                    }
+                    
+                    // Add drink to appropriate category
+                    drinkData[cleanCategory].push({
+                        id: drink.id,
+                        name: drink.name,
+                        description: drink.description || 'Premium drink',
+                        price: drink.price || 500,
+                        category: cleanCategory,
+                        db_id: drink.id // Keep original database ID
+                    });
+                });
+                
+                // Log counts for debugging
+                Object.keys(drinkData).forEach(category => {
+                    console.log(`Category ${category}: ${drinkData[category].length} items`);
+                });
+                
+                // Update menu categories
+                updateMenuCategories();
+                
+            } catch (error) {
+                console.error("Failed to load drink data:", error);
+                showNotification('Failed to load menu data');
+                showDefaultCategories();
+            }
+        }
+
+        // Update menu categories based on database data
+        function updateMenuCategories() {
+            const buttonsContainer = document.querySelector('.buttons-container');
+            if (!buttonsContainer) return;
+            
+            // Remove loading message
+            const loadingMessage = document.getElementById('loading-message');
+            if (loadingMessage) {
+                loadingMessage.remove();
+            }
+            
+            // Check which categories actually have data
+            const availableCategories = Object.keys(drinkData).filter(category => 
+                drinkData[category].length > 0
+            );
+            
+            // If no categories found, show default
+            if (availableCategories.length === 0) {
+                showDefaultCategories();
+                return;
+            }
+            
+            // Define category metadata
+            const categoryMetadata = {
+                'cocktails': { icon: 'fas fa-cocktail', text: 'Cocktails' },
+                'mocktails': { icon: 'fas fa-seedling', text: 'Mocktails' },
+                'soft-drinks': { icon: 'fas fa-glass-whiskey', text: 'Soft Drinks' },
+                'softdrinks': { icon: 'fas fa-glass-whiskey', text: 'Soft Drinks' },
+                'champagne': { icon: 'fas fa-wine-glass-alt', text: 'Champagne & Sparkling Wine' },
+                'shooters': { icon: 'fas fa-glass-cheers', text: 'Shooters & Liquors' },
+                'beers': { icon: 'fas fa-beer', text: 'Beers' },
+                'wines': { icon: 'fas fa-wine-bottle', text: 'Wines' },
+                'spirits': { icon: 'fas fa-whiskey-glass', text: 'Spirits' },
+                'hotdrinks': { icon: 'fas fa-mug-hot', text: 'Hot Drinks' }
+            };
+            
+            let buttonsHTML = '';
+            availableCategories.forEach(category => {
+                const meta = categoryMetadata[category] || { 
+                    icon: 'fas fa-glass-cheers', 
+                    text: category.charAt(0).toUpperCase() + category.slice(1).replace('-', ' ')
+                };
+                
+                buttonsHTML += `
+                    <button class="menu-button" data-category="${category}">
+                        <i class="${meta.icon}"></i>
+                        <span class="button-text">${meta.text}</span>
+                    </button>
+                `;
+            });
+            
+            buttonsContainer.innerHTML = buttonsHTML;
+            
+            // Re-attach event listeners
+            document.querySelectorAll('.menu-button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const category = btn.getAttribute('data-category');
+                    showCategoryPage(category);
+                });
+            });
+        }
+
+        // Show default categories if database fails
+        function showDefaultCategories() {
+            const buttonsContainer = document.querySelector('.buttons-container');
+            if (!buttonsContainer) return;
+            
+            const loadingMessage = document.getElementById('loading-message');
+            if (loadingMessage) {
+                loadingMessage.remove();
+            }
+            
+            const defaultCategories = [
+                { id: 'cocktails', icon: 'fas fa-cocktail', text: 'Cocktails' },
+                { id: 'mocktails', icon: 'fas fa-seedling', text: 'Mocktails' },
+                { id: 'soft-drinks', icon: 'fas fa-glass-whiskey', text: 'Soft Drinks' },
+                { id: 'champagne', icon: 'fas fa-wine-glass-alt', text: 'Champagne' },
+                { id: 'shooters', icon: 'fas fa-glass-cheers', text: 'Shooters' }
+            ];
+            
+            let buttonsHTML = '';
+            defaultCategories.forEach(category => {
+                buttonsHTML += `
+                    <button class="menu-button" data-category="${category.id}">
+                        <i class="${category.icon}"></i>
+                        <span class="button-text">${category.text}</span>
+                    </button>
+                `;
+            });
+            
+            buttonsContainer.innerHTML = buttonsHTML;
+            
+            // Use default hardcoded data
+            drinkData = {
+                cocktails: [
+                    { id: 1, name: "Old Fashioned", description: "Classic bourbon cocktail", price: 1200 },
+                    { id: 2, name: "Moscow Mule", description: "Vodka with ginger beer", price: 1100 }
+                ],
+                mocktails: [
+                    { id: 1, name: "Virgin Mojito", description: "Mint and lime refreshment", price: 500 }
+                ],
+                "soft-drinks": [
+                    { id: 1, name: "Coca-Cola", description: "Classic cola", price: 200 }
+                ],
+                champagne: [
+                    { id: 1, name: "Sparkling Wine", description: "Premium sparkling", price: 6000 }
+                ],
+                shooters: [
+                    { id: 1, name: "Tequila Shot", description: "100% agave tequila", price: 700 }
+                ]
+            };
+            
+            // Re-attach event listeners
+            document.querySelectorAll('.menu-button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const category = btn.getAttribute('data-category');
+                    showCategoryPage(category);
+                });
+            });
+        }
+
+        // Show category page with database data
+        function showCategoryPage(category) {
+            const menuSection = document.getElementById('menu-section');
+            
+            // Get category display name
+            const categoryNames = {
+                'cocktails': 'Cocktails',
+                'mocktails': 'Mocktails',
+                'soft-drinks': 'Soft Drinks',
+                'softdrinks': 'Soft Drinks',
+                'champagne': 'Champagne & Sparkling Wine',
+                'shooters': 'Shooters & Liquors',
+                'beers': 'Beers',
+                'wines': 'Wines',
+                'spirits': 'Spirits',
+                'hotdrinks': 'Hot Drinks'
+            };
+            
+            const displayName = categoryNames[category] || category.charAt(0).toUpperCase() + category.slice(1).replace('-', ' ');
+            
+            // Check if category has drinks
+            if (!drinkData[category] || drinkData[category].length === 0) {
+                menuSection.innerHTML = `
+                    <button class="back-button" id="back-button">
+                        <i class="fas fa-arrow-left"></i> Back to Categories
+                    </button>
+                    <h2 class="section-title">${displayName}</h2>
+                    <div class="no-orders" style="margin-top: 2rem;">
+                        <p>No drinks available in this category</p>
+                        <p style="margin-top: 1rem; font-size: 0.9rem; color: #aaa;">Check back later or try another category</p>
+                    </div>
+                `;
+                
+                document.getElementById('back-button').addEventListener('click', () => {
+                    location.reload();
+                });
+                return;
+            }
+            
+            let drinksHTML = '';
+            drinkData[category].forEach(drink => {
+                drinksHTML += `
+                    <div class="drink-card">
+                        <h3 class="drink-name">${drink.name}</h3>
+                        <p class="drink-description">${drink.description}</p>
+                        <div class="drink-price">Ksh ${drink.price.toLocaleString()}</div>
+                        <button class="add-to-cart-button" data-drink-id="${drink.id}" data-category="${category}" data-db-id="${drink.db_id || drink.id}">
+                            <i class="fas fa-cart-plus"></i> Add to Cart
+                        </button>
+                    </div>
+                `;
+            });
+            
+            menuSection.innerHTML = `
+                <button class="back-button" id="back-button">
+                    <i class="fas fa-arrow-left"></i> Back to Categories
+                </button>
+                <h2 class="section-title">${displayName}</h2>
+                <div class="drink-list">
+                    ${drinksHTML}
+                </div>
+            `;
+            
+            document.getElementById('back-button').addEventListener('click', () => {
+                location.reload();
+            });
+            
+            document.querySelectorAll('.add-to-cart-button').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const drinkId = parseInt(this.getAttribute('data-drink-id'));
+                    const category = this.getAttribute('data-category');
+                    const dbId = this.getAttribute('data-db-id');
+                    const drink = drinkData[category].find(d => d.id === drinkId);
+                    
+                    if (drink) {
+                        addToCart(drink, category, dbId);
+                    } else {
+                        showNotification('Drink not found');
+                    }
+                });
+            });
+        }
+
+        // Add to cart with database reference
+        function addToCart(drink, category, dbId) {
+            const existingItem = shoppingCart.find(item => 
+                item.db_id === dbId || (item.id === drink.id && item.category === category)
+            );
+            
+            if (existingItem) {
+                existingItem.quantity++;
+            } else {
+                shoppingCart.push({
+                    id: drink.id,
+                    name: drink.name,
+                    price: drink.price,
+                    category: category,
+                    db_id: dbId || drink.id, // Store database ID for reference
+                    quantity: 1
+                });
+            }
+            
+            saveCart();
+            updateCartDisplay();
+            showNotification(`${drink.name} added to cart!`);
+        }
 
         function initUI() {
             // Set username
@@ -1575,14 +1844,6 @@
             });
             
             document.getElementById('checkout-button').addEventListener('click', checkout);
-            
-            // Category buttons
-            document.querySelectorAll('.menu-button').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const category = btn.getAttribute('data-category');
-                    showCategoryPage(category);
-                });
-            });
             
             // Orders tabs
             document.querySelectorAll('.orders-tab').forEach(tab => {
@@ -1737,74 +1998,6 @@
 
         function saveCart() {
             localStorage.setItem('alCaponeCart', JSON.stringify(shoppingCart));
-        }
-
-        function showCategoryPage(category) {
-            const menuSection = document.getElementById('menu-section');
-            const categoryNames = {
-                'cocktails': 'Cocktails',
-                'mocktails': 'Mocktails',
-                'soft-drinks': 'Soft Drinks',
-                'champagne': 'Champagne & Sparkling Wine',
-                'shooters': 'Shooters & Liquors'
-            };
-            
-            let drinksHTML = '';
-            drinkData[category].forEach(drink => {
-                drinksHTML += `
-                    <div class="drink-card">
-                        <h3 class="drink-name">${drink.name}</h3>
-                        <p class="drink-description">${drink.description}</p>
-                        <div class="drink-price">Ksh ${drink.price.toLocaleString()}</div>
-                        <button class="add-to-cart-button" data-drink-id="${drink.id}" data-category="${category}">
-                            <i class="fas fa-cart-plus"></i> Add to Cart
-                        </button>
-                    </div>
-                `;
-            });
-            
-            menuSection.innerHTML = `
-                <button class="back-button" id="back-button">
-                    <i class="fas fa-arrow-left"></i> Back to Categories
-                </button>
-                <h2 class="section-title">${categoryNames[category]}</h2>
-                <div class="drink-list">
-                    ${drinksHTML}
-                </div>
-            `;
-            
-            document.getElementById('back-button').addEventListener('click', () => {
-                location.reload();
-            });
-            
-            document.querySelectorAll('.add-to-cart-button').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const drinkId = parseInt(this.getAttribute('data-drink-id'));
-                    const category = this.getAttribute('data-category');
-                    const drink = drinkData[category].find(d => d.id === drinkId);
-                    addToCart(drink, category);
-                });
-            });
-        }
-
-        function addToCart(drink, category) {
-            const existingItem = shoppingCart.find(item => item.id === drink.id && item.category === category);
-            
-            if (existingItem) {
-                existingItem.quantity++;
-            } else {
-                shoppingCart.push({
-                    id: drink.id,
-                    name: drink.name,
-                    price: drink.price,
-                    category: category,
-                    quantity: 1
-                });
-            }
-            
-            saveCart();
-            updateCartDisplay();
-            showNotification(`${drink.name} added to cart!`);
         }
 
         async function checkout() {
@@ -2068,21 +2261,23 @@
 
         function loadUserData() {
             // Try to get user data from Supabase auth
-            supabase.auth.getUser().then(({ data: { user } }) => {
-                if (user) {
-                    currentUser = {
-                        ...currentUser,
-                        userId: user.id,
-                        username: user.user_metadata?.username || currentUser.username,
-                        email: user.email || currentUser.email,
-                        phone: user.user_metadata?.phone || currentUser.phone
-                    };
-                    
-                    localStorage.setItem('alCaponeClubUser', JSON.stringify(currentUser));
-                    document.getElementById('username-display').textContent = currentUser.username || currentUser.email.split('@')[0];
-                    document.getElementById('menu-username').textContent = currentUser.username || currentUser.email.split('@')[0];
-                }
-            });
+            if (supabase && supabase.auth) {
+                supabase.auth.getUser().then(({ data: { user } }) => {
+                    if (user) {
+                        currentUser = {
+                            ...currentUser,
+                            userId: user.id,
+                            username: user.user_metadata?.username || currentUser.username,
+                            email: user.email || currentUser.email,
+                            phone: user.user_metadata?.phone || currentUser.phone
+                        };
+                        
+                        localStorage.setItem('alCaponeClubUser', JSON.stringify(currentUser));
+                        document.getElementById('username-display').textContent = currentUser.username || currentUser.email.split('@')[0];
+                        document.getElementById('menu-username').textContent = currentUser.username || currentUser.email.split('@')[0];
+                    }
+                });
+            }
         }
 
         function logout() {
