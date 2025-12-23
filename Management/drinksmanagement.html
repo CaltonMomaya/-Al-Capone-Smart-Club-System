@@ -1,0 +1,1826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Al Capone Club - Drink Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+            touch-action: manipulation;
+        }
+
+        :root {
+            --primary-color: #1a1a1a;
+            --secondary-color: #f5f5f5;
+            --accent-color: #8B4513;
+            --highlight-color: #D4AF37;
+            --success-color: #2e7d32;
+            --danger-color: #c62828;
+            --warning-color: #f57c00;
+            --info-color: #1565c0;
+            --card-bg: rgba(30, 30, 30, 0.98);
+            --menu-bg: rgba(30, 30, 30, 0.98);
+        }
+
+        html {
+            font-size: 16px;
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            width: 100vw;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(139, 69, 19, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 85% 30%, rgba(212, 175, 55, 0.1) 0%, transparent 20%);
+            padding: 0;
+            margin: 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+
+        @media (max-width: 768px) {
+            html {
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            html {
+                font-size: 13px;
+            }
+        }
+
+        .container {
+            width: 100%;
+            height: 100vh;
+            height: -webkit-fill-available;
+            margin: 0 auto;
+            padding: clamp(10px, 2vw, 20px);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            position: relative;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: clamp(1rem, 2vh, 2rem);
+            padding-bottom: clamp(0.5rem, 1vh, 1rem);
+            border-bottom: 2px solid var(--highlight-color);
+        }
+
+        .header h1 {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            color: var(--highlight-color);
+            margin-bottom: clamp(0.25rem, 0.5vh, 0.5rem);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            line-height: 1.2;
+        }
+
+        .header p {
+            color: #aaa;
+            max-width: min(800px, 90vw);
+            margin: 0 auto;
+            line-height: 1.4;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+        /* Main Dashboard */
+        .dashboard {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: calc(100vh - 150px);
+            height: calc(100dvh - 150px);
+            gap: clamp(1rem, 2vh, 2rem);
+        }
+
+        @media (min-width: 769px) {
+            .dashboard {
+                flex-direction: row;
+                height: calc(100vh - 120px);
+                height: calc(100dvh - 120px);
+            }
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            background: var(--menu-bg);
+            border-radius: clamp(8px, 1vw, 10px);
+            padding: clamp(1rem, 2vw, 1.5rem);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            min-width: 250px;
+            max-width: 300px;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                max-width: 100%;
+                order: -1;
+            }
+        }
+
+        .nav-title {
+            color: var(--highlight-color);
+            margin-bottom: clamp(1rem, 2vh, 1.5rem);
+            font-size: clamp(1.1rem, 3vw, 1.3rem);
+            text-align: center;
+            padding-bottom: clamp(5px, 1vh, 10px);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .nav-item {
+            display: block;
+            width: 100%;
+            padding: clamp(10px, 2vh, 12px) clamp(12px, 2vw, 15px);
+            margin-bottom: clamp(8px, 1vh, 10px);
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            border-left: 4px solid transparent;
+            border-radius: clamp(4px, 0.5vw, 5px);
+            color: var(--secondary-color);
+            font-size: clamp(0.9rem, 2vw, 1rem);
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: clamp(8px, 1vw, 10px);
+            white-space: nowrap;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: rgba(212, 175, 55, 0.2);
+            border-left-color: var(--highlight-color);
+            color: var(--highlight-color);
+        }
+
+        /* Main Content */
+        .main-content {
+            background: var(--card-bg);
+            border-radius: clamp(8px, 1vw, 10px);
+            padding: clamp(1rem, 2vw, 2rem);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            min-height: 400px;
+        }
+
+        .content-title {
+            color: var(--highlight-color);
+            margin-bottom: clamp(1rem, 2vh, 2rem);
+            font-size: clamp(1.3rem, 3vw, 1.8rem);
+            padding-bottom: clamp(8px, 1vh, 10px);
+            border-bottom: 2px solid var(--accent-color);
+        }
+
+        /* Content Sections */
+        .content-section {
+            display: none;
+            width: 100%;
+            height: 100%;
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Drink Form */
+        .form-container {
+            width: 100%;
+            max-width: min(800px, 100%);
+            margin: 0 auto;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: clamp(1rem, 2vh, 1.5rem);
+            margin-bottom: clamp(1rem, 2vh, 1.5rem);
+        }
+
+        .form-group {
+            margin-bottom: clamp(1rem, 2vh, 1.5rem);
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: clamp(0.3rem, 0.5vh, 0.5rem);
+            font-weight: 600;
+            color: var(--secondary-color);
+            font-size: clamp(0.85rem, 1.5vw, 0.95rem);
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: clamp(10px, 2vh, 12px);
+            border-radius: clamp(4px, 0.5vw, 5px);
+            border: 1px solid #555;
+            background: #333;
+            color: white;
+            font-size: clamp(0.9rem, 1.5vw, 1rem);
+            transition: all 0.3s ease;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--highlight-color);
+            box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.1);
+        }
+
+        .form-textarea {
+            min-height: clamp(80px, 15vh, 100px);
+            resize: vertical;
+            max-height: 200px;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: clamp(0.5rem, 1vw, 1rem);
+            margin-bottom: clamp(0.8rem, 1.5vh, 1rem);
+            align-items: flex-end;
+        }
+
+        .form-row .form-group {
+            flex: 1 1 calc(50% - 1rem);
+            margin-bottom: 0;
+            min-width: 200px;
+        }
+
+        .price-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: clamp(0.8rem, 1.5vw, 1rem);
+            margin-top: clamp(0.8rem, 1.5vh, 1rem);
+        }
+
+        .price-group {
+            background: rgba(0, 0, 0, 0.3);
+            padding: clamp(0.8rem, 1.5vw, 1rem);
+            border-radius: clamp(4px, 0.5vw, 5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .price-group label {
+            display: block;
+            margin-bottom: clamp(5px, 1vh, 8px);
+            color: #aaa;
+            font-size: clamp(0.8rem, 1.5vw, 0.9rem);
+        }
+
+        /* Category Management */
+        .category-manager {
+            width: 100%;
+            max-width: min(900px, 100%);
+            margin: 0 auto;
+        }
+
+        .category-section {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: clamp(6px, 0.8vw, 8px);
+            padding: clamp(1rem, 2vw, 1.5rem);
+            margin-bottom: clamp(1rem, 2vh, 2rem);
+            border: 1px solid rgba(212, 175, 55, 0.1);
+        }
+
+        .category-header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: clamp(1rem, 2vh, 1.5rem);
+            padding-bottom: clamp(8px, 1vh, 10px);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+            gap: 10px;
+        }
+
+        .category-name {
+            color: var(--highlight-color);
+            font-size: clamp(1.1rem, 2.5vw, 1.3rem);
+            font-weight: 600;
+        }
+
+        .subcategory-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr));
+            gap: clamp(0.8rem, 1.5vw, 1rem);
+            margin-top: clamp(0.8rem, 1.5vh, 1rem);
+        }
+
+        .subcategory-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: clamp(10px, 2vh, 12px);
+            border-radius: clamp(4px, 0.5vw, 5px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            min-height: 44px;
+        }
+
+        .subcategory-name {
+            font-weight: 500;
+            color: #fff;
+            font-size: clamp(0.85rem, 1.5vw, 0.95rem);
+        }
+
+        /* Drink List */
+        .drink-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+            gap: clamp(1rem, 2vh, 1.5rem);
+            margin-top: clamp(1rem, 2vh, 2rem);
+        }
+
+        .drink-card {
+            background: rgba(42, 42, 42, 0.9);
+            border-radius: clamp(8px, 1vw, 10px);
+            padding: clamp(1rem, 2vw, 1.5rem);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            min-height: 200px;
+        }
+
+        .drink-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(212, 175, 55, 0.5);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .drink-header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: clamp(0.8rem, 1.5vh, 1rem);
+            gap: 10px;
+        }
+
+        .drink-title {
+            font-size: clamp(1.1rem, 2.5vw, 1.3rem);
+            color: var(--highlight-color);
+            font-weight: 600;
+            flex: 1;
+            min-width: 150px;
+            word-break: break-word;
+        }
+
+        .drink-category {
+            background: rgba(139, 69, 19, 0.3);
+            color: #fff;
+            padding: clamp(3px, 0.5vh, 4px) clamp(8px, 1vw, 12px);
+            border-radius: 20px;
+            font-size: clamp(0.75rem, 1.5vw, 0.85rem);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .drink-desc {
+            color: #ccc;
+            margin-bottom: clamp(0.8rem, 1.5vh, 1rem);
+            line-height: 1.4;
+            font-size: clamp(0.85rem, 1.5vw, 0.95rem);
+            min-height: clamp(40px, 8vh, 60px);
+            word-break: break-word;
+        }
+
+        .drink-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: clamp(5px, 1vw, 8px);
+            margin-bottom: clamp(0.8rem, 1.5vh, 1rem);
+            padding: clamp(8px, 1.5vw, 10px);
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: clamp(4px, 0.5vw, 5px);
+        }
+
+        .detail-tag {
+            background: rgba(255, 255, 255, 0.1);
+            padding: clamp(4px, 0.8vw, 5px) clamp(8px, 1.5vw, 10px);
+            border-radius: clamp(3px, 0.5vw, 5px);
+            font-size: clamp(0.75rem, 1.5vw, 0.85rem);
+            display: flex;
+            align-items: center;
+            gap: clamp(4px, 0.8vw, 5px);
+            flex-shrink: 0;
+        }
+
+        .price-section {
+            background: rgba(0, 0, 0, 0.3);
+            padding: clamp(0.8rem, 1.5vw, 1rem);
+            border-radius: clamp(4px, 0.5vw, 5px);
+            margin-bottom: clamp(0.8rem, 1.5vh, 1rem);
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: clamp(5px, 1vh, 8px);
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .price-label {
+            color: #aaa;
+            font-size: clamp(0.8rem, 1.5vw, 0.9rem);
+        }
+
+        .price-value {
+            font-weight: bold;
+            color: #fff;
+            font-size: clamp(0.85rem, 1.5vw, 0.95rem);
+        }
+
+        .drink-actions {
+            display: flex;
+            gap: clamp(8px, 1.5vw, 10px);
+            justify-content: flex-end;
+            padding-top: clamp(0.8rem, 1.5vh, 1rem);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: clamp(7px, 1.5vh, 8px) clamp(12px, 2vw, 16px);
+            border: none;
+            border-radius: clamp(4px, 0.5vw, 5px);
+            font-size: clamp(0.8rem, 1.5vw, 0.9rem);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: clamp(6px, 1vw, 8px);
+            min-height: 44px;
+            min-width: 44px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: var(--highlight-color);
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            background: #c9a52c;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #555;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #666;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #b71c1c;
+        }
+
+        .btn-small {
+            padding: clamp(4px, 1vh, 5px) clamp(8px, 1.5vw, 10px);
+            font-size: clamp(0.75rem, 1.5vw, 0.8rem);
+        }
+
+        /* Form Buttons */
+        .form-buttons {
+            display: flex;
+            gap: clamp(0.8rem, 1.5vw, 1rem);
+            justify-content: flex-end;
+            margin-top: clamp(1rem, 2vh, 2rem);
+            padding-top: clamp(1rem, 2vh, 1.5rem);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            flex-wrap: wrap;
+        }
+
+        .form-btn {
+            padding: clamp(10px, 2vh, 12px) clamp(20px, 4vw, 30px);
+            border: none;
+            border-radius: clamp(4px, 0.5vw, 5px);
+            font-size: clamp(0.9rem, 2vw, 1rem);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-height: 44px;
+            min-width: 44px;
+            flex: 1;
+            max-width: 200px;
+        }
+
+        /* Conditional Fields */
+        .conditional-field {
+            display: none;
+        }
+
+        .conditional-field.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* Notifications */
+        .notification {
+            position: fixed;
+            top: clamp(15px, 3vh, 20px);
+            right: clamp(15px, 3vw, 20px);
+            padding: clamp(12px, 2vh, 15px) clamp(15px, 3vw, 20px);
+            border-radius: clamp(4px, 0.5vw, 5px);
+            font-weight: 600;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+            max-width: min(400px, 90vw);
+            display: flex;
+            align-items: center;
+            gap: clamp(8px, 1.5vw, 10px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+        .notification.success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .notification.error {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .notification.warning {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: clamp(40px, 10vw, 50px);
+            height: clamp(40px, 10vw, 50px);
+            border: clamp(4px, 1vw, 5px) solid #333;
+            border-top-color: var(--highlight-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: clamp(2rem, 5vh, 3rem);
+            color: #888;
+            grid-column: 1 / -1;
+            width: 100%;
+        }
+
+        .empty-state i {
+            font-size: clamp(2rem, 8vw, 3rem);
+            margin-bottom: clamp(0.8rem, 2vh, 1rem);
+            opacity: 0.5;
+        }
+
+        .empty-state p {
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--highlight-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #c9a52c;
+        }
+
+        /* Prevent zoom on mobile */
+        input, select, textarea, button {
+            font-size: 16px !important;
+        }
+
+        @media (max-width: 768px) {
+            input, select, textarea, button {
+                font-size: 14px !important;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .dashboard {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                max-width: 100%;
+                order: -1;
+            }
+            
+            .drink-list {
+                grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                flex-direction: column;
+            }
+            
+            .form-row .form-group {
+                flex: 1 1 100%;
+                min-width: 100%;
+            }
+            
+            .drink-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: clamp(8px, 2vw, 10px);
+            }
+            
+            .price-inputs {
+                grid-template-columns: 1fr;
+            }
+            
+            .subcategory-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-buttons {
+                flex-direction: column;
+            }
+            
+            .form-btn {
+                max-width: 100%;
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: clamp(1.3rem, 5vw, 1.5rem);
+            }
+            
+            .drink-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .category-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .category-header button {
+                width: 100%;
+            }
+        }
+
+        /* Fix for iOS Safari */
+        @supports (-webkit-touch-callout: none) {
+            body {
+                height: -webkit-fill-available;
+            }
+            
+            .container {
+                height: -webkit-fill-available;
+            }
+            
+            .dashboard {
+                height: -webkit-fill-available;
+            }
+            
+            .main-content {
+                max-height: -webkit-fill-available;
+            }
+        }
+
+        /* Prevent text selection */
+        .no-select {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* Fix for Android Chrome */
+        @media (hover: none) and (pointer: coarse) {
+            .btn, .nav-item, .form-btn {
+                min-height: 48px;
+            }
+            
+            .form-input, .form-select, .form-textarea {
+                font-size: 16px;
+                padding: 14px;
+            }
+        }
+    </style>
+</head>
+<body class="no-select">
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-cocktail"></i> Al Capone Club - Drink Management</h1>
+            <p>Complete control over your drink menu. Add categories, subcategories, and manage all drink items.</p>
+        </div>
+
+        <div class="dashboard">
+            <!-- Sidebar Navigation -->
+            <div class="sidebar">
+                <h3 class="nav-title">Management Menu</h3>
+                
+                <button class="nav-item active" data-section="add-drink">
+                    <i class="fas fa-plus-circle"></i> Add New Drink
+                </button>
+                
+                <button class="nav-item" data-section="manage-categories">
+                    <i class="fas fa-tags"></i> Manage Categories
+                </button>
+                
+                <button class="nav-item" data-section="view-drinks">
+                    <i class="fas fa-list"></i> View All Drinks
+                </button>
+                
+                <button class="nav-item" data-section="edit-drink" style="display: none;">
+                    <i class="fas fa-edit"></i> Edit Drink
+                </button>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="main-content">
+                <!-- Add/Edit Drink Section -->
+                <div class="content-section active" id="add-drink-section">
+                    <h2 class="content-title">Add New Drink</h2>
+                    <div class="form-container">
+                        <form id="drink-form">
+                            <input type="hidden" id="drink-id">
+                            
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label" for="drink-name">Drink Name *</label>
+                                    <input type="text" id="drink-name" class="form-input" required placeholder="e.g., Old Fashioned">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label" for="category">Main Category *</label>
+                                    <select id="category" class="form-select" required>
+                                        <option value="">Select Category</option>
+                                        <option value="cocktails">Cocktails</option>
+                                        <option value="wine">Wine</option>
+                                        <option value="drinks">Other Drinks</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label" for="subcategory">Subcategory *</label>
+                                    <select id="subcategory" class="form-select" required>
+                                        <option value="">Select Subcategory</option>
+                                        <option value="N/A">N/A (No Subcategory)</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group conditional-field" id="wine-type-group">
+                                    <label class="form-label" for="wine-type">Wine Type</label>
+                                    <select id="wine-type" class="form-select">
+                                        <option value="">Select Type</option>
+                                        <option value="red">Red</option>
+                                        <option value="white">White</option>
+                                        <option value="rose">Rosé</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label" for="serving-type">Serving Type *</label>
+                                    <select id="serving-type" class="form-select" required>
+                                        <option value="">Select Serving</option>
+                                        <option value="glass">Glass</option>
+                                        <option value="bottle">Bottle</option>
+                                        <option value="both">Both Glass & Bottle</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group conditional-field" id="shot-type-group">
+                                    <label class="form-label" for="shot-type">Shot Type</label>
+                                    <select id="shot-type" class="form-select">
+                                        <option value="">Select Option</option>
+                                        <option value="1shot">1 Shot</option>
+                                        <option value="6shots">6 Shots</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label class="form-label" for="description">Description</label>
+                                <textarea id="description" class="form-textarea" placeholder="Describe the drink..."></textarea>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label class="form-label">Pricing</label>
+                                <div class="price-inputs">
+                                    <div class="price-group" id="glass-price-group">
+                                        <label for="price-glass">Price per Glass (Ksh)</label>
+                                        <input type="number" id="price-glass" class="form-input" min="0" step="50" placeholder="0.00">
+                                    </div>
+                                    
+                                    <div class="price-group conditional-field" id="bottle-price-group">
+                                        <label for="price-bottle">Price per Bottle (Ksh)</label>
+                                        <input type="number" id="price-bottle" class="form-input" min="0" step="100" placeholder="0.00">
+                                    </div>
+                                </div>
+                                <small style="color: #aaa; display: block; margin-top: 5px;">* At least one price is required</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="quantity">Available Quantity *</label>
+                                <input type="number" id="quantity" class="form-input" min="0" value="10" required placeholder="Number available">
+                            </div>
+                            
+                            <div class="form-buttons">
+                                <button type="button" class="form-btn btn-secondary" id="cancel-edit-btn" style="display: none;">
+                                    Cancel Edit
+                                </button>
+                                <button type="submit" class="form-btn btn-primary">
+                                    Save Drink
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Manage Categories Section -->
+                <div class="content-section" id="manage-categories-section">
+                    <h2 class="content-title">Manage Categories & Subcategories</h2>
+                    <div class="category-manager">
+                        
+                        <!-- Add New Category -->
+                        <div class="category-section">
+                            <div class="category-header">
+                                <h3 class="category-name">Add New Category</h3>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Category Name</label>
+                                    <input type="text" id="new-category-name" class="form-input" placeholder="e.g., Shisha">
+                                </div>
+                                <button class="btn btn-primary" id="add-category-btn">
+                                    <i class="fas fa-plus"></i> Add Category
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Add Subcategory -->
+                        <div class="category-section">
+                            <div class="category-header">
+                                <h3 class="category-name">Add New Subcategory</h3>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Select Category</label>
+                                    <select id="parent-category" class="form-select">
+                                        <option value="">Choose Category</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Subcategory Name</label>
+                                    <input type="text" id="new-subcategory-name" class="form-input" placeholder="e.g., Single Malt">
+                                </div>
+                                <button class="btn btn-primary" id="add-subcategory-btn">
+                                    <i class="fas fa-plus"></i> Add Subcategory
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Categories List -->
+                        <div class="category-section">
+                            <div class="category-header">
+                                <h3 class="category-name">All Categories</h3>
+                            </div>
+                            <div id="categories-list">
+                                <!-- Categories will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- View Drinks Section -->
+                <div class="content-section" id="view-drinks-section">
+                    <h2 class="content-title">All Drinks</h2>
+                    
+                    <!-- Search and Filter -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Search Drinks</label>
+                            <input type="text" id="search-drinks" class="form-input" placeholder="Search by name or description...">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Filter by Category</label>
+                            <select id="filter-category" class="form-select">
+                                <option value="">All Categories</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Drinks List -->
+                    <div class="drink-list" id="drinks-list-container">
+                        <div class="empty-state">
+                            <i class="fas fa-glass-cheers"></i>
+                            <p>No drinks found. Add your first drink!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/dist/umd/supabase.min.js"></script>
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://tfuwozhljthmxxcztfws.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRmdXdvemhsanRobXh4Y3p0ZndzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5OTA0NjEsImV4cCI6MjA4MTU2NjQ2MX0.7stJZibmLvBk0-oEQk6XSfjsfXaqYf9_O3308ZBOTjc';
+        
+        let supabase;
+        let currentDrinks = [];
+        let currentCategories = {};
+        let editingDrinkId = null;
+
+        // Default categories structure with N/A option
+        const defaultCategories = {
+            'cocktails': ['N/A'],
+            'wine': ['red', 'white', 'rosé'],
+            'drinks': ['soft drinks', 'mocktails', 'champagne & sparkling wine', 'shooters & liquors', 'N/A']
+        };
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Check if user is authenticated
+            const userData = localStorage.getItem('alCaponeClubUser');
+            if (!userData) {
+                window.location.href = 'admin-login.html';
+                return;
+            }
+
+            // Prevent zooming
+            document.addEventListener('touchstart', function(event) {
+                if (event.touches.length > 1) {
+                    event.preventDefault();
+                }
+            }, { passive: false });
+
+            document.addEventListener('gesturestart', function(event) {
+                event.preventDefault();
+            });
+
+            // Initialize Supabase
+            try {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log("Supabase initialized successfully");
+            } catch (error) {
+                console.error("Failed to initialize Supabase:", error);
+                showNotification('Failed to connect to database.', 'error');
+                return;
+            }
+
+            // Initialize UI and load data
+            initUI();
+            initEventListeners();
+            await loadCategories();
+            await loadDrinks();
+        });
+
+        function initUI() {
+            // Set up category change handler
+            document.getElementById('category').addEventListener('change', function() {
+                updateSubcategories();
+                updateConditionalFields();
+            });
+
+            // Set up serving type change handler
+            document.getElementById('serving-type').addEventListener('change', function() {
+                updateConditionalFields();
+            });
+
+            // Set up subcategory change handler
+            document.getElementById('subcategory').addEventListener('change', function() {
+                updateShotTypeField();
+            });
+
+            // Initial updates
+            updateSubcategories();
+            updateConditionalFields();
+        }
+
+        function initEventListeners() {
+            // Navigation
+            document.querySelectorAll('.nav-item').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const sectionId = this.getAttribute('data-section');
+                    switchSection(sectionId);
+                });
+            });
+
+            // Form submission
+            document.getElementById('drink-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                await saveDrink();
+            });
+
+            // Cancel edit button
+            document.getElementById('cancel-edit-btn').addEventListener('click', function() {
+                resetForm();
+                switchSection('view-drinks');
+            });
+
+            // Category management
+            document.getElementById('add-category-btn').addEventListener('click', addCategory);
+            document.getElementById('add-subcategory-btn').addEventListener('click', addSubcategory);
+
+            // Search and filter
+            document.getElementById('search-drinks').addEventListener('input', filterDrinks);
+            document.getElementById('filter-category').addEventListener('change', filterDrinks);
+        }
+
+        function switchSection(sectionId) {
+            // Update active nav item
+            document.querySelectorAll('.nav-item').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-section') === sectionId);
+            });
+
+            // Hide edit drink nav item if not editing
+            const editNav = document.querySelector('.nav-item[data-section="edit-drink"]');
+            if (sectionId !== 'edit-drink') {
+                editNav.style.display = 'none';
+            }
+
+            // Show selected section
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.toggle('active', section.id === sectionId + '-section');
+            });
+
+            // Load data if needed
+            if (sectionId === 'manage-categories') {
+                displayCategories();
+            }
+        }
+
+        function updateSubcategories() {
+            const category = document.getElementById('category').value;
+            const subcategorySelect = document.getElementById('subcategory');
+            
+            subcategorySelect.innerHTML = '<option value="">Select Subcategory</option>';
+            subcategorySelect.innerHTML += '<option value="N/A">N/A (No Subcategory)</option>';
+            
+            if (category && currentCategories[category]) {
+                currentCategories[category].forEach(sub => {
+                    if (sub !== 'N/A') {
+                        const option = document.createElement('option');
+                        option.value = sub;
+                        option.textContent = sub.charAt(0).toUpperCase() + sub.slice(1);
+                        subcategorySelect.appendChild(option);
+                    }
+                });
+            }
+            
+            // Default to N/A if no subcategories
+            if (!category || !currentCategories[category] || currentCategories[category].length === 0) {
+                subcategorySelect.value = 'N/A';
+            }
+        }
+
+        function updateConditionalFields() {
+            const category = document.getElementById('category').value;
+            const servingType = document.getElementById('serving-type').value;
+            
+            // Show wine type for wine category
+            const wineTypeGroup = document.getElementById('wine-type-group');
+            wineTypeGroup.classList.toggle('active', category === 'wine');
+            
+            // Show bottle price for bottle or both serving types
+            const bottlePriceGroup = document.getElementById('bottle-price-group');
+            bottlePriceGroup.classList.toggle('active', 
+                servingType === 'bottle' || servingType === 'both');
+            
+            // Show glass price for glass or both serving types
+            const glassPriceGroup = document.getElementById('glass-price-group');
+            glassPriceGroup.classList.toggle('active', 
+                servingType === 'glass' || servingType === 'both');
+        }
+
+        function updateShotTypeField() {
+            const subcategory = document.getElementById('subcategory').value;
+            const shotTypeGroup = document.getElementById('shot-type-group');
+            
+            // Show shot type only for shooters & liquors
+            shotTypeGroup.classList.toggle('active', 
+                subcategory === 'shooters & liquors');
+        }
+
+        async function loadCategories() {
+            try {
+                // First try to load from database
+                const { data: dbCategories, error } = await supabase
+                    .from('drink_categories')
+                    .select('*');
+                
+                if (error) throw error;
+                
+                if (dbCategories && dbCategories.length > 0) {
+                    // Convert database format to our structure
+                    currentCategories = {};
+                    dbCategories.forEach(item => {
+                        if (!currentCategories[item.main_category]) {
+                            currentCategories[item.main_category] = [];
+                        }
+                        currentCategories[item.main_category].push(item.subcategory);
+                    });
+                } else {
+                    // Use default categories
+                    currentCategories = JSON.parse(JSON.stringify(defaultCategories));
+                    
+                    // Save defaults to database
+                    const categoriesToInsert = [];
+                    Object.keys(defaultCategories).forEach(mainCat => {
+                        defaultCategories[mainCat].forEach(subCat => {
+                            categoriesToInsert.push({
+                                main_category: mainCat,
+                                subcategory: subCat,
+                                is_active: true
+                            });
+                        });
+                    });
+                    
+                    await supabase.from('drink_categories').insert(categoriesToInsert);
+                }
+                
+                // Update category selects
+                updateCategorySelects();
+                
+            } catch (error) {
+                console.error('Error loading categories:', error);
+                // Use default categories as fallback
+                currentCategories = JSON.parse(JSON.stringify(defaultCategories));
+                updateCategorySelects();
+            }
+        }
+
+        function updateCategorySelects() {
+            // Update category select in add drink form
+            const categorySelect = document.getElementById('category');
+            categorySelect.innerHTML = '<option value="">Select Category</option>';
+            
+            Object.keys(currentCategories).forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category.charAt(0).toUpperCase() + category.slice(1);
+                categorySelect.appendChild(option);
+            });
+            
+            // Update filter category select
+            const filterSelect = document.getElementById('filter-category');
+            filterSelect.innerHTML = '<option value="">All Categories</option>';
+            
+            Object.keys(currentCategories).forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category.charAt(0).toUpperCase() + category.slice(1);
+                filterSelect.appendChild(option);
+            });
+            
+            // Update parent category select for subcategory addition
+            const parentSelect = document.getElementById('parent-category');
+            parentSelect.innerHTML = '<option value="">Choose Category</option>';
+            
+            Object.keys(currentCategories).forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category.charAt(0).toUpperCase() + category.slice(1);
+                parentSelect.appendChild(option);
+            });
+        }
+
+        async function loadDrinks() {
+            showLoading(true);
+            
+            try {
+                const { data: drinks, error } = await supabase
+                    .from('drinks')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                currentDrinks = drinks || [];
+                displayDrinks(currentDrinks);
+                
+            } catch (error) {
+                console.error('Error loading drinks:', error);
+                showNotification('Failed to load drinks.', 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function displayDrinks(drinks) {
+            const container = document.getElementById('drinks-list-container');
+            
+            if (!drinks || drinks.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-glass-cheers"></i>
+                        <p>No drinks found. Add your first drink!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            
+            drinks.forEach(drink => {
+                // Determine shot type display
+                let shotTypeDisplay = '';
+                if (drink.subcategory === 'shooters & liquors' && drink.shot_type) {
+                    shotTypeDisplay = drink.shot_type === '1shot' ? '1 Shot' : '6 Shots';
+                }
+                
+                // Format subcategory display
+                const subcategoryDisplay = drink.subcategory === 'N/A' ? 'No Subcategory' : drink.subcategory;
+                
+                // Format price display
+                let priceDisplay = '';
+                if (drink.price_glass && drink.price_bottle) {
+                    priceDisplay = `
+                        <div class="price-row">
+                            <span class="price-label">Glass:</span>
+                            <span class="price-value">Ksh ${drink.price_glass.toLocaleString()}</span>
+                        </div>
+                        <div class="price-row">
+                            <span class="price-label">Bottle:</span>
+                            <span class="price-value">Ksh ${drink.price_bottle.toLocaleString()}</span>
+                        </div>
+                    `;
+                } else if (drink.price_glass) {
+                    priceDisplay = `
+                        <div class="price-row">
+                            <span class="price-label">Price:</span>
+                            <span class="price-value">Ksh ${drink.price_glass.toLocaleString()} per glass</span>
+                        </div>
+                    `;
+                } else if (drink.price_bottle) {
+                    priceDisplay = `
+                        <div class="price-row">
+                            <span class="price-label">Price:</span>
+                            <span class="price-value">Ksh ${drink.price_bottle.toLocaleString()} per bottle</span>
+                        </div>
+                    `;
+                }
+                
+                html += `
+                    <div class="drink-card">
+                        <div class="drink-header">
+                            <h3 class="drink-title">${drink.name}</h3>
+                            <span class="drink-category">${drink.category}</span>
+                        </div>
+                        <p class="drink-desc">${drink.description || 'No description'}</p>
+                        
+                        <div class="drink-details">
+                            <span class="detail-tag">
+                                <i class="fas fa-tag"></i> ${subcategoryDisplay}
+                            </span>
+                            ${drink.wine_type ? `
+                            <span class="detail-tag">
+                                <i class="fas fa-wine-glass"></i> ${drink.wine_type}
+                            </span>` : ''}
+                            <span class="detail-tag">
+                                <i class="fas fa-glass-whiskey"></i> ${drink.serving_type}
+                            </span>
+                            ${shotTypeDisplay ? `
+                            <span class="detail-tag">
+                                <i class="fas fa-wine-bottle"></i> ${shotTypeDisplay}
+                            </span>` : ''}
+                            <span class="detail-tag">
+                                <i class="fas fa-box"></i> ${drink.quantity} available
+                            </span>
+                        </div>
+                        
+                        ${priceDisplay ? `
+                        <div class="price-section">
+                            ${priceDisplay}
+                        </div>` : ''}
+                        
+                        <div class="drink-actions">
+                            <button class="btn btn-primary btn-small" onclick="editDrink('${drink.id}')">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="btn btn-danger btn-small" onclick="deleteDrink('${drink.id}')">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        async function saveDrink() {
+            showLoading(true);
+            
+            try {
+                const formData = {
+                    name: document.getElementById('drink-name').value.trim(),
+                    description: document.getElementById('description').value.trim(),
+                    category: document.getElementById('category').value,
+                    subcategory: document.getElementById('subcategory').value,
+                    wine_type: document.getElementById('wine-type').value || null,
+                    serving_type: document.getElementById('serving-type').value,
+                    shot_type: document.getElementById('shot-type').value || null,
+                    price_glass: parseFloat(document.getElementById('price-glass').value) || null,
+                    price_bottle: parseFloat(document.getElementById('price-bottle').value) || null,
+                    quantity: parseInt(document.getElementById('quantity').value) || 0,
+                    updated_at: new Date().toISOString()
+                };
+                
+                // Validation
+                if (!formData.name || !formData.category || !formData.subcategory) {
+                    throw new Error('Please fill in all required fields');
+                }
+                
+                if (!formData.price_glass && !formData.price_bottle) {
+                    throw new Error('Please provide at least one price');
+                }
+                
+                if (formData.quantity < 0) {
+                    throw new Error('Quantity cannot be negative');
+                }
+                
+                let result;
+                
+                if (editingDrinkId) {
+                    // Update existing
+                    const { data, error } = await supabase
+                        .from('drinks')
+                        .update(formData)
+                        .eq('id', editingDrinkId)
+                        .select();
+                    
+                    if (error) throw error;
+                    result = data;
+                    
+                    showNotification('Drink updated successfully!', 'success');
+                } else {
+                    // Create new
+                    formData.created_at = new Date().toISOString();
+                    
+                    const { data, error } = await supabase
+                        .from('drinks')
+                        .insert([formData])
+                        .select();
+                    
+                    if (error) throw error;
+                    result = data;
+                    
+                    showNotification('Drink added successfully!', 'success');
+                }
+                
+                // Refresh and reset
+                await loadDrinks();
+                resetForm();
+                switchSection('view-drinks');
+                
+            } catch (error) {
+                console.error('Error saving drink:', error);
+                showNotification(error.message || 'Failed to save drink.', 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function editDrink(drinkId) {
+            showLoading(true);
+            
+            try {
+                const { data: drink, error } = await supabase
+                    .from('drinks')
+                    .select('*')
+                    .eq('id', drinkId)
+                    .single();
+                
+                if (error) throw error;
+                
+                // Populate form
+                document.getElementById('drink-id').value = drink.id;
+                document.getElementById('drink-name').value = drink.name;
+                document.getElementById('description').value = drink.description || '';
+                document.getElementById('category').value = drink.category;
+                document.getElementById('subcategory').value = drink.subcategory;
+                document.getElementById('wine-type').value = drink.wine_type || '';
+                document.getElementById('serving-type').value = drink.serving_type;
+                document.getElementById('shot-type').value = drink.shot_type || '';
+                document.getElementById('price-glass').value = drink.price_glass || '';
+                document.getElementById('price-bottle').value = drink.price_bottle || '';
+                document.getElementById('quantity').value = drink.quantity || 0;
+                
+                // Update UI
+                updateSubcategories();
+                updateConditionalFields();
+                updateShotTypeField();
+                
+                // Show edit mode
+                document.getElementById('cancel-edit-btn').style.display = 'block';
+                document.querySelector('.nav-item[data-section="edit-drink"]').style.display = 'flex';
+                editingDrinkId = drinkId;
+                
+                switchSection('edit-drink');
+                
+            } catch (error) {
+                console.error('Error loading drink:', error);
+                showNotification('Failed to load drink for editing.', 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function deleteDrink(drinkId) {
+            if (!confirm('Are you sure you want to delete this drink? This action cannot be undone.')) {
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                const { error } = await supabase
+                    .from('drinks')
+                    .delete()
+                    .eq('id', drinkId);
+                
+                if (error) throw error;
+                
+                showNotification('Drink deleted successfully!', 'success');
+                
+                // Reset if editing this drink
+                if (editingDrinkId === drinkId) {
+                    resetForm();
+                    switchSection('view-drinks');
+                }
+                
+                await loadDrinks();
+                
+            } catch (error) {
+                console.error('Error deleting drink:', error);
+                showNotification('Failed to delete drink.', 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function addCategory() {
+            const categoryName = document.getElementById('new-category-name').value.trim().toLowerCase();
+            
+            if (!categoryName) {
+                showNotification('Please enter a category name', 'warning');
+                return;
+            }
+            
+            if (currentCategories[categoryName]) {
+                showNotification('Category already exists', 'warning');
+                return;
+            }
+            
+            // Add to local structure with N/A subcategory
+            currentCategories[categoryName] = ['N/A'];
+            
+            // Save to database
+            try {
+                const { error } = await supabase
+                    .from('drink_categories')
+                    .insert([
+                        { 
+                            main_category: categoryName,
+                            subcategory: 'N/A',
+                            is_active: true 
+                        }
+                    ]);
+                
+                if (error) throw error;
+                
+                // Update UI
+                document.getElementById('new-category-name').value = '';
+                updateCategorySelects();
+                showNotification('Category added successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Error adding category:', error);
+                showNotification('Failed to add category to database.', 'error');
+            }
+        }
+
+        async function addSubcategory() {
+            const parentCategory = document.getElementById('parent-category').value;
+            const subcategoryName = document.getElementById('new-subcategory-name').value.trim().toLowerCase();
+            
+            if (!parentCategory || !subcategoryName) {
+                showNotification('Please select a category and enter subcategory name', 'warning');
+                return;
+            }
+            
+            if (!currentCategories[parentCategory]) {
+                showNotification('Parent category not found', 'error');
+                return;
+            }
+            
+            if (currentCategories[parentCategory].includes(subcategoryName)) {
+                showNotification('Subcategory already exists', 'warning');
+                return;
+            }
+            
+            // Add to local structure
+            currentCategories[parentCategory].push(subcategoryName);
+            
+            // Save to database
+            try {
+                const { error } = await supabase
+                    .from('drink_categories')
+                    .insert([
+                        { 
+                            main_category: parentCategory,
+                            subcategory: subcategoryName,
+                            is_active: true 
+                        }
+                    ]);
+                
+                if (error) throw error;
+                
+                // Update UI
+                document.getElementById('new-subcategory-name').value = '';
+                updateCategorySelects();
+                showNotification('Subcategory added successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Error adding subcategory:', error);
+                showNotification('Failed to add subcategory to database.', 'error');
+            }
+        }
+
+        function displayCategories() {
+            const container = document.getElementById('categories-list');
+            let html = '';
+            
+            Object.keys(currentCategories).forEach(category => {
+                // Filter out N/A from display
+                const displaySubcategories = currentCategories[category].filter(sub => sub !== 'N/A');
+                
+                html += `
+                    <div class="category-section" style="margin-bottom: 1rem;">
+                        <div class="category-header">
+                            <h3 class="category-name" style="color: var(--highlight-color);">${category.charAt(0).toUpperCase() + category.slice(1)}</h3>
+                            <button class="btn btn-danger btn-small" onclick="deleteCategory('${category}')">
+                                <i class="fas fa-trash"></i> Delete Category
+                            </button>
+                        </div>
+                        ${displaySubcategories.length > 0 ? `
+                        <div class="subcategory-list">
+                            ${displaySubcategories.map(sub => `
+                                <div class="subcategory-item">
+                                    <span class="subcategory-name">${sub.charAt(0).toUpperCase() + sub.slice(1)}</span>
+                                    <button class="btn btn-danger btn-small" onclick="deleteSubcategory('${category}', '${sub}')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                        ` : `
+                        <div style="text-align: center; padding: 1rem; color: #888;">
+                            <i class="fas fa-info-circle"></i>
+                            <p>No subcategories (uses N/A)</p>
+                        </div>
+                        `}
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        async function deleteCategory(categoryName) {
+            if (!confirm(`Delete category "${categoryName}" and all its subcategories?`)) {
+                return;
+            }
+            
+            // Remove from local structure
+            delete currentCategories[categoryName];
+            
+            // Remove from database
+            try {
+                const { error } = await supabase
+                    .from('drink_categories')
+                    .delete()
+                    .eq('main_category', categoryName);
+                
+                if (error) throw error;
+                
+                // Update UI
+                updateCategorySelects();
+                displayCategories();
+                showNotification('Category deleted successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Error deleting category:', error);
+                showNotification('Failed to delete category.', 'error');
+            }
+        }
+
+        async function deleteSubcategory(categoryName, subcategoryName) {
+            if (!confirm(`Delete subcategory "${subcategoryName}"?`)) {
+                return;
+            }
+            
+            // Remove from local structure
+            const index = currentCategories[categoryName].indexOf(subcategoryName);
+            if (index > -1) {
+                currentCategories[categoryName].splice(index, 1);
+            }
+            
+            // Remove from database
+            try {
+                const { error } = await supabase
+                    .from('drink_categories')
+                    .delete()
+                    .eq('main_category', categoryName)
+                    .eq('subcategory', subcategoryName);
+                
+                if (error) throw error;
+                
+                // Update UI
+                updateCategorySelects();
+                displayCategories();
+                showNotification('Subcategory deleted successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Error deleting subcategory:', error);
+                showNotification('Failed to delete subcategory.', 'error');
+            }
+        }
+
+        function filterDrinks() {
+            const searchTerm = document.getElementById('search-drinks').value.toLowerCase();
+            const categoryFilter = document.getElementById('filter-category').value;
+            
+            let filtered = currentDrinks;
+            
+            // Apply search filter
+            if (searchTerm) {
+                filtered = filtered.filter(drink => 
+                    drink.name.toLowerCase().includes(searchTerm) ||
+                    (drink.description && drink.description.toLowerCase().includes(searchTerm))
+                );
+            }
+            
+            // Apply category filter
+            if (categoryFilter) {
+                filtered = filtered.filter(drink => drink.category === categoryFilter);
+            }
+            
+            displayDrinks(filtered);
+        }
+
+        function resetForm() {
+            document.getElementById('drink-form').reset();
+            document.getElementById('drink-id').value = '';
+            document.getElementById('cancel-edit-btn').style.display = 'none';
+            editingDrinkId = null;
+            
+            // Reset selects to defaults
+            document.getElementById('category').value = '';
+            document.getElementById('subcategory').innerHTML = '<option value="">Select Subcategory</option><option value="N/A">N/A (No Subcategory)</option>';
+            document.getElementById('serving-type').value = '';
+            document.getElementById('quantity').value = '10';
+            
+            // Hide conditional fields
+            document.getElementById('wine-type-group').classList.remove('active');
+            document.getElementById('shot-type-group').classList.remove('active');
+            document.getElementById('bottle-price-group').classList.remove('active');
+            document.getElementById('glass-price-group').classList.add('active');
+        }
+
+        function showLoading(show) {
+            document.getElementById('loading-overlay').classList.toggle('active', show);
+        }
+
+        function showNotification(message, type = 'success') {
+            // Remove existing notifications
+            document.querySelectorAll('.notification').forEach(n => n.remove());
+            
+            // Create new notification
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
