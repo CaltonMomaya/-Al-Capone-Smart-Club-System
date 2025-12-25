@@ -1398,7 +1398,7 @@
                 <div class="success-details" id="success-details">
                     <!-- Order details will be inserted here -->
                 </div>
-                <button class="close-success" id="close-success">Continue Shopping</button>
+                <button class="close-success" id="close-success">Continue ordering</button>
             </div>
         </div>
 
@@ -1442,6 +1442,13 @@
                 supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
                 console.log("Supabase initialized");
                 
+                // Test database connection
+                const isConnected = await testDatabaseConnection();
+                if (!isConnected) {
+                    console.warn("Database connection issues. Orders may not save properly.");
+                    showNotification("Warning: Database connection issues");
+                }
+                
                 // Initialize UI first
                 initUI();
                 initEventListeners();
@@ -1475,10 +1482,52 @@
             clubLogo.src = 'images/logo.png';
         });
 
+        // Test database connection
+        async function testDatabaseConnection() {
+            try {
+                const { data, error } = await supabase
+                    .from('orders')
+                    .select('count')
+                    .limit(1);
+                
+                if (error) {
+                    console.error("Orders table may not exist:", error);
+                    // Try to check if drinks table exists instead
+                    const { data: drinksData, error: drinksError } = await supabase
+                        .from('drinks')
+                        .select('count')
+                        .limit(1);
+                    
+                    if (drinksError) {
+                        console.error("Database connection failed:", drinksError);
+                        return false;
+                    }
+                }
+                
+                console.log("Database connection successful");
+                return true;
+            } catch (error) {
+                console.error("Database connection failed:", error);
+                return false;
+            }
+        }
+
         // Load drink data from Supabase database
         async function loadDrinkDataFromDatabase() {
             try {
                 console.log("Loading drink data from Supabase...");
+                
+                // Test database connection first
+                const { data: testData, error: testError } = await supabase
+                    .from('drinks')
+                    .select('count')
+                    .limit(1);
+                
+                if (testError) {
+                    console.error("Database connection error:", testError);
+                    showDefaultCategories();
+                    return;
+                }
                 
                 // Fetch all drinks from the 'drinks' table
                 const { data: drinks, error } = await supabase
@@ -1489,14 +1538,12 @@
                 
                 if (error) {
                     console.error("Error loading drinks from database:", error);
-                    showNotification('Error loading menu. Please try again later.');
                     showDefaultCategories();
                     return;
                 }
                 
                 if (!drinks || drinks.length === 0) {
                     console.warn("No drinks found in database");
-                    showNotification('No drinks found in database');
                     showDefaultCategories();
                     return;
                 }
@@ -1554,7 +1601,6 @@
                 
             } catch (error) {
                 console.error("Failed to load drink data:", error);
-                showNotification('Failed to load menu data');
                 showDefaultCategories();
             }
         }
@@ -2092,6 +2138,7 @@
             });
         }
 
+        // FIXED: Process payment function - CORRECTED STATUS VALUES
         async function processPayment(totalPrice) {
             const phone = document.getElementById('phone').value;
             const name = document.getElementById('name').value;
@@ -2116,47 +2163,65 @@
             // Create order ID
             const orderId = 'AC-' + Date.now().toString().slice(-8);
             
-            // Prepare order data
+            // Prepare order data for database - CORRECT STATUS VALUES
             const orderData = {
                 order_id: orderId,
                 user_id: currentUser.userId || currentUser.email,
-                username: currentUser.username || currentUser.email.split('@')[0],
-                user_email: currentUser.email,
+                username: name,
+                user_email: email,
                 phone: phone,
-                table_number: tableNumber,
+                table_number: parseInt(tableNumber),
                 items: shoppingCart,
                 total_amount: totalPrice,
-                status: 'pending',
+                status: 'pending',        // Order starts as pending
+                payment_status: 'success', // Payment is successful
                 payment_method: 'M-Pesa',
                 created_at: new Date().toISOString()
             };
             
-            // Save order to Supabase
+            console.log('Saving order to database:', orderData);
+            
             try {
+                // Save order to Supabase - SIMPLIFIED: Just insert, don't update after
                 const { data, error } = await supabase
                     .from('orders')
                     .insert([orderData]);
                 
-                if (error) throw error;
+                if (error) {
+                    console.error('Supabase insert error:', error);
+                    alert('Failed to save order: ' + error.message);
+                    return;
+                }
                 
-                // Simulate M-Pesa payment
+                console.log('Order saved successfully:', data);
+                
+                // Show processing notification
                 showNotification(`Processing M-Pesa payment of Ksh ${totalPrice.toLocaleString()}...`);
                 
+                // Simulate M-Pesa payment processing
                 setTimeout(() => {
+                    // Show success modal
                     showSuccessModal(orderData);
+                    
+                    // Clear cart
                     shoppingCart = [];
                     saveCart();
                     updateCartDisplay();
+                    
+                    // Update pending orders count
                     loadPendingOrdersCount();
+                    
                 }, 3000);
                 
             } catch (error) {
-                console.error('Error saving order:', error);
+                console.error('Error in payment process:', error);
                 alert('Failed to process payment. Please try again.');
             }
         }
 
         function showSuccessModal(orderData) {
+            console.log('Showing success modal for order:', orderData);
+            
             const successDetails = document.getElementById('success-details');
             
             let orderItemsHTML = orderData.items.map(item => 
@@ -2173,12 +2238,16 @@
                 ${orderItemsHTML}
                 <p><strong>Total Amount:</strong> Ksh ${orderData.total_amount.toLocaleString()}</p>
                 <p><strong>Payment Status:</strong> <span style="color: #4CAF50;">Confirmed ✓</span></p>
-                <p><strong>Delivery Status:</strong> Preparing your order...</p>
+                <p><strong>Delivery Status:</strong> Pending - Waiter will deliver shortly</p>
+                <p style="margin-top: 15px; font-size: 0.9rem; color: #4CAF50;">
+                    <i class="fas fa-check-circle"></i> Order saved to database successfully
+                </p>
             `;
             
             document.getElementById('success-modal').classList.add('active');
         }
 
+        // Load orders from database
         async function loadOrders(type) {
             const ordersList = document.querySelector('.orders-list');
             const noOrders = document.getElementById('no-orders');
@@ -2186,32 +2255,62 @@
             ordersList.innerHTML = '';
             
             try {
+                if (!currentUser || (!currentUser.userId && !currentUser.email)) {
+                    console.error('No user data available');
+                    ordersList.innerHTML = '<div class="no-orders"><p>Please login to view orders</p></div>';
+                    return;
+                }
+                
+                const userId = currentUser.userId || currentUser.email;
+                
+                console.log(`Loading ${type} orders for user:`, userId);
+                
+                // IMPORTANT: Use the correct status condition
+                const statusCondition = type === 'pending' ? 'pending' : 'delivered';
+                
                 const { data: orders, error } = await supabase
                     .from('orders')
                     .select('*')
-                    .eq('user_id', currentUser.userId || currentUser.email)
-                    .eq('status', type === 'pending' ? 'pending' : 'delivered')
+                    .eq('user_id', userId)
+                    .eq('status', statusCondition)
                     .order('created_at', { ascending: false });
                 
-                if (error) throw error;
+                if (error) {
+                    console.error('Error loading orders:', error);
+                    ordersList.innerHTML = '<div class="no-orders"><p>Error loading orders</p></div>';
+                    return;
+                }
                 
                 if (!orders || orders.length === 0) {
                     noOrders.style.display = 'block';
+                    if (type === 'pending') {
+                        pendingOrdersCount = 0;
+                        document.getElementById('pending-count').textContent = '0';
+                    }
                     return;
                 }
                 
                 noOrders.style.display = 'none';
                 
+                if (type === 'pending') {
+                    pendingOrdersCount = orders.length;
+                    document.getElementById('pending-count').textContent = pendingOrdersCount;
+                }
+                
                 orders.forEach(order => {
                     let itemsHTML = '';
-                    order.items.forEach(item => {
-                        itemsHTML += `
-                            <div class="order-item">
-                                <span>${item.name} x${item.quantity}</span>
-                                <span>Ksh ${(item.price * item.quantity).toLocaleString()}</span>
-                            </div>
-                        `;
-                    });
+                    if (order.items && Array.isArray(order.items)) {
+                        order.items.forEach(item => {
+                            itemsHTML += `
+                                <div class="order-item">
+                                    <span>${item.name} x${item.quantity}</span>
+                                    <span>Ksh ${(item.price * item.quantity).toLocaleString()}</span>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        itemsHTML = '<div class="order-item"><span>No items details</span></div>';
+                    }
                     
                     const orderCard = document.createElement('div');
                     orderCard.className = 'order-card';
@@ -2219,7 +2318,7 @@
                         <div class="order-header">
                             <div class="order-id">${order.order_id}</div>
                             <div class="order-status ${type === 'pending' ? 'status-pending' : 'status-delivered'}">
-                                ${type === 'pending' ? 'Preparing' : 'Delivered'}
+                                ${type === 'pending' ? 'Pending' : 'Delivered'}
                             </div>
                         </div>
                         <div class="order-details">
@@ -2227,10 +2326,11 @@
                         </div>
                         <div class="order-total">
                             <span>Total:</span>
-                            <span>Ksh ${order.total_amount.toLocaleString()}</span>
+                            <span>Ksh ${order.total_amount?.toLocaleString() || '0'}</span>
                         </div>
                         <div style="margin-top: 10px; font-size: 0.9rem; color: #aaa;">
                             Ordered on ${new Date(order.created_at).toLocaleDateString()} at ${new Date(order.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                            ${order.delivered_at ? `<br>Delivered at: ${new Date(order.delivered_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}` : ''}
                         </div>
                     `;
                     ordersList.appendChild(orderCard);
@@ -2238,29 +2338,41 @@
                 
             } catch (error) {
                 console.error('Error loading orders:', error);
-                ordersList.innerHTML = '<div class="no-orders"><p>Error loading orders</p></div>';
+                ordersList.innerHTML = '<div class="no-orders"><p>Error loading orders. Please try again.</p></div>';
             }
         }
 
+        // Load pending orders count
         async function loadPendingOrdersCount() {
             try {
+                if (!currentUser || (!currentUser.userId && !currentUser.email)) {
+                    console.error('No user data available for pending orders count');
+                    document.getElementById('pending-count').textContent = '0';
+                    return;
+                }
+                
+                const userId = currentUser.userId || currentUser.email;
+                
                 const { data: orders, error } = await supabase
                     .from('orders')
                     .select('*')
-                    .eq('user_id', currentUser.userId || currentUser.email)
+                    .eq('user_id', userId)
                     .eq('status', 'pending');
                 
                 if (!error && orders) {
                     pendingOrdersCount = orders.length;
                     document.getElementById('pending-count').textContent = pendingOrdersCount;
+                } else if (error) {
+                    console.error('Error loading pending orders count:', error);
+                    document.getElementById('pending-count').textContent = '0';
                 }
             } catch (error) {
                 console.error('Error loading pending orders count:', error);
+                document.getElementById('pending-count').textContent = '0';
             }
         }
 
         function loadUserData() {
-            // Try to get user data from Supabase auth
             if (supabase && supabase.auth) {
                 supabase.auth.getUser().then(({ data: { user } }) => {
                     if (user) {

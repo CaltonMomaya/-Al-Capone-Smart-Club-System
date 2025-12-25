@@ -19,10 +19,13 @@
             --secondary-color: #f5f5f5;
             --accent-color: #8B4513;
             --highlight-color: #D4AF37;
+            --gold-color: #FFD700;
+            --vip-color: #FFD700;
             --button-color: #2c2c2c;
             --button-hover: #3a3a3a;
             --pending-color: #c99c33;
             --delivered-color: #2e8b57;
+            --success-color: #28a745;
             --table-odd: rgba(139, 69, 19, 0.05);
             --table-even: rgba(212, 175, 55, 0.05);
             --occupied-color: #8B4513;
@@ -50,6 +53,125 @@
             min-height: 100vh;
         }
 
+        /* Hamburger Menu */
+        .hamburger-menu {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1002;
+            background: var(--highlight-color);
+            border: none;
+            border-radius: 8px;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-menu:hover {
+            background: #c9a52c;
+            transform: scale(1.05);
+        }
+
+        .hamburger-line {
+            width: 24px;
+            height: 3px;
+            background: #000;
+            margin: 3px 0;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 6px);
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -6px);
+        }
+
+        /* Side Menu */
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 280px;
+            height: 100vh;
+            background: rgba(30, 30, 30, 0.98);
+            z-index: 1001;
+            transition: left 0.3s ease;
+            padding: 80px 20px 20px;
+            overflow-y: auto;
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .side-menu.active {
+            left: 0;
+        }
+
+        .menu-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--highlight-color);
+        }
+
+        .menu-title {
+            font-size: 1.5rem;
+            color: var(--highlight-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            border-radius: 8px;
+            color: var(--secondary-color);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-align: left;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .menu-item i {
+            width: 20px;
+            color: var(--highlight-color);
+        }
+
+        .menu-item.logout {
+            background: rgba(198, 40, 40, 0.2);
+            border-left: 4px solid #c62828;
+        }
+
+        .menu-item.logout:hover {
+            background: rgba(198, 40, 40, 0.3);
+        }
+
+        .menu-item.active {
+            background: rgba(212, 175, 55, 0.2);
+            border-left: 4px solid var(--highlight-color);
+        }
+
         /* Header Section */
         .header {
             text-align: center;
@@ -57,32 +179,7 @@
             position: relative;
             border-bottom: 2px solid var(--accent-color);
             margin-bottom: 1.5rem;
-        }
-
-        .logo-area {
-            margin-bottom: 1rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .club-logo {
-            max-width: 150px;
-            height: auto;
-        }
-
-        .logo-placeholder {
-            width: 150px;
-            height: 75px;
-            background-color: rgba(139, 69, 19, 0.2);
-            border: 2px dashed rgba(212, 175, 55, 0.3);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: rgba(245, 245, 245, 0.7);
-            font-size: 1rem;
-            font-weight: bold;
-            border-radius: 8px;
+            margin-top: 60px;
         }
 
         .header-title {
@@ -127,28 +224,6 @@
         @media (min-width: 1024px) {
             .main-content {
                 grid-template-columns: 1fr 450px;
-            }
-        }
-
-        /* Landscape orientation adjustments */
-        @media (orientation: landscape) and (max-height: 600px) {
-            .header {
-                padding: 0.5rem;
-                margin-bottom: 1rem;
-            }
-            
-            .logo-area {
-                margin-bottom: 0.5rem;
-            }
-            
-            .header-title {
-                font-size: 1.5rem;
-                margin-bottom: 0.25rem;
-            }
-            
-            .header-subtitle {
-                font-size: 0.9rem;
-                margin-bottom: 0.5rem;
             }
         }
 
@@ -250,6 +325,30 @@
             font-size: 0.9rem;
         }
 
+        .vip-table-badge {
+            display: inline-block;
+            background-color: var(--gold-color);
+            color: #000;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            margin-left: 0.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 6px rgba(255, 215, 0, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 215, 0, 0);
+            }
+        }
+
         .order-items {
             max-width: 300px;
         }
@@ -291,6 +390,11 @@
 
         .status-delivered {
             color: var(--delivered-color);
+            font-weight: 600;
+        }
+
+        .status-success {
+            color: var(--success-color);
             font-weight: 600;
         }
 
@@ -391,7 +495,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* Table Arrangement with Mockups */
+        /* Table Arrangement with Pagination */
         .table-arrangement {
             margin-top: 1.5rem;
         }
@@ -402,8 +506,43 @@
             color: var(--highlight-color);
             display: flex;
             align-items: center;
+            justify-content: space-between;
             gap: 0.5rem;
             flex-wrap: wrap;
+        }
+
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .pagination-btn {
+            background-color: var(--button-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background-color: var(--button-hover);
+            transform: translateY(-2px);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-info {
+            font-size: 0.9rem;
+            color: rgba(245, 245, 245, 0.8);
+            padding: 0.5rem;
         }
 
         .table-grid {
@@ -411,45 +550,6 @@
             grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
             gap: 1rem;
             justify-items: center;
-        }
-
-        @media (max-width: 768px) {
-            .table-grid {
-                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-                gap: 0.75rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .table-grid {
-                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-                gap: 0.5rem;
-            }
-        }
-
-        /* Portrait mode adjustments */
-        @media (orientation: portrait) and (max-width: 768px) {
-            .table-grid {
-                grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-            }
-        }
-
-        /* Landscape mode adjustments for tablets */
-        @media (orientation: landscape) and (max-height: 768px) {
-            .table-grid {
-                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-                gap: 0.5rem;
-            }
-            
-            .table-mockup {
-                width: 100px;
-                height: 100px;
-            }
-            
-            .table-top {
-                width: 60px;
-                height: 60px;
-            }
         }
 
         /* Table Mockup Styling */
@@ -464,20 +564,6 @@
             transition: all 0.3s ease;
             cursor: pointer;
             touch-action: manipulation;
-        }
-
-        @media (max-width: 768px) {
-            .table-mockup {
-                width: 100px;
-                height: 100px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .table-mockup {
-                width: 90px;
-                height: 90px;
-            }
         }
 
         .table-mockup:hover {
@@ -496,6 +582,17 @@
         .table-mockup.vacant .table-top {
             background-color: var(--vacant-color);
             box-shadow: 0 4px 8px rgba(46, 139, 87, 0.3);
+        }
+
+        .table-mockup.vip-table .table-top {
+            background: linear-gradient(135deg, var(--gold-color), #ffed4e);
+            color: #000;
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+        }
+
+        .table-mockup.vip-table.occupied .table-top {
+            background: linear-gradient(135deg, #b8860b, #daa520);
+            color: #fff;
         }
 
         /* Table Top */
@@ -517,28 +614,12 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
 
-        @media (max-width: 768px) {
-            .table-top {
-                width: 60px;
-                height: 60px;
-                font-size: 1rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .table-top {
-                width: 50px;
-                height: 50px;
-                font-size: 0.9rem;
-            }
-        }
-
         .table-number-display {
             transform: rotate(-45deg);
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
         }
 
-        /* Chairs around the table */
+        /* Chairs */
         .chair {
             position: absolute;
             width: 16px;
@@ -546,20 +627,6 @@
             background-color: var(--button-color);
             border-radius: 4px;
             transition: all 0.3s ease;
-        }
-
-        @media (max-width: 768px) {
-            .chair {
-                width: 14px;
-                height: 14px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .chair {
-                width: 12px;
-                height: 12px;
-            }
         }
 
         .table-mockup.occupied .chair {
@@ -570,11 +637,19 @@
             background-color: #247a48;
         }
 
-        /* Position chairs around the table */
-        .chair-1 { top: 0; left: 50%; transform: translateX(-50%); } /* Top */
-        .chair-2 { top: 50%; right: 0; transform: translateY(-50%); } /* Right */
-        .chair-3 { bottom: 0; left: 50%; transform: translateX(-50%); } /* Bottom */
-        .chair-4 { top: 50%; left: 0; transform: translateY(-50%); } /* Left */
+        .table-mockup.vip-table .chair {
+            background-color: #d4af37;
+        }
+
+        .table-mockup.vip-table.occupied .chair {
+            background-color: #b8860b;
+        }
+
+        /* Chair positions */
+        .chair-1 { top: 0; left: 50%; transform: translateX(-50%); }
+        .chair-2 { top: 50%; right: 0; transform: translateY(-50%); }
+        .chair-3 { bottom: 0; left: 50%; transform: translateX(-50%); }
+        .chair-4 { top: 50%; left: 0; transform: translateY(-50%); }
 
         /* Table Info */
         .table-info {
@@ -611,82 +686,87 @@
             white-space: nowrap;
         }
 
-        /* Table Types */
-        .table-type-indicator {
-            position: absolute;
-            top: -4px;
-            right: -4px;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.6rem;
-            color: white;
-            z-index: 3;
-        }
-
-        .vip-table .table-type-indicator {
-            background-color: var(--highlight-color);
-        }
-
-        .booth-table .table-type-indicator {
-            background-color: #9b59b6;
-        }
-
-        .regular-table .table-type-indicator {
-            background-color: #3498db;
-        }
-
-        /* Table Highlight for Orders */
+        /* Order Indicator */
         .has-order {
-            animation: pulse 2s infinite;
+            animation: glow 2s infinite;
         }
 
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7);
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 0 5px rgba(212, 175, 55, 0.7);
             }
-            70% {
-                box-shadow: 0 0 0 8px rgba(212, 175, 55, 0);
+            50% {
+                box-shadow: 0 0 20px rgba(212, 175, 55, 0.9), 0 0 30px rgba(212, 175, 55, 0.6);
             }
-            100% {
-                box-shadow: 0 0 0 0 rgba(212, 175, 55, 0);
-            }
-        }
-
-        .table-mockup.has-order {
-            position: relative;
         }
 
         .order-indicator {
             position: absolute;
             top: -6px;
             right: -6px;
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             background-color: var(--pending-color);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.6rem;
+            font-size: 0.7rem;
             color: white;
             font-weight: bold;
             z-index: 4;
             border: 2px solid var(--primary-color);
         }
 
-        @media (max-width: 480px) {
-            .order-indicator {
-                width: 16px;
-                height: 16px;
-                font-size: 0.5rem;
-                top: -4px;
-                right: -4px;
-            }
+        .vip-request-indicator {
+            position: absolute;
+            top: -6px;
+            left: -6px;
+            width: 20px;
+            height: 20px;
+            background-color: var(--gold-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            color: #000;
+            font-weight: bold;
+            z-index: 4;
+            border: 2px solid var(--primary-color);
+            animation: pulse 2s infinite;
         }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+            font-size: 0.75rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.75rem;
+            color: rgba(245, 245, 245, 0.8);
+            white-space: nowrap;
+        }
+
+        .legend-color {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+        }
+
+        .legend-occupied { background-color: var(--occupied-color); }
+        .legend-vacant { background-color: var(--vacant-color); }
+        .legend-vip { background-color: var(--gold-color); }
+        .legend-order { background-color: var(--pending-color); }
+        .legend-vip-request { background-color: var(--gold-color); }
 
         /* Footer */
         .footer {
@@ -712,54 +792,7 @@
             color: var(--accent-color);
         }
 
-        /* Legend */
-        .legend {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-top: 1rem;
-            flex-wrap: wrap;
-            font-size: 0.75rem;
-        }
-
-        @media (max-width: 768px) {
-            .legend {
-                gap: 0.75rem;
-            }
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            font-size: 0.75rem;
-            color: rgba(245, 245, 245, 0.8);
-            white-space: nowrap;
-        }
-
-        .legend-color {
-            width: 14px;
-            height: 14px;
-            border-radius: 3px;
-        }
-
-        .legend-occupied {
-            background-color: var(--occupied-color);
-        }
-
-        .legend-vacant {
-            background-color: var(--vacant-color);
-        }
-
-        .legend-vip {
-            background-color: var(--highlight-color);
-        }
-
-        .legend-booth {
-            background-color: #9b59b6;
-        }
-
-        /* Responsive Table Styles */
+        /* Responsive adjustments */
         @media (max-width: 768px) {
             .orders-table {
                 display: block;
@@ -803,17 +836,22 @@
                 border-bottom: none;
             }
             
-            .order-items {
-                flex-direction: column;
-                align-items: flex-start;
+            .table-grid {
+                grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+                gap: 0.75rem;
             }
             
-            .order-item {
-                width: 100%;
+            .table-mockup {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .table-top {
+                width: 60px;
+                height: 60px;
             }
         }
 
-        /* Mobile-specific adjustments */
         @media (max-width: 480px) {
             .container {
                 padding: 0.75rem;
@@ -834,76 +872,63 @@
                 flex-direction: column;
             }
             
-            .order-id {
-                font-size: 0.9rem;
-            }
-        }
-
-        /* Very small phones */
-        @media (max-width: 360px) {
-            .header-title {
-                font-size: 1.3rem;
-            }
-            
-            .section-title {
-                font-size: 1.1rem;
+            .table-grid {
+                grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+                gap: 0.5rem;
             }
             
             .table-mockup {
-                width: 80px;
-                height: 80px;
+                width: 85px;
+                height: 85px;
             }
             
             .table-top {
-                width: 45px;
-                height: 45px;
-            }
-            
-            .table-status {
-                font-size: 0.6rem;
-            }
-        }
-
-        /* High-resolution displays */
-        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-            .table-top,
-            .chair {
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-            }
-        }
-
-        /* Print styles */
-        @media print {
-            body {
-                background-color: white;
-                color: black;
-            }
-            
-            .container {
-                max-width: 100%;
-                padding: 0;
-            }
-            
-            .btn,
-            .table-mockup {
-                display: none !important;
-            }
-            
-            .orders-table {
-                width: 100%;
-                border: 1px solid #ccc;
+                width: 50px;
+                height: 50px;
             }
         }
     </style>
 </head>
 <body>
+    <!-- Hamburger Menu -->
+    <button class="hamburger-menu" id="hamburger-menu">
+        <div class="hamburger-line"></div>
+        <div class="hamburger-line"></div>
+        <div class="hamburger-line"></div>
+    </button>
+
+    <!-- Side Menu -->
+    <div class="side-menu" id="side-menu">
+        <div class="menu-header">
+            <h3 class="menu-title">WaiterBay Menu</h3>
+            <div class="username-display" id="menu-username">Waiter</div>
+        </div>
+        
+        <button class="menu-item active" id="menu-orders">
+            <i class="fas fa-concierge-bell"></i>
+            <span>Current Orders</span>
+        </button>
+        
+        <button class="menu-item" id="menu-pending-orders">
+            <i class="fas fa-clock"></i>
+            <span>Pending Orders</span>
+            <span class="cart-count" id="pending-count" style="margin-left: auto; margin-right: 10px;">0</span>
+        </button>
+        
+        <button class="menu-item" id="menu-delivered-orders">
+            <i class="fas fa-check-circle"></i>
+            <span>Delivered Orders</span>
+        </button>
+        
+        <button class="menu-item logout" id="menu-logout">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+        </button>
+    </div>
+
     <div class="container">
         <!-- Header Section -->
         <div class="header">
-            <div class="logo-area">
-                <div class="logo-placeholder" id="logo-placeholder">WAITERBAY</div>
-                <img id="club-logo" class="club-logo" src="" alt="Al Capone Club Logo">
-            </div>
             <h1 class="header-title">WaiterBay - Order Management</h1>
             <p class="header-subtitle">Track and manage all club orders in real-time. Mark orders as delivered and monitor table occupancy.</p>
         </div>
@@ -914,7 +939,7 @@
             <div class="orders-section">
                 <div class="section-title">
                     <span>Current Orders</span>
-                    <div class="orders-count" id="orders-count">5 Orders</div>
+                    <div class="orders-count" id="orders-count">0 Orders</div>
                 </div>
                 
                 <div class="orders-container">
@@ -925,6 +950,7 @@
                                 <th>Table</th>
                                 <th>Items</th>
                                 <th>Status</th>
+                                <th>Payment</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -953,21 +979,33 @@
                         <div class="stat-label">Total Tables</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="occupied-tables">8</div>
+                        <div class="stat-value" id="occupied-tables">0</div>
                         <div class="stat-label">Occupied Tables</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="pending-orders">5</div>
+                        <div class="stat-value" id="pending-orders">0</div>
                         <div class="stat-label">Pending Orders</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="delivered-today">23</div>
+                        <div class="stat-value" id="delivered-today">0</div>
                         <div class="stat-label">Delivered Today</div>
                     </div>
                 </div>
                 
                 <div class="table-arrangement">
-                    <h3><i class="fas fa-chair"></i> Table Arrangement</h3>
+                    <h3>
+                        <span><i class="fas fa-chair"></i> Table Arrangement</span>
+                        <div class="pagination-controls">
+                            <button class="pagination-btn" id="prev-page" disabled>
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <span class="page-info" id="page-info">Page 1 of 1</span>
+                            <button class="pagination-btn" id="next-page" disabled>
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </h3>
+                    
                     <div class="table-grid" id="table-grid">
                         <!-- Table mockups will be populated here by JavaScript -->
                     </div>
@@ -986,8 +1024,12 @@
                             <span>VIP Table</span>
                         </div>
                         <div class="legend-item">
-                            <div class="legend-color legend-booth"></div>
-                            <span>Booth</span>
+                            <div class="legend-color legend-order"></div>
+                            <span>Has Order</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color legend-vip-request"></div>
+                            <span>VIP Request</span>
                         </div>
                     </div>
                 </div>
@@ -996,87 +1038,27 @@
 
         <!-- Footer -->
         <div class="footer">
-            <p>Al Capone Club &copy; 2025 | WaiterBay Order Management System v2.0</p>
+            <p>Al Capone Club &copy; 2025 | WaiterBay Order Management System v3.0</p>
         </div>
     </div>
 
+    <!-- Load Supabase from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/dist/umd/supabase.min.js"></script>
+    
     <script>
-        // Initial orders data
-        const initialOrders = [
-            {
-                id: "CAP-1025",
-                table: 3,
-                items: [
-                    { name: "Old Fashioned", quantity: 2 },
-                    { name: "Whiskey Sour", quantity: 1 },
-                    { name: "Sparkling Water", quantity: 1 }
-                ],
-                status: "pending",
-                time: "8:30 PM"
-            },
-            {
-                id: "CAP-1026",
-                table: 7,
-                items: [
-                    { name: "Mojito", quantity: 3 },
-                    { name: "Margarita", quantity: 2 }
-                ],
-                status: "pending",
-                time: "8:45 PM"
-            },
-            {
-                id: "CAP-1027",
-                table: 12,
-                items: [
-                    { name: "Champagne Bottle", quantity: 1 },
-                    { name: "Cheese Platter", quantity: 1 }
-                ],
-                status: "pending",
-                time: "9:05 PM"
-            },
-            {
-                id: "CAP-1028",
-                table: 5,
-                items: [
-                    { name: "Manhattan", quantity: 2 },
-                    { name: "Gin & Tonic", quantity: 2 },
-                    { name: "Club Soda", quantity: 1 }
-                ],
-                status: "pending",
-                time: "9:15 PM"
-            },
-            {
-                id: "CAP-1029",
-                table: 9,
-                items: [
-                    { name: "Vodka Shot", quantity: 4 },
-                    { name: "Beer", quantity: 2 }
-                ],
-                status: "pending",
-                time: "9:20 PM"
-            }
-        ];
-
-        // Table arrangement data with enhanced details
-        const tables = [
-            { id: 1, status: "occupied", type: "vip", seats: 4, hasOrder: true, orderCount: 2 },
-            { id: 2, status: "vacant", type: "regular", seats: 2, hasOrder: false, orderCount: 0 },
-            { id: 3, status: "occupied", type: "regular", seats: 4, hasOrder: true, orderCount: 1 },
-            { id: 4, status: "occupied", type: "booth", seats: 6, hasOrder: false, orderCount: 0 },
-            { id: 5, status: "occupied", type: "regular", seats: 4, hasOrder: true, orderCount: 1 },
-            { id: 6, status: "vacant", type: "regular", seats: 2, hasOrder: false, orderCount: 0 },
-            { id: 7, status: "occupied", type: "vip", seats: 4, hasOrder: true, orderCount: 1 },
-            { id: 8, status: "occupied", type: "regular", seats: 4, hasOrder: false, orderCount: 0 },
-            { id: 9, status: "occupied", type: "booth", seats: 6, hasOrder: true, orderCount: 1 },
-            { id: 10, status: "vacant", type: "regular", seats: 2, hasOrder: false, orderCount: 0 },
-            { id: 11, status: "occupied", type: "regular", seats: 4, hasOrder: false, orderCount: 0 },
-            { id: 12, status: "occupied", type: "vip", seats: 4, hasOrder: true, orderCount: 1 }
-        ];
-
-        // Global orders array that we'll modify
-        let orders = [...initialOrders];
-        let deliveredCount = 0;
-
+        // Initialize Supabase
+        let supabase;
+        
+        // Global variables
+        let orders = [];
+        let tables = [];
+        let deliveredToday = 0;
+        let currentPage = 1;
+        const tablesPerPage = 6;
+        
+        // VIP tables
+        const vipTables = [1, 6, 7];
+        
         // DOM elements
         const ordersBody = document.getElementById('orders-body');
         const emptyOrdersMessage = document.getElementById('empty-orders-message');
@@ -1085,75 +1067,276 @@
         const pendingOrdersElement = document.getElementById('pending-orders');
         const occupiedTablesElement = document.getElementById('occupied-tables');
         const deliveredTodayElement = document.getElementById('delivered-today');
-
+        const prevPageBtn = document.getElementById('prev-page');
+        const nextPageBtn = document.getElementById('next-page');
+        const pageInfo = document.getElementById('page-info');
+        
         // Initialize the page
-        document.addEventListener('DOMContentLoaded', function() {
-            renderOrders();
-            renderTableMockups();
-            updateStats();
-            setupResponsiveTable();
-            
-            // Load logo
-            const clubLogo = document.getElementById('club-logo');
-            const logoPlaceholder = document.getElementById('logo-placeholder');
-            
-            clubLogo.src = 'images/logo.png';
-            clubLogo.onload = function() {
-                clubLogo.style.display = 'block';
-                logoPlaceholder.style.display = 'none';
-            };
-            clubLogo.onerror = function() {
-                console.log('Logo not found at images/logo.png');
-            };
-            
-            // Handle orientation changes
-            window.addEventListener('orientationchange', function() {
-                setTimeout(function() {
-                    renderTableMockups();
-                    updateTableLayout();
-                }, 100);
-            });
-            
-            // Handle window resize
-            window.addEventListener('resize', debounce(function() {
-                updateTableLayout();
-            }, 250));
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                const supabaseUrl = "https://tfuwozhljthmxxcztfws.supabase.co";
+                const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRmdXdvemhsanRobXh4Y3p0ZndzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5OTA0NjEsImV4cCI6MjA4MTU2NjQ2MX0.7stJZibmLvBk0-oEQk6XSfjsfXaqYf9_O3308ZBOTjc";
+                
+                supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+                console.log("Supabase initialized");
+                
+                // Initialize UI
+                initUI();
+                initEventListeners();
+                
+                // Load orders and tables
+                await loadOrdersFromDatabase();
+                initializeTables();
+                renderTableMockups();
+                updateStats();
+                
+                // Start real-time updates
+                setupRealtimeUpdates();
+                
+            } catch (error) {
+                console.error("Failed to initialize Supabase:", error);
+                showNotification('Service temporarily unavailable. Please try again later.');
+            }
         });
 
-        // Setup responsive table for mobile
-        function setupResponsiveTable() {
-            const tableCells = document.querySelectorAll('.orders-table td');
-            const tableHeaders = document.querySelectorAll('.orders-table th');
-            
-            if (window.innerWidth <= 768) {
-                tableHeaders.forEach((header, index) => {
-                    tableCells.forEach(cell => {
-                        if (cell.parentElement.children[index] === cell) {
-                            cell.setAttribute('data-label', header.textContent);
-                        }
-                    });
-                });
+        // Initialize UI
+        function initUI() {
+            const savedDelivered = localStorage.getItem('waiterbayDeliveredToday');
+            if (savedDelivered) {
+                deliveredToday = parseInt(savedDelivered);
+                deliveredTodayElement.textContent = deliveredToday;
             }
         }
 
-        // Update table layout based on screen size
-        function updateTableLayout() {
-            setupResponsiveTable();
+        // Initialize event listeners
+        function initEventListeners() {
+            // Hamburger menu
+            document.getElementById('hamburger-menu').addEventListener('click', toggleSideMenu);
             
-            // Adjust table grid columns for different orientations
-            const container = document.querySelector('.table-grid');
-            const isMobile = window.innerWidth <= 480;
-            const isLandscape = window.innerWidth > window.innerHeight;
+            // Side menu items
+            document.getElementById('menu-orders').addEventListener('click', () => {
+                closeSideMenu();
+            });
             
-            if (isMobile) {
-                if (isLandscape) {
-                    // Mobile landscape
-                    container.style.gridTemplateColumns = 'repeat(auto-fill, minmax(90px, 1fr))';
-                } else {
-                    // Mobile portrait
-                    container.style.gridTemplateColumns = 'repeat(auto-fill, minmax(100px, 1fr))';
+            document.getElementById('menu-pending-orders').addEventListener('click', () => {
+                closeSideMenu();
+            });
+            
+            document.getElementById('menu-delivered-orders').addEventListener('click', () => {
+                closeSideMenu();
+            });
+            
+            document.getElementById('menu-logout').addEventListener('click', logout);
+            
+            // Pagination buttons
+            prevPageBtn.addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderTableMockups();
+                    updatePaginationButtons();
                 }
+            });
+            
+            nextPageBtn.addEventListener('click', () => {
+                const totalPages = Math.ceil(tables.length / tablesPerPage);
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    renderTableMockups();
+                    updatePaginationButtons();
+                }
+            });
+            
+            // Close side menu when clicking outside
+            document.addEventListener('click', (e) => {
+                const sideMenu = document.getElementById('side-menu');
+                const hamburger = document.getElementById('hamburger-menu');
+                
+                if (!sideMenu.contains(e.target) && !hamburger.contains(e.target) && sideMenu.classList.contains('active')) {
+                    closeSideMenu();
+                }
+            });
+        }
+
+        // Toggle side menu
+        function toggleSideMenu() {
+            const menu = document.getElementById('side-menu');
+            const hamburger = document.getElementById('hamburger-menu');
+            menu.classList.toggle('active');
+            hamburger.classList.toggle('active');
+        }
+
+        // Close side menu
+        function closeSideMenu() {
+            document.getElementById('side-menu').classList.remove('active');
+            document.getElementById('hamburger-menu').classList.remove('active');
+        }
+
+        // Initialize tables
+        function initializeTables() {
+            tables = [];
+            for (let i = 1; i <= 12; i++) {
+                const isVip = vipTables.includes(i);
+                tables.push({
+                    id: i,
+                    status: 'vacant',
+                    type: isVip ? 'vip' : 'regular',
+                    seats: isVip ? 4 : (i % 2 === 0 ? 2 : 4),
+                    hasOrder: false,
+                    orderCount: 0,
+                    hasVipRequest: false
+                });
             }
+            
+            updateTableStatusFromOrders();
+        }
+
+        // Load orders from Supabase database - ONLY PENDING ORDERS
+        async function loadOrdersFromDatabase() {
+            try {
+                console.log("Loading PENDING orders from Supabase...");
+                
+                const { data: ordersData, error } = await supabase
+                    .from('orders')
+                    .select('*')
+                    .eq('status', 'pending')
+                    .order('created_at', { ascending: true });
+                
+                if (error) {
+                    console.error("Error loading orders from database:", error);
+                    showNotification('Error loading orders. Please try again later.');
+                    return;
+                }
+                
+                orders = ordersData || [];
+                console.log(`Loaded ${orders.length} PENDING orders from database`);
+                
+                renderOrders();
+                updateTableStatusFromOrders();
+                
+            } catch (error) {
+                console.error("Failed to load orders:", error);
+                showNotification('Failed to load orders');
+            }
+        }
+
+        // Setup real-time updates for orders
+        function setupRealtimeUpdates() {
+            console.log("Setting up real-time updates...");
+            
+            // Subscribe to orders table changes
+            const ordersSubscription = supabase
+                .channel('orders-changes')
+                .on('postgres_changes', 
+                    { 
+                        event: 'INSERT', 
+                        schema: 'public', 
+                        table: 'orders' 
+                    }, 
+                    (payload) => {
+                        console.log('NEW ORDER DETECTED:', payload.new);
+                        
+                        // Only add if it's a pending order
+                        if (payload.new.status === 'pending') {
+                            // Check if order already exists in our local array
+                            const existingOrderIndex = orders.findIndex(o => o.order_id === payload.new.order_id);
+                            
+                            if (existingOrderIndex === -1) {
+                                // New order added
+                                orders.push(payload.new);
+                                renderOrders();
+                                updateTableStatusFromOrders();
+                                renderTableMockups();
+                                updateStats();
+                                
+                                // Check if it's a VIP table order
+                                const tableNumber = payload.new.table_number;
+                                if (vipTables.includes(tableNumber)) {
+                                    const tableIndex = tables.findIndex(t => t.id === tableNumber);
+                                    if (tableIndex !== -1) {
+                                        tables[tableIndex].hasVipRequest = true;
+                                        renderTableMockups();
+                                        showNotification(`VIP request from Table ${tableNumber}!`, 'vip');
+                                    }
+                                }
+                                
+                                // Show notification for ALL new orders
+                                showNotification(`New order from Table ${tableNumber}!`);
+                            }
+                        }
+                    }
+                )
+                .on('postgres_changes',
+                    {
+                        event: 'UPDATE',
+                        schema: 'public',
+                        table: 'orders'
+                    },
+                    (payload) => {
+                        console.log('ORDER UPDATED:', payload.new);
+                        
+                        // If an order is marked as delivered, remove it from local array
+                        if (payload.new.status === 'delivered') {
+                            const orderIndex = orders.findIndex(o => o.order_id === payload.new.order_id);
+                            
+                            if (orderIndex !== -1) {
+                                console.log("Removing delivered order via realtime:", payload.new.order_id);
+                                orders.splice(orderIndex, 1);
+                                
+                                // Update delivered count
+                                deliveredToday++;
+                                localStorage.setItem('waiterbayDeliveredToday', deliveredToday);
+                                deliveredTodayElement.textContent = deliveredToday;
+                                
+                                // Update UI
+                                renderOrders();
+                                updateTableStatusFromOrders();
+                                renderTableMockups();
+                                updateStats();
+                                
+                                // Show notification
+                                showNotification(`Order ${payload.new.order_id} delivered`);
+                            }
+                        }
+                    }
+                )
+                .subscribe((status) => {
+                    console.log('Subscription status:', status);
+                    if (status === 'SUBSCRIBED') {
+                        console.log('Successfully subscribed to real-time updates!');
+                    }
+                });
+            
+            // Cleanup on page unload
+            window.addEventListener('beforeunload', () => {
+                if (ordersSubscription) {
+                    supabase.removeChannel(ordersSubscription);
+                }
+            });
+        }
+
+        // Update table status based on current orders
+        function updateTableStatusFromOrders() {
+            tables.forEach(table => {
+                table.status = 'vacant';
+                table.hasOrder = false;
+                table.orderCount = 0;
+                table.hasVipRequest = false;
+            });
+            
+            orders.forEach(order => {
+                const tableNumber = order.table_number;
+                const tableIndex = tables.findIndex(t => t.id === tableNumber);
+                
+                if (tableIndex !== -1) {
+                    tables[tableIndex].status = 'occupied';
+                    tables[tableIndex].hasOrder = true;
+                    tables[tableIndex].orderCount++;
+                    
+                    if (vipTables.includes(tableNumber)) {
+                        tables[tableIndex].hasVipRequest = true;
+                    }
+                }
+            });
         }
 
         // Render orders to the table
@@ -1168,8 +1351,19 @@
             emptyOrdersMessage.style.display = 'none';
             ordersCount.textContent = `${orders.length} Order${orders.length !== 1 ? 's' : ''}`;
             
+            // Sort orders: VIP tables first, then by time
+            const sortedOrders = [...orders].sort((a, b) => {
+                const aIsVip = vipTables.includes(a.table_number);
+                const bIsVip = vipTables.includes(b.table_number);
+                
+                if (aIsVip && !bIsVip) return -1;
+                if (!aIsVip && bIsVip) return 1;
+                
+                return new Date(a.created_at) - new Date(b.created_at);
+            });
+            
             let ordersHTML = '';
-            orders.forEach(order => {
+            sortedOrders.forEach(order => {
                 const itemsHTML = order.items.map(item => 
                     `<div class="order-item">
                         <span class="item-name">${item.name}</span>
@@ -1177,16 +1371,23 @@
                     </div>`
                 ).join('');
                 
+                const isVipTable = vipTables.includes(order.table_number);
+                const vipBadge = isVipTable ? '<span class="vip-table-badge">VIP</span>' : '';
+                
                 ordersHTML += `
                 <tr>
-                    <td class="order-id">${order.id}</td>
-                    <td><div class="table-number">${order.table}</div></td>
-                    <td class="order-items">${itemsHTML}</td>
-                    <td class="status-${order.status}">${order.status.toUpperCase()}</td>
-                    <td>
+                    <td class="order-id" data-label="Order ID">${order.order_id}</td>
+                    <td data-label="Table">
+                        <div class="table-number">${order.table_number}</div>
+                        ${vipBadge}
+                    </td>
+                    <td class="order-items" data-label="Items">${itemsHTML}</td>
+                    <td class="status-pending" data-label="Status">${order.status.toUpperCase()}</td>
+                    <td class="status-success" data-label="Payment">${(order.payment_status || 'success').toUpperCase()}</td>
+                    <td data-label="Actions">
                         <div class="action-buttons">
-                            <button class="btn btn-deliver" onclick="deliverOrder('${order.id}')" ${order.status === 'delivered' ? 'disabled' : ''}>
-                                <i class="fas fa-check-circle"></i> ${order.status === 'delivered' ? 'Delivered' : 'Mark Delivered'}
+                            <button class="btn btn-deliver" onclick="deliverOrder('${order.order_id}')">
+                                <i class="fas fa-check-circle"></i> Mark Delivered
                             </button>
                         </div>
                     </td>
@@ -1195,25 +1396,38 @@
             });
             
             ordersBody.innerHTML = ordersHTML;
-            setupResponsiveTable();
         }
 
-        // Render table mockups
+        // Render table mockups with pagination
         function renderTableMockups() {
-            let tableHTML = '';
-            tables.forEach(table => {
-                const typeIcon = table.type === 'vip' ? 'fas fa-crown' : 
-                                 table.type === 'booth' ? 'fas fa-couch' : 'fas fa-chair';
-                const typeText = table.type === 'vip' ? 'VIP' : 
-                                 table.type === 'booth' ? 'Booth' : 'Regular';
+            // Sort tables: tables with orders first, then VIP tables, then by ID
+            const sortedTables = [...tables].sort((a, b) => {
+                if (a.hasOrder && !b.hasOrder) return -1;
+                if (!a.hasOrder && b.hasOrder) return 1;
                 
+                if (a.type === 'vip' && b.type !== 'vip') return -1;
+                if (a.type !== 'vip' && b.type === 'vip') return 1;
+                
+                return a.id - b.id;
+            });
+            
+            // Calculate pagination
+            const totalPages = Math.ceil(sortedTables.length / tablesPerPage);
+            const startIndex = (currentPage - 1) * tablesPerPage;
+            const endIndex = Math.min(startIndex + tablesPerPage, sortedTables.length);
+            const currentTables = sortedTables.slice(startIndex, endIndex);
+            
+            // Update pagination info
+            pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+            updatePaginationButtons();
+            
+            let tableHTML = '';
+            currentTables.forEach(table => {
                 tableHTML += `
                 <div class="table-mockup ${table.status} ${table.type}-table ${table.hasOrder ? 'has-order' : ''}" 
                      onclick="showTableDetails(${table.id})">
                     ${table.hasOrder ? `<div class="order-indicator">${table.orderCount}</div>` : ''}
-                    <div class="table-type-indicator">
-                        <i class="${typeIcon}"></i>
-                    </div>
+                    ${table.hasVipRequest ? `<div class="vip-request-indicator" title="VIP Request"><i class="fas fa-crown"></i></div>` : ''}
                     <div class="table-top">
                         <div class="table-number-display">${table.id}</div>
                     </div>
@@ -1228,7 +1442,7 @@
                             ${table.status.toUpperCase()}
                         </div>
                         <div class="table-details">
-                            ${typeText} • ${table.seats} seats
+                            ${table.type === 'vip' ? 'VIP' : 'Regular'} • ${table.seats} seats
                         </div>
                     </div>
                 </div>
@@ -1238,18 +1452,28 @@
             tableGrid.innerHTML = tableHTML;
         }
 
+        // Update pagination buttons
+        function updatePaginationButtons() {
+            const totalPages = Math.ceil(tables.length / tablesPerPage);
+            
+            prevPageBtn.disabled = currentPage === 1;
+            nextPageBtn.disabled = currentPage === totalPages || totalPages === 0;
+        }
+
         // Show table details when clicked
         function showTableDetails(tableId) {
             const table = tables.find(t => t.id === tableId);
             if (!table) return;
             
-            const tableOrders = orders.filter(order => order.table === tableId && order.status === 'pending');
+            const tableOrders = orders.filter(order => order.table_number === tableId);
             let orderDetails = '';
             
             if (tableOrders.length > 0) {
-                orderDetails = `<p><strong>Pending Orders:</strong></p><ul>`;
+                orderDetails = `<p><strong>Pending Orders (${tableOrders.length}):</strong></p><ul style="margin-left: 20px;">`;
                 tableOrders.forEach(order => {
-                    orderDetails += `<li>${order.id}: ${order.items.map(item => `${item.name} (x${item.quantity})`).join(', ')}</li>`;
+                    const items = order.items.map(item => `${item.name} (x${item.quantity})`).join(', ');
+                    const time = new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    orderDetails += `<li>${order.order_id} - ${items} (${time})</li>`;
                 });
                 orderDetails += `</ul>`;
             } else {
@@ -1260,16 +1484,15 @@
                 <div style="text-align: left;">
                     <h3 style="color: var(--highlight-color); margin-bottom: 10px;">Table ${tableId} Details</h3>
                     <p><strong>Status:</strong> <span class="${table.status}-status">${table.status.toUpperCase()}</span></p>
-                    <p><strong>Type:</strong> ${table.type === 'vip' ? 'VIP' : table.type === 'booth' ? 'Booth' : 'Regular'}</p>
+                    <p><strong>Type:</strong> ${table.type === 'vip' ? 'VIP <i class="fas fa-crown" style="color: var(--gold-color);"></i>' : 'Regular'}</p>
                     <p><strong>Seats:</strong> ${table.seats}</p>
+                    <p><strong>Has Order:</strong> ${table.hasOrder ? 'Yes' : 'No'}</p>
+                    <p><strong>VIP Request:</strong> ${table.hasVipRequest ? 'Yes <i class="fas fa-exclamation-triangle" style="color: var(--gold-color);"></i>' : 'No'}</p>
                     ${orderDetails}
-                    <p style="margin-top: 15px; font-size: 0.9rem; color: rgba(245,245,245,0.7);">
-                        <i class="fas fa-info-circle"></i> Click on orders above to mark as delivered.
-                    </p>
+                    ${table.hasVipRequest ? '<p style="margin-top: 10px; color: var(--gold-color);"><i class="fas fa-star"></i> VIP attention required!</p>' : ''}
                 </div>
             `;
             
-            // Create a custom alert/modal
             showTableModal(message);
         }
 
@@ -1348,10 +1571,6 @@
             closeButton.onclick = function() {
                 document.body.removeChild(modal);
             };
-            closeButton.ontouchstart = function(e) {
-                e.preventDefault();
-                document.body.removeChild(modal);
-            };
             
             modalContent.innerHTML = content;
             modalContent.appendChild(closeButton);
@@ -1389,95 +1608,106 @@
         // Update statistics
         function updateStats() {
             // Update pending orders count
-            pendingOrdersElement.textContent = orders.filter(order => order.status === 'pending').length;
+            pendingOrdersElement.textContent = orders.length;
             
             // Update occupied tables count
             const occupiedTables = tables.filter(table => table.status === 'occupied').length;
             occupiedTablesElement.textContent = occupiedTables;
             
+            // Update total tables
+            document.getElementById('total-tables').textContent = tables.length;
+            
             // Update delivered today count
-            deliveredTodayElement.textContent = deliveredCount;
+            deliveredTodayElement.textContent = deliveredToday;
         }
 
-        // Deliver an order
-        function deliverOrder(orderId) {
-            const orderIndex = orders.findIndex(order => order.id === orderId);
+        // Deliver an order - FIXED AND WORKING
+        async function deliverOrder(orderId) {
+            console.log("Starting deliverOrder for:", orderId);
             
-            if (orderIndex !== -1 && orders[orderIndex].status === 'pending') {
-                // Mark order as delivered
-                orders[orderIndex].status = 'delivered';
+            try {
+                // Find the order in the local array
+                const orderIndex = orders.findIndex(order => order.order_id === orderId);
                 
-                // Update the delivered count
-                deliveredCount++;
-                
-                // Check if the table still has pending orders
-                const tableNumber = orders[orderIndex].table;
-                const tableHasPendingOrders = orders.some(order => 
-                    order.table === tableNumber && order.status === 'pending'
-                );
-                
-                // Update table status and order indicator
-                const tableIndex = tables.findIndex(table => table.id === tableNumber);
-                if (tableIndex !== -1) {
-                    // Update table's hasOrder status
-                    tables[tableIndex].hasOrder = tableHasPendingOrders;
-                    
-                    // Update order count
-                    if (tableHasPendingOrders) {
-                        const pendingCount = orders.filter(order => 
-                            order.table === tableNumber && order.status === 'pending'
-                        ).length;
-                        tables[tableIndex].orderCount = pendingCount;
-                    } else {
-                        tables[tableIndex].orderCount = 0;
-                        // If no pending orders, mark table as vacant after a delay
-                        setTimeout(() => {
-                            if (!orders.some(order => 
-                                order.table === tableNumber && order.status === 'pending'
-                            )) {
-                                tables[tableIndex].status = 'vacant';
-                                renderTableMockups();
-                            }
-                        }, 2000); // 2 second delay
-                    }
+                if (orderIndex === -1) {
+                    console.error("Order not found in local array:", orderId);
+                    showNotification('Order not found');
+                    return;
                 }
                 
-                // Re-render everything
+                const order = orders[orderIndex];
+                const currentTime = new Date().toISOString();
+                
+                console.log("Updating order in database:", orderId, "to status: delivered", "at:", currentTime);
+                
+                // Update database: set status to 'delivered' and add delivered_at timestamp
+                const { data, error } = await supabase
+                    .from('orders')
+                    .update({ 
+                        status: 'delivered',
+                        delivered_at: currentTime
+                    })
+                    .eq('order_id', orderId);
+                
+                if (error) {
+                    console.error("Error delivering order:", error);
+                    throw error;
+                }
+                
+                console.log("Database update successful:", data);
+                
+                // Remove the order from the local array IMMEDIATELY
+                orders.splice(orderIndex, 1);
+                
+                // Update delivered count and save to localStorage
+                deliveredToday++;
+                localStorage.setItem('waiterbayDeliveredToday', deliveredToday);
+                deliveredTodayElement.textContent = deliveredToday;
+                
+                // Update UI immediately
+                updateTableStatusFromOrders();
                 renderOrders();
                 renderTableMockups();
                 updateStats();
                 
-                // Show a confirmation message
-                showNotification(`Order ${orderId} marked as delivered`);
+                // Show confirmation
+                showNotification(`Order ${orderId} from Table ${order.table_number} marked as delivered!`);
+                
+            } catch (error) {
+                console.error('Failed to deliver order:', error);
+                showNotification('Failed to mark order as delivered. Please check your connection.');
             }
         }
 
         // Show notification
-        function showNotification(message) {
-            // Create notification element
+        function showNotification(message, type = 'info') {
             const notification = document.createElement('div');
+            
+            let bgColor = type === 'vip' ? 'var(--gold-color)' : 'var(--accent-color)';
+            let textColor = type === 'vip' ? '#000' : 'white';
+            let icon = type === 'vip' ? 'fas fa-crown' : 'fas fa-check-circle';
+            
             notification.style.cssText = `
                 position: fixed;
                 top: 20px;
                 right: 20px;
-                background-color: var(--accent-color);
-                color: white;
-                padding: 1rem 1.5rem;
+                background-color: ${bgColor};
+                color: ${textColor};
+                padding: 12px 18px;
                 border-radius: 8px;
                 box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-                z-index: 1000;
+                z-index: 10000;
                 animation: slideIn 0.3s ease;
                 font-weight: 600;
                 max-width: 300px;
                 display: flex;
                 align-items: center;
-                gap: 0.8rem;
+                gap: 10px;
                 word-wrap: break-word;
             `;
-            notification.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+            notification.innerHTML = `<i class="${icon}"></i> ${message}`;
             document.body.appendChild(notification);
             
-            // Remove after 3 seconds
             setTimeout(() => {
                 notification.style.animation = 'slideOut 0.3s ease';
                 setTimeout(() => {
@@ -1487,7 +1717,6 @@
                 }, 300);
             }, 3000);
             
-            // Add keyframe animations
             if (!document.querySelector('#notification-styles')) {
                 const style = document.createElement('style');
                 style.id = 'notification-styles';
@@ -1499,68 +1728,16 @@
                     @keyframes slideOut {
                         from { transform: translateX(0); opacity: 1; }
                         to { transform: translateX(100%); opacity: 0; }
-                    }
                 `;
                 document.head.appendChild(style);
             }
         }
 
-        // Debounce function for resize events
-        function debounce(func, wait) {
-            let timeout;
-            return function executedFunction(...args) {
-                const later = () => {
-                    clearTimeout(timeout);
-                    func(...args);
-                };
-                clearTimeout(timeout);
-                timeout = setTimeout(later, wait);
-            };
+        // Logout function
+        function logout() {
+            localStorage.removeItem('waiterbayDeliveredToday');
+            window.location.href = 'index.html';
         }
-
-        // Function to add a new order (for testing/demo purposes)
-        function addNewOrder() {
-            const availableTables = tables.filter(table => table.status === "vacant");
-            if (availableTables.length === 0) return;
-            
-            const randomTable = availableTables[Math.floor(Math.random() * availableTables.length)];
-            
-            const newOrder = {
-                id: `CAP-${Math.floor(1000 + Math.random() * 9000)}`,
-                table: randomTable.id,
-                items: [
-                    { name: "Negroni", quantity: Math.floor(Math.random() * 3) + 1 },
-                    { name: "Martini", quantity: Math.floor(Math.random() * 2) + 1 }
-                ],
-                status: "pending",
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            };
-            
-            orders.push(newOrder);
-            
-            // Update table status
-            const tableIndex = tables.findIndex(table => table.id === randomTable.id);
-            if (tableIndex !== -1) {
-                tables[tableIndex].status = 'occupied';
-                tables[tableIndex].hasOrder = true;
-                tables[tableIndex].orderCount = 1;
-            }
-            
-            renderOrders();
-            renderTableMockups();
-            updateStats();
-            
-            showNotification(`New order received for Table ${randomTable.id}`);
-        }
-
-        // Simulate new orders for demo (every 30 seconds)
-        setInterval(() => {
-            // Only add new orders if we have less than 8 pending orders
-            const pendingOrders = orders.filter(order => order.status === 'pending').length;
-            if (pendingOrders < 8 && Math.random() > 0.7) {
-                addNewOrder();
-            }
-        }, 30000);
     </script>
 </body>
 </html>
