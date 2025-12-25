@@ -204,6 +204,53 @@
             padding: 0 0.5rem;
         }
 
+        /* Real-time Status */
+        .real-time-status {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            z-index: 1000;
+            background-color: #4CAF50;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            animation: pulse 2s infinite;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .real-time-status .pulse {
+            width: 8px;
+            height: 8px;
+            background-color: white;
+            border-radius: 50%;
+            animation: pulse-dot 1.5s infinite;
+        }
+
+        .real-time-status.disconnected {
+            background-color: #f44336;
+            animation: none;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* New Order Highlight */
+        .new-order-row {
+            animation: highlightNewOrder 3s ease;
+        }
+
+        @keyframes highlightNewOrder {
+            0% { background-color: rgba(76, 175, 80, 0.3); }
+            100% { background-color: transparent; }
+        }
+
         /* Main Content Layout */
         .main-content {
             display: grid;
@@ -495,7 +542,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* Table Arrangement with Pagination */
+        /* Table Arrangement with Pagination - YOUR ORIGINAL STYLE */
         .table-arrangement {
             margin-top: 1.5rem;
         }
@@ -552,7 +599,7 @@
             justify-items: center;
         }
 
-        /* Table Mockup Styling */
+        /* Table Mockup Styling - YOUR ORIGINAL STYLE */
         .table-mockup {
             width: 120px;
             height: 120px;
@@ -890,6 +937,12 @@
     </style>
 </head>
 <body>
+    <!-- Real-time Status -->
+    <div class="real-time-status" id="realTimeStatus">
+        <div class="pulse"></div>
+        <span>LIVE</span>
+    </div>
+
     <!-- Hamburger Menu -->
     <button class="hamburger-menu" id="hamburger-menu">
         <div class="hamburger-line"></div>
@@ -930,7 +983,7 @@
         <!-- Header Section -->
         <div class="header">
             <h1 class="header-title">WaiterBay - Order Management</h1>
-            <p class="header-subtitle">Track and manage all club orders in real-time. Mark orders as delivered and monitor table occupancy.</p>
+            <p class="header-subtitle">Track and manage all club orders in real-time. New orders appear automatically without refresh.</p>
         </div>
 
         <!-- Main Content -->
@@ -962,12 +1015,12 @@
                     <div id="empty-orders-message" class="empty-orders" style="display: none;">
                         <i class="fas fa-glass-cheers"></i>
                         <h3>No Pending Orders</h3>
-                        <p>All orders have been delivered. Check back later for new orders.</p>
+                        <p>All orders have been delivered. New orders will appear automatically.</p>
                     </div>
                 </div>
             </div>
             
-            <!-- Overview Section -->
+            <!-- Overview Section - YOUR ORIGINAL TABLE ARRANGEMENT -->
             <div class="overview-section">
                 <div class="section-title">
                     <span>Club Overview</span>
@@ -1038,7 +1091,7 @@
 
         <!-- Footer -->
         <div class="footer">
-            <p>Al Capone Club &copy; 2025 | WaiterBay Order Management System v3.0</p>
+            <p>Al Capone Club &copy; 2025 | WaiterBay Order Management System v3.0 - REAL-TIME</p>
         </div>
     </div>
 
@@ -1046,6 +1099,10 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/dist/umd/supabase.min.js"></script>
     
     <script>
+        // ==============================================
+        // REAL-TIME WAITERBAY WITH YOUR ORIGINAL TABLE ARRANGEMENT
+        // ==============================================
+        
         // Initialize Supabase
         let supabase;
         
@@ -1056,8 +1113,15 @@
         let currentPage = 1;
         const tablesPerPage = 6;
         
-        // VIP tables
+        // VIP tables - YOUR ORIGINAL CONFIGURATION
         const vipTables = [1, 6, 7];
+        
+        // Track new orders for highlighting
+        let newOrderIds = new Set();
+        
+        // Auto-refresh interval
+        let refreshInterval;
+        const REFRESH_INTERVAL = 3000; // 3 seconds
         
         // DOM elements
         const ordersBody = document.getElementById('orders-body');
@@ -1070,31 +1134,39 @@
         const prevPageBtn = document.getElementById('prev-page');
         const nextPageBtn = document.getElementById('next-page');
         const pageInfo = document.getElementById('page-info');
+        const realTimeStatus = document.getElementById('realTimeStatus');
         
         // Initialize the page
         document.addEventListener('DOMContentLoaded', async function() {
+            console.log("🚀 Initializing WaiterBay REAL-TIME System...");
+            
             try {
                 const supabaseUrl = "https://tfuwozhljthmxxcztfws.supabase.co";
                 const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRmdXdvemhsanRobXh4Y3p0ZndzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5OTA0NjEsImV4cCI6MjA4MTU2NjQ2MX0.7stJZibmLvBk0-oEQk6XSfjsfXaqYf9_O3308ZBOTjc";
                 
                 supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-                console.log("Supabase initialized");
+                console.log("✅ Supabase initialized");
                 
                 // Initialize UI
                 initUI();
                 initEventListeners();
                 
-                // Load orders and tables
+                // Load initial data
                 await loadOrdersFromDatabase();
                 initializeTables();
                 renderTableMockups();
                 updateStats();
                 
-                // Start real-time updates
-                setupRealtimeUpdates();
+                // Start real-time auto-refresh
+                startAutoRefresh();
+                
+                // Try WebSocket connection
+                tryWebSocketConnection();
+                
+                console.log("✅ System ready - Auto-refresh every 3 seconds");
                 
             } catch (error) {
-                console.error("Failed to initialize Supabase:", error);
+                console.error("❌ Failed to initialize:", error);
                 showNotification('Service temporarily unavailable. Please try again later.');
             }
         });
@@ -1171,7 +1243,7 @@
             document.getElementById('hamburger-menu').classList.remove('active');
         }
 
-        // Initialize tables
+        // Initialize tables - YOUR ORIGINAL FUNCTION
         function initializeTables() {
             tables = [];
             for (let i = 1; i <= 12; i++) {
@@ -1190,11 +1262,12 @@
             updateTableStatusFromOrders();
         }
 
-        // Load orders from Supabase database - ONLY PENDING ORDERS
+        // Load orders from database
         async function loadOrdersFromDatabase() {
             try {
-                console.log("Loading PENDING orders from Supabase...");
+                console.log("📥 Loading orders from database...");
                 
+                // Get all pending orders
                 const { data: ordersData, error } = await supabase
                     .from('orders')
                     .select('*')
@@ -1202,116 +1275,153 @@
                     .order('created_at', { ascending: true });
                 
                 if (error) {
-                    console.error("Error loading orders from database:", error);
-                    showNotification('Error loading orders. Please try again later.');
+                    console.error("❌ Error loading orders:", error);
+                    showNotification('Error loading orders');
                     return;
                 }
                 
                 orders = ordersData || [];
-                console.log(`Loaded ${orders.length} PENDING orders from database`);
+                console.log(`✅ Loaded ${orders.length} orders`);
+                
+                // Mark new orders
+                orders.forEach(order => {
+                    newOrderIds.add(order.order_id);
+                });
                 
                 renderOrders();
                 updateTableStatusFromOrders();
                 
             } catch (error) {
-                console.error("Failed to load orders:", error);
+                console.error("❌ Failed to load orders:", error);
                 showNotification('Failed to load orders');
             }
         }
 
-        // Setup real-time updates for orders
-        function setupRealtimeUpdates() {
-            console.log("Setting up real-time updates...");
+        // Start auto-refresh
+        function startAutoRefresh() {
+            console.log(`🔄 Starting auto-refresh every ${REFRESH_INTERVAL/1000} seconds`);
             
-            // Subscribe to orders table changes
-            const ordersSubscription = supabase
-                .channel('orders-changes')
-                .on('postgres_changes', 
-                    { 
-                        event: 'INSERT', 
-                        schema: 'public', 
-                        table: 'orders' 
-                    }, 
-                    (payload) => {
-                        console.log('NEW ORDER DETECTED:', payload.new);
-                        
-                        // Only add if it's a pending order
-                        if (payload.new.status === 'pending') {
-                            // Check if order already exists in our local array
-                            const existingOrderIndex = orders.findIndex(o => o.order_id === payload.new.order_id);
-                            
-                            if (existingOrderIndex === -1) {
-                                // New order added
-                                orders.push(payload.new);
-                                renderOrders();
-                                updateTableStatusFromOrders();
-                                renderTableMockups();
-                                updateStats();
-                                
-                                // Check if it's a VIP table order
-                                const tableNumber = payload.new.table_number;
-                                if (vipTables.includes(tableNumber)) {
-                                    const tableIndex = tables.findIndex(t => t.id === tableNumber);
-                                    if (tableIndex !== -1) {
-                                        tables[tableIndex].hasVipRequest = true;
-                                        renderTableMockups();
-                                        showNotification(`VIP request from Table ${tableNumber}!`, 'vip');
-                                    }
-                                }
-                                
-                                // Show notification for ALL new orders
-                                showNotification(`New order from Table ${tableNumber}!`);
-                            }
-                        }
-                    }
-                )
-                .on('postgres_changes',
-                    {
-                        event: 'UPDATE',
-                        schema: 'public',
-                        table: 'orders'
-                    },
-                    (payload) => {
-                        console.log('ORDER UPDATED:', payload.new);
-                        
-                        // If an order is marked as delivered, remove it from local array
-                        if (payload.new.status === 'delivered') {
-                            const orderIndex = orders.findIndex(o => o.order_id === payload.new.order_id);
-                            
-                            if (orderIndex !== -1) {
-                                console.log("Removing delivered order via realtime:", payload.new.order_id);
-                                orders.splice(orderIndex, 1);
-                                
-                                // Update delivered count
-                                deliveredToday++;
-                                localStorage.setItem('waiterbayDeliveredToday', deliveredToday);
-                                deliveredTodayElement.textContent = deliveredToday;
-                                
-                                // Update UI
-                                renderOrders();
-                                updateTableStatusFromOrders();
-                                renderTableMockups();
-                                updateStats();
-                                
-                                // Show notification
-                                showNotification(`Order ${payload.new.order_id} delivered`);
-                            }
-                        }
-                    }
-                )
-                .subscribe((status) => {
-                    console.log('Subscription status:', status);
-                    if (status === 'SUBSCRIBED') {
-                        console.log('Successfully subscribed to real-time updates!');
-                    }
-                });
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
             
-            // Cleanup on page unload
-            window.addEventListener('beforeunload', () => {
-                if (ordersSubscription) {
-                    supabase.removeChannel(ordersSubscription);
+            refreshInterval = setInterval(async () => {
+                try {
+                    await checkForNewOrders();
+                } catch (error) {
+                    console.error('❌ Auto-refresh error:', error);
+                    realTimeStatus.classList.add('disconnected');
+                    realTimeStatus.innerHTML = '<div class="pulse"></div><span>DISCONNECTED</span>';
                 }
-            });
+            }, REFRESH_INTERVAL);
+        }
+
+        // Check for new orders
+        async function checkForNewOrders() {
+            try {
+                // Get latest orders to check for changes
+                const { data: latestOrders, error } = await supabase
+                    .from('orders')
+                    .select('order_id, status, created_at')
+                    .eq('status', 'pending')
+                    .order('created_at', { ascending: false })
+                    .limit(5);
+                
+                if (error) throw error;
+                
+                if (latestOrders && latestOrders.length > 0) {
+                    // Check if we have any new orders
+                    let hasChanges = false;
+                    
+                    for (const order of latestOrders) {
+                        // Check if this order is already in our list
+                        const existingOrder = orders.find(o => o.order_id === order.order_id);
+                        
+                        if (!existingOrder) {
+                            // New order found!
+                            hasChanges = true;
+                            console.log(`🆕 Found new order: ${order.order_id}`);
+                            newOrderIds.add(order.order_id);
+                            break;
+                        }
+                    }
+                    
+                    // Also check if any orders were delivered
+                    const currentOrderIds = orders.map(o => o.order_id);
+                    const latestOrderIds = latestOrders.map(o => o.order_id);
+                    
+                    // Find orders that are in our list but not in latest (delivered)
+                    const deliveredOrders = currentOrderIds.filter(id => !latestOrderIds.includes(id));
+                    if (deliveredOrders.length > 0) {
+                        hasChanges = true;
+                        console.log(`✅ Orders delivered: ${deliveredOrders.join(', ')}`);
+                    }
+                    
+                    if (hasChanges) {
+                        // Reload all orders
+                        await loadOrdersFromDatabase();
+                        renderTableMockups();
+                        updateStats();
+                        
+                        // Update status
+                        realTimeStatus.classList.remove('disconnected');
+                        realTimeStatus.innerHTML = '<div class="pulse"></div><span>LIVE</span>';
+                    }
+                }
+                
+            } catch (error) {
+                console.error('❌ Error checking for new orders:', error);
+                throw error;
+            }
+        }
+
+        // Try WebSocket connection
+        function tryWebSocketConnection() {
+            try {
+                console.log('🔔 Attempting WebSocket connection...');
+                
+                const channel = supabase.channel('orders-channel')
+                    .on('postgres_changes', 
+                        { 
+                            event: 'INSERT', 
+                            schema: 'public', 
+                            table: 'orders',
+                            filter: 'status=eq.pending'
+                        }, 
+                        (payload) => {
+                            console.log('🎯 WebSocket: New order!', payload.new);
+                            
+                            // Add to new orders
+                            newOrderIds.add(payload.new.order_id);
+                            
+                            // Add to orders array
+                            orders.unshift(payload.new);
+                            
+                            // Update UI
+                            renderOrders();
+                            updateTableStatusFromOrders();
+                            renderTableMockups();
+                            updateStats();
+                            
+                            // Show notification
+                            showNotification(`🆕 New order from Table ${payload.new.table_number}!`);
+                            
+                            // VIP special handling
+                            if (vipTables.includes(payload.new.table_number)) {
+                                showNotification(`👑 VIP ORDER! Table ${payload.new.table_number}`, 'vip');
+                            }
+                        }
+                    )
+                    .subscribe((status) => {
+                        console.log('WebSocket status:', status);
+                        if (status === 'SUBSCRIBED') {
+                            console.log('✅ WebSocket connected!');
+                        }
+                    });
+                
+            } catch (error) {
+                console.log('⚠️ WebSocket not available, using polling');
+            }
         }
 
         // Update table status based on current orders
@@ -1374,8 +1484,12 @@
                 const isVipTable = vipTables.includes(order.table_number);
                 const vipBadge = isVipTable ? '<span class="vip-table-badge">VIP</span>' : '';
                 
+                // Check if this is a new order
+                const isNewOrder = newOrderIds.has(order.order_id);
+                const newOrderClass = isNewOrder ? 'new-order-row' : '';
+                
                 ordersHTML += `
-                <tr>
+                <tr class="${newOrderClass}" id="order-${order.order_id}">
                     <td class="order-id" data-label="Order ID">${order.order_id}</td>
                     <td data-label="Table">
                         <div class="table-number">${order.table_number}</div>
@@ -1396,9 +1510,20 @@
             });
             
             ordersBody.innerHTML = ordersHTML;
+            
+            // Remove new order highlight after 3 seconds
+            if (newOrderIds.size > 0) {
+                setTimeout(() => {
+                    const newRows = document.querySelectorAll('.new-order-row');
+                    newRows.forEach(row => {
+                        row.classList.remove('new-order-row');
+                    });
+                    newOrderIds.clear();
+                }, 3000);
+            }
         }
 
-        // Render table mockups with pagination
+        // Render table mockups with pagination - YOUR ORIGINAL FUNCTION
         function renderTableMockups() {
             // Sort tables: tables with orders first, then VIP tables, then by ID
             const sortedTables = [...tables].sort((a, b) => {
@@ -1473,7 +1598,8 @@
                 tableOrders.forEach(order => {
                     const items = order.items.map(item => `${item.name} (x${item.quantity})`).join(', ');
                     const time = new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    orderDetails += `<li>${order.order_id} - ${items} (${time})</li>`;
+                    const isNew = newOrderIds.has(order.order_id) ? '<span style="color: #4CAF50; font-size: 0.8rem;"> 🆕</span>' : '';
+                    orderDetails += `<li>${order.order_id} - ${items} (${time})${isNew}</li>`;
                 });
                 orderDetails += `</ul>`;
             } else {
@@ -1619,11 +1745,14 @@
             
             // Update delivered today count
             deliveredTodayElement.textContent = deliveredToday;
+            
+            // Update pending count in menu
+            document.getElementById('pending-count').textContent = orders.length;
         }
 
-        // Deliver an order - FIXED AND WORKING
+        // Deliver an order
         async function deliverOrder(orderId) {
-            console.log("Starting deliverOrder for:", orderId);
+            console.log("🚚 Delivering order:", orderId);
             
             try {
                 // Find the order in the local array
@@ -1638,7 +1767,7 @@
                 const order = orders[orderIndex];
                 const currentTime = new Date().toISOString();
                 
-                console.log("Updating order in database:", orderId, "to status: delivered", "at:", currentTime);
+                console.log("Updating order in database:", orderId, "to status: delivered");
                 
                 // Update database: set status to 'delivered' and add delivered_at timestamp
                 const { data, error } = await supabase
@@ -1654,10 +1783,11 @@
                     throw error;
                 }
                 
-                console.log("Database update successful:", data);
+                console.log("Database update successful");
                 
-                // Remove the order from the local array IMMEDIATELY
+                // Remove the order from the local array
                 orders.splice(orderIndex, 1);
+                newOrderIds.delete(orderId);
                 
                 // Update delivered count and save to localStorage
                 deliveredToday++;
@@ -1671,10 +1801,10 @@
                 updateStats();
                 
                 // Show confirmation
-                showNotification(`Order ${orderId} from Table ${order.table_number} marked as delivered!`);
+                showNotification(`✅ Order ${orderId} from Table ${order.table_number} delivered!`);
                 
             } catch (error) {
-                console.error('Failed to deliver order:', error);
+                console.error('❌ Failed to deliver order:', error);
                 showNotification('Failed to mark order as delivered. Please check your connection.');
             }
         }
@@ -1685,7 +1815,7 @@
             
             let bgColor = type === 'vip' ? 'var(--gold-color)' : 'var(--accent-color)';
             let textColor = type === 'vip' ? '#000' : 'white';
-            let icon = type === 'vip' ? 'fas fa-crown' : 'fas fa-check-circle';
+            let icon = type === 'vip' ? 'fas fa-crown' : 'fas fa-bell';
             
             notification.style.cssText = `
                 position: fixed;
@@ -1728,6 +1858,7 @@
                     @keyframes slideOut {
                         from { transform: translateX(0); opacity: 1; }
                         to { transform: translateX(100%); opacity: 0; }
+                    }
                 `;
                 document.head.appendChild(style);
             }
@@ -1735,6 +1866,11 @@
 
         // Logout function
         function logout() {
+            // Cleanup
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+            
             localStorage.removeItem('waiterbayDeliveredToday');
             window.location.href = 'index.html';
         }
