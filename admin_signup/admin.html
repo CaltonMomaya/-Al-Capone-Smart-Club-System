@@ -1282,8 +1282,8 @@
             const now = new Date();
             
             orders.forEach(order => {
-                // Extract customer information from order
-                let customerName = order.customer_name || order.customerName || order.name || order.full_name || order.fullName || 'Unknown Customer';
+                // Extract customer information from order - PRIORITIZE username FROM ORDERS TABLE
+                let customerName = order.username || order.user_name || order.customer_name || order.customerName || order.name || order.full_name || order.fullName || 'Unknown Customer';
                 let customerEmail = order.user_email || order.customer_email || order.customerEmail || order.email || 'no-email@example.com';
                 let customerPhone = order.phone || order.customer_phone || order.phone_no || order.mobile || 'N/A';
                 
@@ -1445,7 +1445,7 @@
                     return b.orderCount - a.orderCount;
                 }
                 // Tertiary sort: total spent
-                return b.totalSpent - a.totalSpent;
+                    return b.totalSpent - a.totalSpent;
             });
             
             console.log(`Processed ${customers.length} unique customers with loyalty scoring`);
@@ -1514,10 +1514,10 @@
                         orderAmount = 1000 + Math.random() * 2000;
                     }
                     
-                    // Create order
+                    // Create order - USING username FIELD
                     orders.push({
                         id: orderId++,
-                        customer_name: customer.name,
+                        username: customer.name,
                         user_email: customer.email,
                         phone: customer.phone,
                         items: [
@@ -2034,8 +2034,8 @@
                 const statusClass = `status-${order.status || 'pending'}`;
                 const statusText = (order.status || 'pending').charAt(0).toUpperCase() + (order.status || 'pending').slice(1);
                 
-                // Extract customer information
-                let customerName = order.customer_name || order.customerName || order.name || order.full_name || order.fullName || 'Unknown Customer';
+                // Extract customer information - USING username FROM ORDERS TABLE
+                let customerName = order.username || order.user_name || order.customer_name || order.customerName || order.name || order.full_name || order.fullName || 'Unknown Customer';
                 let customerEmail = order.user_email || order.customer_email || order.customerEmail || order.email || 'No email';
                 let customerPhone = order.phone || order.customer_phone || order.phone_no || order.mobile || 'N/A';
                 
@@ -2431,7 +2431,8 @@
             dayOrders.slice(0, 5).forEach(order => {
                 const orderDate = new Date(order.created_at);
                 const time = orderDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-                const customerName = order.customer_name || order.customerName || order.name || order.full_name || order.fullName || 'Customer';
+                // Using username from orders table
+                const customerName = order.username || order.user_name || order.customer_name || order.customerName || order.name || order.full_name || order.fullName || 'Customer';
                 detailsMessage += `• ${time}: ${customerName} - Ksh ${(parseFloat(order.total_amount || order.totalAmount || order.amount || 0)).toLocaleString()}<br>`;
             });
             
