@@ -1423,16 +1423,25 @@
         let drinkData = {};
         let drinkCategories = [];
 
-        // Initialize the app
+        // Initialize the app - FIXED: No redirect to index.html
         document.addEventListener('DOMContentLoaded', async function() {
-            // Check if user is logged in
+            console.log('Al Capone Club Bar Menu Loading...');
+            
+            // Load or create user data - NO REDIRECT TO INDEX
             const userData = localStorage.getItem('alCaponeClubUser');
             if (!userData) {
-                window.location.href = 'index.html';
-                return;
+                // Create guest user if not logged in
+                currentUser = {
+                    username: 'Guest',
+                    email: 'guest@alcapone.com',
+                    userId: 'guest_' + Date.now()
+                };
+                localStorage.setItem('alCaponeClubUser', JSON.stringify(currentUser));
+                console.log('Created guest user:', currentUser);
+            } else {
+                currentUser = JSON.parse(userData);
+                console.log('Loaded existing user:', currentUser);
             }
-            
-            currentUser = JSON.parse(userData);
             
             // Initialize Supabase with your credentials
             try {
@@ -1445,8 +1454,8 @@
                 // Test database connection
                 const isConnected = await testDatabaseConnection();
                 if (!isConnected) {
-                    console.warn("Database connection issues. Orders may not save properly.");
-                    showNotification("Warning: Database connection issues");
+                    console.warn("Database connection issues. Working in offline mode.");
+                    showNotification("Working in offline mode - some features limited");
                 }
                 
                 // Initialize UI first
@@ -1458,14 +1467,16 @@
                 
             } catch (error) {
                 console.error("Failed to initialize Supabase:", error);
-                showNotification('Service temporarily unavailable. Please try again later.');
+                showNotification('Working in offline mode - some features limited');
+                
                 // Initialize UI even if database fails
                 initUI();
                 initEventListeners();
-                return;
+                
+                // Load fallback drink data
+                loadFallbackDrinkData();
             }
 
-            loadUserData();
             loadPendingOrdersCount();
             
             // Try to load logo
@@ -1476,11 +1487,57 @@
                 clubLogo.style.display = 'block';
                 logoPlaceholder.style.display = 'none';
             };
+            
             clubLogo.onerror = function() {
-                console.log('Logo not found');
+                console.log('Logo not found, using placeholder');
+                logoPlaceholder.style.display = 'flex';
             };
+            
             clubLogo.src = 'images/logo.png';
         });
+
+        // Load fallback drink data for offline mode
+        function loadFallbackDrinkData() {
+            console.log('Loading fallback drink data...');
+            
+            drinkData = {
+                cocktails: [
+                    { id: 1, name: "Old Fashioned", description: "Classic bourbon cocktail with bitters and orange", price: 1200 },
+                    { id: 2, name: "Moscow Mule", description: "Vodka with ginger beer and lime", price: 1100 },
+                    { id: 3, name: "Margarita", description: "Tequila with lime and triple sec", price: 1000 },
+                    { id: 4, name: "Mojito", description: "White rum with mint, lime, and soda", price: 950 },
+                    { id: 5, name: "Martini", description: "Gin or vodka with vermouth", price: 1150 }
+                ],
+                mocktails: [
+                    { id: 1, name: "Virgin Mojito", description: "Mint and lime refreshment", price: 500 },
+                    { id: 2, name: "Tropical Punch", description: "Mixed fruit juice blend", price: 450 },
+                    { id: 3, name: "Sunrise Cooler", description: "Orange and grenadine mocktail", price: 500 },
+                    { id: 4, name: "Berry Blast", description: "Mixed berry mocktail", price: 550 }
+                ],
+                "soft-drinks": [
+                    { id: 1, name: "Coca-Cola", description: "Classic cola", price: 200 },
+                    { id: 2, name: "Sprite", description: "Lemon-lime soda", price: 200 },
+                    { id: 3, name: "Fanta Orange", description: "Orange flavored soda", price: 200 },
+                    { id: 4, name: "Bottled Water", description: "500ml mineral water", price: 150 },
+                    { id: 5, name: "Tonic Water", description: "For your gin and tonic", price: 250 }
+                ],
+                champagne: [
+                    { id: 1, name: "Moët & Chandon", description: "Premium French champagne", price: 15000 },
+                    { id: 2, name: "Veuve Clicquot", description: "Yellow Label Brut", price: 12000 },
+                    { id: 3, name: "Prosecco", description: "Italian sparkling wine", price: 6000 },
+                    { id: 4, name: "Dom Pérignon", description: "Vintage champagne", price: 25000 }
+                ],
+                shooters: [
+                    { id: 1, name: "Tequila Shot", description: "100% agave tequila", price: 700 },
+                    { id: 2, name: "Jägermeister", description: "Herbal digestif", price: 650 },
+                    { id: 3, name: "Whiskey Shot", description: "Premium whiskey", price: 800 },
+                    { id: 4, name: "Vodka Shot", description: "Premium vodka", price: 600 },
+                    { id: 5, name: "Sambuca", description: "Italian anise-flavored liqueur", price: 750 }
+                ]
+            };
+            
+            updateMenuCategories();
+        }
 
         // Test database connection
         async function testDatabaseConnection() {
@@ -1525,7 +1582,7 @@
                 
                 if (testError) {
                     console.error("Database connection error:", testError);
-                    showDefaultCategories();
+                    loadFallbackDrinkData();
                     return;
                 }
                 
@@ -1538,13 +1595,13 @@
                 
                 if (error) {
                     console.error("Error loading drinks from database:", error);
-                    showDefaultCategories();
+                    loadFallbackDrinkData();
                     return;
                 }
                 
                 if (!drinks || drinks.length === 0) {
                     console.warn("No drinks found in database");
-                    showDefaultCategories();
+                    loadFallbackDrinkData();
                     return;
                 }
                 
@@ -1601,7 +1658,7 @@
                 
             } catch (error) {
                 console.error("Failed to load drink data:", error);
-                showDefaultCategories();
+                loadFallbackDrinkData();
             }
         }
 
@@ -1621,9 +1678,9 @@
                 drinkData[category].length > 0
             );
             
-            // If no categories found, show default
+            // If no categories found, use fallback
             if (availableCategories.length === 0) {
-                showDefaultCategories();
+                loadFallbackDrinkData();
                 return;
             }
             
@@ -1657,65 +1714,6 @@
             });
             
             buttonsContainer.innerHTML = buttonsHTML;
-            
-            // Re-attach event listeners
-            document.querySelectorAll('.menu-button').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const category = btn.getAttribute('data-category');
-                    showCategoryPage(category);
-                });
-            });
-        }
-
-        // Show default categories if database fails
-        function showDefaultCategories() {
-            const buttonsContainer = document.querySelector('.buttons-container');
-            if (!buttonsContainer) return;
-            
-            const loadingMessage = document.getElementById('loading-message');
-            if (loadingMessage) {
-                loadingMessage.remove();
-            }
-            
-            const defaultCategories = [
-                { id: 'cocktails', icon: 'fas fa-cocktail', text: 'Cocktails' },
-                { id: 'mocktails', icon: 'fas fa-seedling', text: 'Mocktails' },
-                { id: 'soft-drinks', icon: 'fas fa-glass-whiskey', text: 'Soft Drinks' },
-                { id: 'champagne', icon: 'fas fa-wine-glass-alt', text: 'Champagne' },
-                { id: 'shooters', icon: 'fas fa-glass-cheers', text: 'Shooters' }
-            ];
-            
-            let buttonsHTML = '';
-            defaultCategories.forEach(category => {
-                buttonsHTML += `
-                    <button class="menu-button" data-category="${category.id}">
-                        <i class="${category.icon}"></i>
-                        <span class="button-text">${category.text}</span>
-                    </button>
-                `;
-            });
-            
-            buttonsContainer.innerHTML = buttonsHTML;
-            
-            // Use default hardcoded data
-            drinkData = {
-                cocktails: [
-                    { id: 1, name: "Old Fashioned", description: "Classic bourbon cocktail", price: 1200 },
-                    { id: 2, name: "Moscow Mule", description: "Vodka with ginger beer", price: 1100 }
-                ],
-                mocktails: [
-                    { id: 1, name: "Virgin Mojito", description: "Mint and lime refreshment", price: 500 }
-                ],
-                "soft-drinks": [
-                    { id: 1, name: "Coca-Cola", description: "Classic cola", price: 200 }
-                ],
-                champagne: [
-                    { id: 1, name: "Sparkling Wine", description: "Premium sparkling", price: 6000 }
-                ],
-                shooters: [
-                    { id: 1, name: "Tequila Shot", description: "100% agave tequila", price: 700 }
-                ]
-            };
             
             // Re-attach event listeners
             document.querySelectorAll('.menu-button').forEach(btn => {
@@ -1834,9 +1832,10 @@
         }
 
         function initUI() {
-            // Set username
-            document.getElementById('username-display').textContent = currentUser.username || currentUser.email.split('@')[0];
-            document.getElementById('menu-username').textContent = currentUser.username || currentUser.email.split('@')[0];
+            // Set username - handle guest case
+            const username = currentUser?.username || currentUser?.email?.split('@')[0] || 'Guest';
+            document.getElementById('username-display').textContent = username;
+            document.getElementById('menu-username').textContent = username;
             
             // Load table number
             const savedTable = localStorage.getItem('alCaponeTableNumber');
@@ -2138,7 +2137,7 @@
             });
         }
 
-        // FIXED: Process payment function - CORRECTED STATUS VALUES
+        // Process payment function
         async function processPayment(totalPrice) {
             const phone = document.getElementById('phone').value;
             const name = document.getElementById('name').value;
@@ -2163,7 +2162,7 @@
             // Create order ID
             const orderId = 'AC-' + Date.now().toString().slice(-8);
             
-            // Prepare order data for database - CORRECT STATUS VALUES
+            // Prepare order data for database
             const orderData = {
                 order_id: orderId,
                 user_id: currentUser.userId || currentUser.email,
@@ -2173,8 +2172,8 @@
                 table_number: parseInt(tableNumber),
                 items: shoppingCart,
                 total_amount: totalPrice,
-                status: 'pending',        // Order starts as pending
-                payment_status: 'success', // Payment is successful
+                status: 'pending',
+                payment_status: 'success',
                 payment_method: 'M-Pesa',
                 created_at: new Date().toISOString()
             };
@@ -2182,7 +2181,7 @@
             console.log('Saving order to database:', orderData);
             
             try {
-                // Save order to Supabase - SIMPLIFIED: Just insert, don't update after
+                // Save order to Supabase
                 const { data, error } = await supabase
                     .from('orders')
                     .insert([orderData]);
@@ -2265,7 +2264,7 @@
                 
                 console.log(`Loading ${type} orders for user:`, userId);
                 
-                // IMPORTANT: Use the correct status condition
+                // Use the correct status condition
                 const statusCondition = type === 'pending' ? 'pending' : 'delivered';
                 
                 const { data: orders, error } = await supabase
@@ -2372,31 +2371,34 @@
             }
         }
 
-        function loadUserData() {
-            if (supabase && supabase.auth) {
-                supabase.auth.getUser().then(({ data: { user } }) => {
-                    if (user) {
-                        currentUser = {
-                            ...currentUser,
-                            userId: user.id,
-                            username: user.user_metadata?.username || currentUser.username,
-                            email: user.email || currentUser.email,
-                            phone: user.user_metadata?.phone || currentUser.phone
-                        };
-                        
-                        localStorage.setItem('alCaponeClubUser', JSON.stringify(currentUser));
-                        document.getElementById('username-display').textContent = currentUser.username || currentUser.email.split('@')[0];
-                        document.getElementById('menu-username').textContent = currentUser.username || currentUser.email.split('@')[0];
-                    }
-                });
-            }
-        }
-
         function logout() {
+            // Clear user data
             localStorage.removeItem('alCaponeClubUser');
             localStorage.removeItem('alCaponeCart');
             localStorage.removeItem('alCaponeTableNumber');
-            window.location.href = 'index.html';
+            
+            // Set as guest user instead of redirecting
+            currentUser = {
+                username: 'Guest',
+                email: 'guest@alcapone.com',
+                userId: 'guest_' + Date.now()
+            };
+            localStorage.setItem('alCaponeClubUser', JSON.stringify(currentUser));
+            
+            // Clear cart
+            shoppingCart = [];
+            saveCart();
+            updateCartDisplay();
+            
+            // Update UI
+            document.getElementById('username-display').textContent = 'Guest';
+            document.getElementById('menu-username').textContent = 'Guest';
+            
+            // Show notification
+            showNotification('Logged out. You are now browsing as Guest');
+            
+            // Reload to show default menu
+            showDrinksMenu();
         }
 
         function showNotification(message) {

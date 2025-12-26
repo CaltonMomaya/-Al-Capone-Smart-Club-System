@@ -6,6 +6,7 @@
     <title>Super Admin - Al Capone Club Analytics</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -60,31 +61,6 @@
             margin-bottom: 2rem;
             background-color: rgba(0, 0, 0, 0.6);
             border-radius: 0 0 12px 12px;
-        }
-
-        .logo-area {
-            margin-bottom: 1rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .club-logo {
-            max-width: 200px;
-            height: auto;
-        }
-
-        .logo-placeholder {
-            width: 200px;
-            height: 100px;
-            background-color: rgba(139, 69, 19, 0.2);
-            border: 2px dashed rgba(212, 175, 55, 0.3);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: rgba(245, 245, 245, 0.7);
-            font-size: 1.2rem;
-            font-weight: bold;
         }
 
         .header-title {
@@ -178,7 +154,7 @@
             color: var(--secondary-color);
             text-decoration: none;
             transition: all 0.3s ease;
-            font-weight: 500;
+            font-weight: 500
         }
 
         .nav-link:hover, .nav-link.active {
@@ -514,14 +490,14 @@
             gap: 0.5rem;
         }
 
-        /* Customers Table */
-        .customers-table {
+        /* Tables */
+        .data-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 1rem;
         }
 
-        .customers-table th {
+        .data-table th {
             background-color: var(--button-color);
             color: var(--highlight-color);
             text-align: left;
@@ -532,20 +508,20 @@
             border-bottom: 2px solid var(--accent-color);
         }
 
-        .customers-table td {
+        .data-table td {
             padding: 1rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .customers-table tr:nth-child(odd) {
+        .data-table tr:nth-child(odd) {
             background-color: var(--table-odd);
         }
 
-        .customers-table tr:nth-child(even) {
+        .data-table tr:nth-child(even) {
             background-color: var(--table-even);
         }
 
-        .customers-table tr:hover {
+        .data-table tr:hover {
             background-color: rgba(212, 175, 55, 0.1);
         }
 
@@ -697,6 +673,104 @@
             border-radius: 50%;
         }
 
+        /* Customer Management Table */
+        .customer-management {
+            display: none;
+        }
+
+        .customer-management.active {
+            display: block;
+        }
+
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-completed {
+            background-color: rgba(46, 139, 87, 0.2);
+            color: #2e8b57;
+        }
+
+        .status-pending {
+            background-color: rgba(255, 152, 0, 0.2);
+            color: #ff9800;
+        }
+
+        .status-cancelled {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .pagination button {
+            background-color: var(--button-color);
+            color: var(--secondary-color);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            min-width: 40px;
+        }
+
+        .pagination button:hover {
+            background-color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        .pagination button.active {
+            background-color: var(--accent-color);
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Loyalty Score Badge */
+        .loyalty-score {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .loyalty-high {
+            background-color: rgba(212, 175, 55, 0.2);
+            color: var(--highlight-color);
+            border: 1px solid var(--highlight-color);
+        }
+
+        .loyalty-medium {
+            background-color: rgba(255, 152, 0, 0.2);
+            color: #ff9800;
+            border: 1px solid #ff9800;
+        }
+
+        .loyalty-low {
+            background-color: rgba(192, 192, 192, 0.2);
+            color: #c0c0c0;
+            border: 1px solid #c0c0c0;
+        }
+
         /* Footer */
         .footer {
             text-align: center;
@@ -706,6 +780,26 @@
             opacity: 0.7;
             font-size: 0.9rem;
             border-top: 1px solid rgba(139, 69, 19, 0.3);
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+            font-size: 1.2rem;
+            color: var(--highlight-color);
+        }
+
+        .loading-spinner i {
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         /* Responsive */
@@ -730,7 +824,7 @@
                 height: 250px;
             }
             
-            .customers-table {
+            .data-table {
                 display: block;
                 overflow-x: auto;
             }
@@ -757,6 +851,10 @@
             .section-title {
                 font-size: 1.3rem;
             }
+            
+            .pagination {
+                flex-wrap: wrap;
+            }
         }
     </style>
 </head>
@@ -764,10 +862,6 @@
     <div class="container">
         <!-- Header Section -->
         <div class="header">
-            <div class="logo-area">
-                <div class="logo-placeholder" id="logo-placeholder">SUPER ADMIN</div>
-                <img id="club-logo" class="club-logo" src="" alt="Al Capone Club Logo">
-            </div>
             <h1 class="header-title">Super Admin Dashboard</h1>
             <p class="header-subtitle">Comprehensive analytics and insights for Al Capone Club. Track sales, customer loyalty, and identify top performers for the Dubai trip.</p>
             <div class="dubai-trip-banner">
@@ -783,9 +877,9 @@
                 <div class="sidebar-section">
                     <h3 class="sidebar-title"><i class="fas fa-tachometer-alt"></i> Dashboard</h3>
                     <ul class="nav-menu">
-                        <li class="nav-item"><a href="#" class="nav-link active"><i class="fas fa-chart-line"></i> Analytics Overview</a></li>
-                        <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-users"></i> Customer Management</a></li>
-                        <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-cash-register"></i> Sales Tracking</a></li>
+                        <li class="nav-item"><a href="#" class="nav-link active" onclick="showSection('analytics')"><i class="fas fa-chart-line"></i> Analytics Overview</a></li>
+                        <li class="nav-item"><a href="#" class="nav-link" onclick="showSection('customer-management')"><i class="fas fa-users"></i> Customer Management</a></li>
+                        <li class="nav-item"><a href="#" class="nav-link" onclick="showSection('sales-tracking')"><i class="fas fa-cash-register"></i> Sales Tracking</a></li>
                         <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-glass-cheers"></i> Inventory & Menu</a></li>
                         <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-calendar-alt"></i> Events & Promotions</a></li>
                         <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-user-tie"></i> Staff Management</a></li>
@@ -797,11 +891,15 @@
                 <div class="stock-alerts">
                     <div class="alerts-header">
                         <h4 class="alerts-title"><i class="fas fa-exclamation-triangle"></i> Stock Alerts</h4>
-                        <div class="alerts-count" id="alerts-count">5</div>
+                        <div class="alerts-count" id="alerts-count">0</div>
                     </div>
                     
                     <ul class="alerts-list" id="alerts-list">
-                        <!-- Stock alerts will be populated by JavaScript -->
+                        <li class="alert-item">
+                            <div class="alert-item-header">
+                                <div class="alert-item-name">No stock alerts</div>
+                            </div>
+                        </li>
                     </ul>
                     
                     <div class="view-all-alerts">
@@ -812,129 +910,270 @@
 
             <!-- Main Content -->
             <div class="main-content">
-                <!-- Stats Cards -->
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <h3 class="stat-title">Total Revenue</h3>
-                            <div class="stat-icon icon-revenue">
-                                <i class="fas fa-dollar-sign"></i>
+                <!-- Analytics Overview Section -->
+                <div id="analytics-section">
+                    <!-- Stats Cards -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <h3 class="stat-title">Total Revenue</h3>
+                                <div class="stat-icon icon-revenue">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value" id="total-revenue">Ksh 0</div>
+                            <div class="stat-change" id="revenue-change">
+                                <i class="fas fa-spinner fa-spin"></i> Loading...
                             </div>
                         </div>
-                        <div class="stat-value" id="total-revenue">$124,580</div>
-                        <div class="stat-change change-positive">
-                            <i class="fas fa-arrow-up"></i> 12.5% from last month
+                        
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <h3 class="stat-title">Total Orders</h3>
+                                <div class="stat-icon icon-orders">
+                                    <i class="fas fa-shopping-cart"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value" id="total-orders">0</div>
+                            <div class="stat-change" id="orders-change">
+                                <i class="fas fa-spinner fa-spin"></i> Loading...
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <h3 class="stat-title">Active Customers</h3>
+                                <div class="stat-icon icon-customers">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value" id="active-customers">0</div>
+                            <div class="stat-change" id="customers-change">
+                                <i class="fas fa-spinner fa-spin"></i> Loading...
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <h3 class="stat-title">Avg. Order Value</h3>
+                                <div class="stat-icon icon-avg">
+                                    <i class="fas fa-chart-bar"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value" id="avg-order-value">Ksh 0</div>
+                            <div class="stat-change" id="avg-order-change">
+                                <i class="fas fa-spinner fa-spin"></i> Loading...
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <h3 class="stat-title">Total Orders</h3>
-                            <div class="stat-icon icon-orders">
-                                <i class="fas fa-shopping-cart"></i>
+
+                    <!-- Charts Section -->
+                    <div class="charts-section">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3 class="chart-title"><i class="fas fa-chart-line"></i> Revenue Trend (Last 30 Days)</h3>
+                                <select id="revenue-period" class="btn-select" style="padding: 0.3rem 0.8rem;" onchange="updateRevenueChart()">
+                                    <option value="30">Last 30 Days</option>
+                                    <option value="90">Last 90 Days</option>
+                                    <option value="365">Last Year</option>
+                                </select>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="revenueChart"></canvas>
                             </div>
                         </div>
-                        <div class="stat-value" id="total-orders">2,847</div>
-                        <div class="stat-change change-positive">
-                            <i class="fas fa-arrow-up"></i> 8.3% from last month
+                        
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3 class="chart-title"><i class="fas fa-chart-pie"></i> Sales by Category</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="categoryChart"></canvas>
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <h3 class="stat-title">Active Customers</h3>
-                            <div class="stat-icon icon-customers">
-                                <i class="fas fa-users"></i>
+
+                    <!-- Top Customers Section -->
+                    <div class="top-customers-section">
+                        <div class="section-title">
+                            <span><i class="fas fa-crown"></i> Top Loyal Customers - Dubai Trip Selection</span>
+                            <div class="trip-indicator" id="trip-indicator">
+                                <i class="fas fa-spinner fa-spin"></i> Loading...
                             </div>
                         </div>
-                        <div class="stat-value" id="active-customers">312</div>
-                        <div class="stat-change change-positive">
-                            <i class="fas fa-arrow-up"></i> 5.2% from last month
+                        
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th width="50">Rank</th>
+                                    <th>Customer Name</th>
+                                    <th>Phone No</th>
+                                    <th>Email</th>
+                                    <th>Total Visits</th>
+                                    <th>Total Spent</th>
+                                    <th>Loyalty Score</th>
+                                    <th>Last Visit</th>
+                                    <th>Select for Dubai</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customers-body">
+                                <tr>
+                                    <td colspan="9" class="loading-spinner">
+                                        <i class="fas fa-spinner fa-spin"></i> Loading customer data...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <!-- Pagination -->
+                        <div class="pagination" id="customers-pagination">
+                            <!-- Pagination will be inserted here by JavaScript -->
                         </div>
                     </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <h3 class="stat-title">Avg. Order Value</h3>
-                            <div class="stat-icon icon-avg">
-                                <i class="fas fa-chart-bar"></i>
-                            </div>
+
+                    <!-- Sales Breakdown -->
+                    <div class="sales-breakdown">
+                        <div class="breakdown-card">
+                            <h3 class="chart-title"><i class="fas fa-list-alt"></i> Top Selling Items</h3>
+                            <ul class="breakdown-list" id="top-items-list">
+                                <li class="breakdown-item">
+                                    <div class="loading-spinner">
+                                        <i class="fas fa-spinner fa-spin"></i> Loading...
+                                    </div>
+                                </li>
+                            </ul>
                         </div>
-                        <div class="stat-value" id="avg-order-value">$43.75</div>
-                        <div class="stat-change change-positive">
-                            <i class="fas fa-arrow-up"></i> 3.8% from last month
+                        
+                        <div class="breakdown-card">
+                            <h3 class="chart-title"><i class="fas fa-clock"></i> Peak Hours</h3>
+                            <ul class="breakdown-list" id="peak-hours-list">
+                                <li class="breakdown-item">
+                                    <div class="loading-spinner">
+                                        <i class="fas fa-spinner fa-spin"></i> Loading...
+                                    </div>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
 
-                <!-- Charts Section -->
-                <div class="charts-section">
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <h3 class="chart-title"><i class="fas fa-chart-line"></i> Revenue Trend (Last 30 Days)</h3>
-                            <select id="revenue-period" class="btn-select" style="padding: 0.3rem 0.8rem;">
-                                <option value="30">Last 30 Days</option>
-                                <option value="90">Last 90 Days</option>
-                                <option value="365">Last Year</option>
-                            </select>
+                <!-- Customer Management Section -->
+                <div id="customer-management-section" class="customer-management">
+                    <div class="top-customers-section">
+                        <div class="section-title">
+                            <span><i class="fas fa-users"></i> All Orders (Customer Management)</span>
+                            <div class="trip-indicator">
+                                <i class="fas fa-database"></i> Live from Database
+                            </div>
                         </div>
-                        <div class="chart-container">
-                            <canvas id="revenueChart"></canvas>
-                        </div>
-                    </div>
-                    
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <h3 class="chart-title"><i class="fas fa-chart-pie"></i> Sales by Category</h3>
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="categoryChart"></canvas>
-                        </div>
+                        
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer Name</th>
+                                    <th>Phone No</th>
+                                    <th>Email</th>
+                                    <th>Items</th>
+                                    <th>Total Amount</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="all-orders-body">
+                                <tr>
+                                    <td colspan="8" class="loading-spinner">
+                                        <i class="fas fa-spinner fa-spin"></i> Loading orders data...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
-                <!-- Top Customers Section -->
-                <div class="top-customers-section">
-                    <div class="section-title">
-                        <span><i class="fas fa-crown"></i> Top Loyal Customers - Dubai Trip Selection</span>
-                        <div class="trip-indicator">
-                            <i class="fas fa-plane"></i> 2 Seats Available
+                <!-- Sales Tracking Section -->
+                <div id="sales-tracking-section" class="customer-management">
+                    <div class="top-customers-section">
+                        <div class="section-title">
+                            <span><i class="fas fa-cash-register"></i> Sales Tracking</span>
+                            <div class="trip-indicator">
+                                <i class="fas fa-chart-line"></i> Real-time Sales Data
+                            </div>
                         </div>
-                    </div>
-                    
-                    <table class="customers-table">
-                        <thead>
-                            <tr>
-                                <th width="50">Rank</th>
-                                <th>Customer</th>
-                                <th>Membership</th>
-                                <th>Total Spent</th>
-                                <th>Visits</th>
-                                <th>Avg. Spend</th>
-                                <th>Last Visit</th>
-                                <th>Select for Dubai</th>
-                            </tr>
-                        </thead>
-                        <tbody id="customers-body">
-                            <!-- Customers will be populated by JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Sales Breakdown -->
-                <div class="sales-breakdown">
-                    <div class="breakdown-card">
-                        <h3 class="chart-title"><i class="fas fa-list-alt"></i> Top Selling Items</h3>
-                        <ul class="breakdown-list" id="top-items-list">
-                            <!-- Top items will be populated by JavaScript -->
-                        </ul>
-                    </div>
-                    
-                    <div class="breakdown-card">
-                        <h3 class="chart-title"><i class="fas fa-clock"></i> Peak Hours</h3>
-                        <ul class="breakdown-list" id="peak-hours-list">
-                            <!-- Peak hours will be populated by JavaScript -->
-                        </ul>
+                        
+                        <div class="stats-grid" style="margin-bottom: 1.5rem;">
+                            <div class="stat-card">
+                                <div class="stat-header">
+                                    <h3 class="stat-title">Today's Revenue</h3>
+                                    <div class="stat-icon icon-revenue">
+                                        <i class="fas fa-money-bill-wave"></i>
+                                    </div>
+                                </div>
+                                <div class="stat-value" id="today-revenue">Ksh 0</div>
+                                <div class="stat-change" id="today-revenue-change">
+                                    Loading...
+                                </div>
+                            </div>
+                            
+                            <div class="stat-card">
+                                <div class="stat-header">
+                                    <h3 class="stat-title">Today's Orders</h3>
+                                    <div class="stat-icon icon-orders">
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </div>
+                                </div>
+                                <div class="stat-value" id="today-orders">0</div>
+                                <div class="stat-change" id="today-orders-change">
+                                    Loading...
+                                </div>
+                            </div>
+                            
+                            <div class="stat-card">
+                                <div class="stat-header">
+                                    <h3 class="stat-title">This Week's Revenue</h3>
+                                    <div class="stat-icon icon-revenue">
+                                        <i class="fas fa-calendar-week"></i>
+                                    </div>
+                                </div>
+                                <div class="stat-value" id="week-revenue">Ksh 0</div>
+                                <div class="stat-change" id="week-revenue-change">
+                                    Loading...
+                                </div>
+                            </div>
+                            
+                            <div class="stat-card">
+                                <div class="stat-header">
+                                    <h3 class="stat-title">Best Selling Day</h3>
+                                    <div class="stat-icon icon-avg">
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                </div>
+                                <div class="stat-value" id="best-day">-</div>
+                                <div class="stat-change" id="best-day-change">
+                                    Loading...
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Total Orders</th>
+                                    <th>Total Revenue</th>
+                                    <th>Avg. Order Value</th>
+                                    <th>Unique Customers</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sales-tracking-body">
+                                <tr>
+                                    <td colspan="6" class="loading-spinner">
+                                        <i class="fas fa-spinner fa-spin"></i> Loading sales data...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -942,250 +1181,452 @@
 
         <!-- Footer -->
         <div class="footer">
-            <p>Al Capone Club &copy; 2025 | Super Admin Dashboard v2.1 | Confidential - For Management Use Only</p>
+            <p>Al Capone Club &copy; 2025 | Super Admin Dashboard v2.1 | Connected to Supabase Database</p>
         </div>
     </div>
 
     <script>
-        // Mock data for the dashboard
-        const customers = [
-            {
-                id: 1,
-                name: "Vincent Rossi",
-                avatar: "VR",
-                membership: "Platinum",
-                totalSpent: 12540,
-                visits: 42,
-                avgSpend: 298.57,
-                lastVisit: "2025-11-05",
-                selectedForDubai: true
-            },
-            {
-                id: 2,
-                name: "Giovanni Bianchi",
-                avatar: "GB",
-                membership: "Platinum",
-                totalSpent: 11875,
-                visits: 38,
-                avgSpend: 312.50,
-                lastVisit: "2025-11-08",
-                selectedForDubai: true
-            },
-            {
-                id: 3,
-                name: "Marco Conti",
-                avatar: "MC",
-                membership: "Gold",
-                totalSpent: 9870,
-                visits: 35,
-                avgSpend: 282.00,
-                lastVisit: "2025-11-03",
-                selectedForDubai: false
-            },
-            {
-                id: 4,
-                name: "Francesca Russo",
-                avatar: "FR",
-                membership: "Gold",
-                totalSpent: 8450,
-                visits: 31,
-                avgSpend: 272.58,
-                lastVisit: "2025-10-28",
-                selectedForDubai: false
-            },
-            {
-                id: 5,
-                name: "Antonio Ferrari",
-                avatar: "AF",
-                membership: "Silver",
-                totalSpent: 7250,
-                visits: 28,
-                avgSpend: 258.93,
-                lastVisit: "2025-10-25",
-                selectedForDubai: false
-            },
-            {
-                id: 6,
-                name: "Isabella Romano",
-                avatar: "IR",
-                membership: "Platinum",
-                totalSpent: 6890,
-                visits: 24,
-                avgSpend: 287.08,
-                lastVisit: "2025-10-30",
-                selectedForDubai: false
-            },
-            {
-                id: 7,
-                name: "Luca Marino",
-                avatar: "LM",
-                membership: "Gold",
-                totalSpent: 6120,
-                visits: 22,
-                avgSpend: 278.18,
-                lastVisit: "2025-10-22",
-                selectedForDubai: false
-            },
-            {
-                id: 8,
-                name: "Sophia Gallo",
-                avatar: "SG",
-                membership: "Silver",
-                totalSpent: 5340,
-                visits: 19,
-                avgSpend: 281.05,
-                lastVisit: "2025-10-18",
-                selectedForDubai: false
-            }
-        ];
-
-        // Stock alerts data
-        const stockAlerts = [
-            {
-                id: 1,
-                name: "Macallan 18 Year",
-                category: "Premium Whiskey",
-                currentStock: 2,
-                minStock: 5,
-                status: "critical",
-                lastRestocked: "2025-10-15"
-            },
-            {
-                id: 2,
-                name: "Dom Pérignon Champagne",
-                category: "Champagne",
-                currentStock: 3,
-                minStock: 6,
-                status: "critical",
-                lastRestocked: "2025-10-20"
-            },
-            {
-                id: 3,
-                name: "Blue Label Johnnie Walker",
-                category: "Premium Whiskey",
-                currentStock: 4,
-                minStock: 8,
-                status: "low",
-                lastRestocked: "2025-10-25"
-            },
-            {
-                id: 4,
-                name: "Patrón Añejo Tequila",
-                category: "Premium Tequila",
-                currentStock: 5,
-                minStock: 10,
-                status: "low",
-                lastRestocked: "2025-10-28"
-            },
-            {
-                id: 5,
-                name: "Cocktail Napkins",
-                category: "Supplies",
-                currentStock: 120,
-                minStock: 500,
-                status: "low",
-                lastRestocked: "2025-11-01"
-            },
-            {
-                id: 6,
-                name: "Signature Martini Glasses",
-                category: "Glassware",
-                currentStock: 8,
-                minStock: 25,
-                status: "low",
-                lastRestocked: "2025-10-30"
-            }
-        ];
-
-        // Sales data for charts
-        const revenueData = {
-            labels: ['Oct 10', 'Oct 15', 'Oct 20', 'Oct 25', 'Oct 30', 'Nov 4', 'Nov 9'],
-            datasets: [{
-                label: 'Daily Revenue ($)',
-                data: [3200, 4100, 3800, 5200, 4700, 6100, 5800],
-                borderColor: '#D4AF37',
-                backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                borderWidth: 3,
-                fill: true,
-                tension: 0.4
-            }]
-        };
-
-        const categoryData = {
-            labels: ['Cocktails', 'Champagne', 'Whiskey', 'Wine', 'Beer', 'Mocktails', 'Food'],
-            datasets: [{
-                data: [35, 22, 18, 12, 8, 3, 2],
-                backgroundColor: [
-                    '#D4AF37',
-                    '#8B4513',
-                    '#2e8b57',
-                    '#e74c3c',
-                    '#3498db',
-                    '#9b59b6',
-                    '#ff9800'
-                ],
-                borderWidth: 1,
-                borderColor: '#1a1a1a'
-            }]
-        };
-
-        // Top selling items
-        const topItems = [
-            { name: "Old Fashioned", sales: 245, revenue: 9800 },
-            { name: "Champagne Bottle", sales: 89, revenue: 13350 },
-            { name: "Macallan 18yr", sales: 67, revenue: 13400 },
-            { name: "Signature Martini", sales: 156, revenue: 7800 },
-            { name: "Whiskey Sour", sales: 189, revenue: 5670 }
-        ];
-
-        // Peak hours
-        const peakHours = [
-            { hour: "8:00 PM", orders: 142, percentage: 22 },
-            { hour: "9:00 PM", orders: 178, percentage: 28 },
-            { hour: "10:00 PM", orders: 165, percentage: 26 },
-            { hour: "11:00 PM", orders: 98, percentage: 15 },
-            { hour: "12:00 AM", orders: 54, percentage: 9 }
-        ];
+        // Global variables
+        let orders = [];
+        let customers = [];
+        let selectedForDubai = [];
+        let supabaseClient = null;
+        let revenueChart = null;
+        let categoryChart = null;
+        let currentPage = 1;
+        const itemsPerPage = 10;
 
         // Initialize the dashboard
-        document.addEventListener('DOMContentLoaded', function() {
-            // Load logo
-            const clubLogo = document.getElementById('club-logo');
-            const logoPlaceholder = document.getElementById('logo-placeholder');
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('Dashboard initializing...');
             
-            clubLogo.src = 'images/logo.png';
-            clubLogo.onload = function() {
-                clubLogo.style.display = 'block';
-                logoPlaceholder.style.display = 'none';
-            };
-            clubLogo.onerror = function() {
-                console.log('Logo not found at images/logo.png');
-            };
+            try {
+                // Initialize Supabase client
+                supabaseClient = window.supabase.createClient(
+                    'https://tfuwozhljthmxxcztfws.supabase.co',
+                    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRmdXdvemhsanRobXh4Y3p0ZndzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5OTA0NjEsImV4cCI6MjA4MTU2NjQ2MX0.7stJZibmLvBk0-oEQk6XSfjsfXaqYf9_O3308ZBOTjc'
+                );
+
+                console.log('Supabase client initialized');
+                
+                // Set active nav link
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                        this.classList.add('active');
+                    });
+                });
+
+                // Load all data
+                await loadAllData();
+                
+                // Initialize charts AFTER data is loaded
+                initCharts();
+                
+                // Show success notification
+                setTimeout(() => {
+                    showNotification('Connected to Supabase database successfully!', 'success');
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showNotification('Error initializing dashboard. Using demo data.', 'error');
+                loadDemoData();
+                initCharts();
+            }
+        });
+
+        // Load all data from Supabase
+        async function loadAllData() {
+            try {
+                console.log('Loading data from Supabase...');
+                
+                // Load orders - include all relevant fields
+                const { data: ordersData, error: ordersError } = await supabaseClient
+                    .from('orders')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (ordersError) {
+                    console.error('Orders error:', ordersError);
+                    throw ordersError;
+                }
+                
+                orders = ordersData || [];
+                console.log(`Loaded ${orders.length} orders`);
+                
+                // Process customers from orders with loyalty scoring
+                processCustomersWithLoyaltyScoring();
+                
+                // Load Dubai selections from localStorage
+                selectedForDubai = JSON.parse(localStorage.getItem('dubaiSelections')) || [];
+                
+                // Update all sections
+                updateStats();
+                renderCustomers();
+                renderAllOrders();
+                renderTopItems();
+                renderPeakHours();
+                updateSalesTracking();
+                
+            } catch (error) {
+                console.error('Error loading data:', error);
+                throw error;
+            }
+        }
+
+        // Process customers from orders with advanced loyalty scoring
+        function processCustomersWithLoyaltyScoring() {
+            const uniqueCustomers = new Map();
+            const now = new Date();
             
-            // Initialize charts
-            initCharts();
+            orders.forEach(order => {
+                // Extract customer information from order
+                let customerName = order.customer_name || order.customerName || order.name || order.full_name || order.fullName || 'Unknown Customer';
+                let customerEmail = order.user_email || order.customer_email || order.customerEmail || order.email || 'no-email@example.com';
+                let customerPhone = order.phone || order.customer_phone || order.phone_no || order.mobile || 'N/A';
+                
+                const key = customerEmail.toLowerCase();
+                if (!uniqueCustomers.has(key)) {
+                    uniqueCustomers.set(key, {
+                        name: customerName,
+                        email: customerEmail,
+                        phone: customerPhone,
+                        totalSpent: 0,
+                        orderCount: 0,
+                        firstOrder: order.created_at,
+                        lastOrder: order.created_at,
+                        orderDates: [],
+                        orders: [],
+                        loyaltyScore: 0,
+                        averageDaysBetweenVisits: 0,
+                        consistencyScore: 0
+                    });
+                }
+                
+                const customer = uniqueCustomers.get(key);
+                const orderAmount = parseFloat(order.total_amount || order.totalAmount || order.amount || 0);
+                
+                // Update basic stats
+                customer.totalSpent += orderAmount;
+                customer.orderCount += 1;
+                customer.orders.push({
+                    id: order.id,
+                    amount: orderAmount,
+                    date: order.created_at,
+                    items: order.items,
+                    status: order.status
+                });
+                customer.orderDates.push(new Date(order.created_at));
+                
+                // Update order dates
+                const orderDate = new Date(order.created_at);
+                if (orderDate > new Date(customer.lastOrder)) {
+                    customer.lastOrder = order.created_at;
+                }
+                if (orderDate < new Date(customer.firstOrder)) {
+                    customer.firstOrder = order.created_at;
+                }
+            });
             
-            // Render customers table
+            // Calculate loyalty scores for each customer
+            customers = Array.from(uniqueCustomers.values());
+            
+            customers.forEach(customer => {
+                // Calculate visit frequency and consistency
+                if (customer.orderDates.length > 1) {
+                    // Sort dates
+                    customer.orderDates.sort((a, b) => a - b);
+                    
+                    // Calculate days between visits
+                    const daysBetweenVisits = [];
+                    for (let i = 1; i < customer.orderDates.length; i++) {
+                        const diffInDays = Math.round((customer.orderDates[i] - customer.orderDates[i-1]) / (1000 * 60 * 60 * 24));
+                        daysBetweenVisits.push(diffInDays);
+                    }
+                    
+                    // Calculate average days between visits
+                    if (daysBetweenVisits.length > 0) {
+                        customer.averageDaysBetweenVisits = daysBetweenVisits.reduce((a, b) => a + b, 0) / daysBetweenVisits.length;
+                        
+                        // Consistency score: lower average days between visits = higher consistency
+                        // Max score for daily visits (1 day between visits)
+                        if (customer.averageDaysBetweenVisits <= 7) {
+                            customer.consistencyScore = 100;
+                        } else if (customer.averageDaysBetweenVisits <= 14) {
+                            customer.consistencyScore = 75;
+                        } else if (customer.averageDaysBetweenVisits <= 30) {
+                            customer.consistencyScore = 50;
+                        } else {
+                            customer.consistencyScore = 25;
+                        }
+                    }
+                } else {
+                    customer.averageDaysBetweenVisits = 999; // Only one visit
+                    customer.consistencyScore = 10; // Low score for single visit
+                }
+                
+                // Calculate recency: recent visits get higher score
+                const lastVisitDate = new Date(customer.lastOrder);
+                const daysSinceLastVisit = Math.round((now - lastVisitDate) / (1000 * 60 * 60 * 24));
+                let recencyScore = 0;
+                
+                if (daysSinceLastVisit <= 7) {
+                    recencyScore = 100;
+                } else if (daysSinceLastVisit <= 14) {
+                    recencyScore = 80;
+                } else if (daysSinceLastVisit <= 30) {
+                    recencyScore = 60;
+                } else if (daysSinceLastVisit <= 60) {
+                    recencyScore = 40;
+                } else if (daysSinceLastVisit <= 90) {
+                    recencyScore = 20;
+                } else {
+                    recencyScore = 5;
+                }
+                
+                // Calculate monetary value score (spending)
+                const avgSpendPerVisit = customer.totalSpent / customer.orderCount;
+                let monetaryScore = 0;
+                
+                if (avgSpendPerVisit >= 50000) {
+                    monetaryScore = 100;
+                } else if (avgSpendPerVisit >= 20000) {
+                    monetaryScore = 80;
+                } else if (avgSpendPerVisit >= 10000) {
+                    monetaryScore = 60;
+                } else if (avgSpendPerVisit >= 5000) {
+                    monetaryScore = 40;
+                } else if (avgSpendPerVisit >= 1000) {
+                    monetaryScore = 20;
+                } else {
+                    monetaryScore = 5;
+                }
+                
+                // Calculate frequency score (number of visits)
+                let frequencyScore = 0;
+                if (customer.orderCount >= 30) {
+                    frequencyScore = 100;
+                } else if (customer.orderCount >= 20) {
+                    frequencyScore = 80;
+                } else if (customer.orderCount >= 10) {
+                    frequencyScore = 60;
+                } else if (customer.orderCount >= 5) {
+                    frequencyScore = 40;
+                } else if (customer.orderCount >= 2) {
+                    frequencyScore = 20;
+                } else {
+                    frequencyScore = 5;
+                }
+                
+                // FINAL LOYALTY SCORE (Weighted average)
+                // Consistency: 40%, Recency: 25%, Frequency: 20%, Monetary: 15%
+                customer.loyaltyScore = Math.round(
+                    (customer.consistencyScore * 0.4) +
+                    (recencyScore * 0.25) +
+                    (frequencyScore * 0.20) +
+                    (monetaryScore * 0.15)
+                );
+                
+                // Cap at 100
+                if (customer.loyaltyScore > 100) customer.loyaltyScore = 100;
+                if (customer.loyaltyScore < 0) customer.loyaltyScore = 0;
+            });
+            
+            // Sort customers by loyalty score (descending)
+            customers.sort((a, b) => {
+                // Primary sort: loyalty score
+                if (b.loyaltyScore !== a.loyaltyScore) {
+                    return b.loyaltyScore - a.loyaltyScore;
+                }
+                // Secondary sort: number of visits
+                if (b.orderCount !== a.orderCount) {
+                    return b.orderCount - a.orderCount;
+                }
+                // Tertiary sort: total spent
+                return b.totalSpent - a.totalSpent;
+            });
+            
+            console.log(`Processed ${customers.length} unique customers with loyalty scoring`);
+        }
+
+        // Load demo data as fallback
+        function loadDemoData() {
+            console.log('Loading demo data...');
+            
+            // Generate demo data with realistic patterns
+            const now = new Date();
+            const demoCustomers = [
+                { name: "Vincent Rossi", email: "vincent@example.com", phone: "+254 712 345678" },
+                { name: "Giovanni Bianchi", email: "giovanni@example.com", phone: "+254 723 456789" },
+                { name: "Marco Conti", email: "marco@example.com", phone: "+254 734 567890" },
+                { name: "Luca Ferrari", email: "luca@example.com", phone: "+254 745 678901" },
+                { name: "Antonio Romano", email: "antonio@example.com", phone: "+254 756 789012" },
+                { name: "Francesco Esposito", email: "francesco@example.com", phone: "+254 767 890123" },
+                { name: "Alessandro Ricci", email: "alessandro@example.com", phone: "+254 778 901234" },
+                { name: "Leonardo Moretti", email: "leonardo@example.com", phone: "+254 789 012345" },
+                { name: "Stefano Gallo", email: "stefano@example.com", phone: "+254 790 123456" },
+                { name: "Roberto Costa", email: "roberto@example.com", phone: "+254 701 234567" },
+                { name: "Paolo Marino", email: "paolo@example.com", phone: "+254 712 345679" },
+                { name: "Davide Greco", email: "davide@example.com", phone: "+254 723 456790" },
+                { name: "Simone Barbieri", email: "simone@example.com", phone: "+254 734 567891" },
+                { name: "Angelo Ferrara", email: "angelo@example.com", phone: "+254 745 678902" },
+                { name: "Giuseppe Rizzo", email: "giuseppe@example.com", phone: "+254 756 789013" }
+            ];
+            
+            orders = [];
+            let orderId = 1;
+            
+            // Generate orders for each customer with different patterns
+            demoCustomers.forEach((customer, customerIndex) => {
+                // Different customers have different visit frequencies
+                let numOrders;
+                if (customerIndex < 3) { // Top 3 customers: frequent visitors
+                    numOrders = 25 + Math.floor(Math.random() * 10);
+                } else if (customerIndex < 8) { // Next 5: regular visitors
+                    numOrders = 10 + Math.floor(Math.random() * 10);
+                } else { // Others: occasional visitors
+                    numOrders = 3 + Math.floor(Math.random() * 7);
+                }
+                
+                // Generate orders with realistic dates
+                for (let i = 0; i < numOrders; i++) {
+                    // Create date - recent dates for loyal customers, older dates for occasional ones
+                    const daysAgo = customerIndex < 3 ? 
+                        Math.floor(Math.random() * 30) : // Top customers visit in last 30 days
+                        customerIndex < 8 ? 
+                        Math.floor(Math.random() * 60) : // Regular in last 60 days
+                        Math.floor(Math.random() * 180); // Occasional in last 180 days
+                    
+                    const orderDate = new Date(now);
+                    orderDate.setDate(orderDate.getDate() - daysAgo);
+                    
+                    // Different spending patterns
+                    let orderAmount;
+                    if (customerIndex < 2) { // Very high spenders
+                        orderAmount = 15000 + Math.random() * 35000;
+                    } else if (customerIndex < 5) { // High spenders
+                        orderAmount = 8000 + Math.random() * 12000;
+                    } else if (customerIndex < 10) { // Medium spenders
+                        orderAmount = 3000 + Math.random() * 7000;
+                    } else { // Low spenders
+                        orderAmount = 1000 + Math.random() * 2000;
+                    }
+                    
+                    // Create order
+                    orders.push({
+                        id: orderId++,
+                        customer_name: customer.name,
+                        user_email: customer.email,
+                        phone: customer.phone,
+                        items: [
+                            {name: 'Old Fashioned', quantity: Math.floor(Math.random() * 3) + 1, price: 1200},
+                            {name: 'Signature Martini', quantity: Math.floor(Math.random() * 2) + 1, price: 1500}
+                        ],
+                        total_amount: Math.round(orderAmount),
+                        status: 'completed',
+                        created_at: orderDate.toISOString()
+                    });
+                }
+            });
+            
+            // Process customers from demo orders
+            processCustomersWithLoyaltyScoring();
+            
+            // Load Dubai selections
+            selectedForDubai = JSON.parse(localStorage.getItem('dubaiSelections')) || [];
+            
+            updateStats();
             renderCustomers();
-            
-            // Render stock alerts
-            renderStockAlerts();
-            
-            // Render top items and peak hours
+            renderAllOrders();
             renderTopItems();
             renderPeakHours();
+            updateSalesTracking();
+        }
+
+        // Update statistics
+        function updateStats() {
+            // Total Revenue in Ksh
+            const totalRevenue = orders.reduce((sum, order) => {
+                return sum + (parseFloat(order.total_amount || order.totalAmount || order.amount || 0));
+            }, 0);
             
-            // Add event listeners
-            document.getElementById('revenue-period').addEventListener('change', updateRevenueChart);
-        });
+            // Format with Kenyan Shilling
+            const formatKsh = (amount) => {
+                if (amount >= 1000000) {
+                    return `Ksh ${(amount/1000000).toFixed(1)}M`;
+                } else if (amount >= 1000) {
+                    return `Ksh ${(amount/1000).toFixed(1)}K`;
+                }
+                return `Ksh ${amount.toFixed(2)}`;
+            };
+            
+            document.getElementById('total-revenue').textContent = formatKsh(totalRevenue);
+            
+            // Total Orders
+            const totalOrders = orders.length;
+            document.getElementById('total-orders').textContent = totalOrders;
+            
+            // Active Customers (unique customers who made orders)
+            const activeCustomers = customers.length;
+            document.getElementById('active-customers').textContent = activeCustomers;
+            
+            // Average Order Value in Ksh
+            const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+            document.getElementById('avg-order-value').textContent = formatKsh(avgOrderValue);
+            
+            // Update changes
+            const changeIcon = totalOrders > 0 ? 'fa-arrow-up' : 'fa-minus';
+            const changeColor = totalOrders > 0 ? 'change-positive' : '';
+            
+            document.getElementById('revenue-change').innerHTML = 
+                `<i class="fas ${changeIcon}"></i> Real-time data from database`;
+            document.getElementById('revenue-change').className = `stat-change ${changeColor}`;
+            
+            document.getElementById('orders-change').innerHTML = 
+                `<i class="fas ${changeIcon}"></i> ${totalOrders} total orders`;
+            document.getElementById('orders-change').className = `stat-change ${changeColor}`;
+            
+            document.getElementById('customers-change').innerHTML = 
+                `<i class="fas ${changeIcon}"></i> ${activeCustomers} unique customers`;
+            document.getElementById('customers-change').className = `stat-change ${changeColor}`;
+            
+            document.getElementById('avg-order-change').innerHTML = 
+                `<i class="fas ${changeIcon}"></i> Based on real orders`;
+            document.getElementById('avg-order-change').className = `stat-change ${changeColor}`;
+        }
 
         // Initialize charts
         function initCharts() {
+            // Destroy existing charts if they exist
+            if (revenueChart) {
+                revenueChart.destroy();
+            }
+            if (categoryChart) {
+                categoryChart.destroy();
+            }
+            
             // Revenue Chart
             const revenueCtx = document.getElementById('revenueChart').getContext('2d');
-            window.revenueChart = new Chart(revenueCtx, {
+            
+            // Prepare revenue data from last 30 days
+            const last30DaysData = prepareRevenueData(30);
+            
+            revenueChart = new Chart(revenueCtx, {
                 type: 'line',
-                data: revenueData,
+                data: {
+                    labels: last30DaysData.labels,
+                    datasets: [{
+                        label: 'Daily Revenue (Ksh)',
+                        data: last30DaysData.data,
+                        borderColor: '#D4AF37',
+                        backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
@@ -1212,7 +1653,7 @@
                             ticks: {
                                 color: '#f5f5f5',
                                 callback: function(value) {
-                                    return '$' + value;
+                                    return 'Ksh ' + value;
                                 }
                             }
                         }
@@ -1222,9 +1663,29 @@
             
             // Category Chart
             const categoryCtx = document.getElementById('categoryChart').getContext('2d');
-            window.categoryChart = new Chart(categoryCtx, {
+            
+            // Prepare category data from orders
+            const categoryData = prepareCategoryData();
+            
+            categoryChart = new Chart(categoryCtx, {
                 type: 'doughnut',
-                data: categoryData,
+                data: {
+                    labels: categoryData.labels,
+                    datasets: [{
+                        data: categoryData.data,
+                        backgroundColor: [
+                            '#D4AF37',
+                            '#8B4513',
+                            '#2e8b57',
+                            '#e74c3c',
+                            '#3498db',
+                            '#9b59b6',
+                            '#ff9800'
+                        ],
+                        borderWidth: 1,
+                        borderColor: '#1a1a1a'
+                    }]
+                },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
@@ -1241,151 +1702,195 @@
             });
         }
 
-        // Render stock alerts
-        function renderStockAlerts() {
-            const alertsList = document.getElementById('alerts-list');
-            const alertsCount = document.getElementById('alerts-count');
+        // Prepare revenue data for chart
+        function prepareRevenueData(days) {
+            const result = {
+                labels: [],
+                data: []
+            };
             
-            // Filter only critical and low stock items (for demo, show first 4)
-            const criticalAlerts = stockAlerts.filter(item => item.status === "critical");
-            const lowAlerts = stockAlerts.filter(item => item.status === "low");
-            const displayAlerts = [...criticalAlerts, ...lowAlerts].slice(0, 4);
+            // Create array of dates for the last X days
+            const today = new Date();
+            for (let i = days - 1; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(today.getDate() - i);
+                const dateString = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                result.labels.push(dateString);
+                result.data.push(0);
+            }
             
-            alertsCount.textContent = stockAlerts.length;
-            
-            let alertsHTML = '';
-            
-            displayAlerts.forEach(item => {
-                const alertClass = item.status === "critical" ? "" : "low";
-                const stockClass = item.status === "critical" ? "stock-critical" : "stock-low";
-                const statusText = item.status === "critical" ? "CRITICAL" : "LOW";
+            // Sum revenue for each date
+            orders.forEach(order => {
+                const orderDate = new Date(order.created_at);
+                const daysAgo = Math.floor((today - orderDate) / (1000 * 60 * 60 * 24));
                 
-                alertsHTML += `
-                <li class="alert-item ${alertClass}">
-                    <div class="alert-item-header">
-                        <div class="alert-item-name">${item.name}</div>
-                        <div class="alert-item-category">${item.category}</div>
-                    </div>
-                    <div class="alert-item-details">
-                        <div class="stock-level ${stockClass}">${item.currentStock} units (${statusText})</div>
-                        <button class="btn-restock" onclick="restockItem(${item.id})">Restock</button>
-                    </div>
-                </li>
-                `;
+                if (daysAgo >= 0 && daysAgo < days) {
+                    const index = days - 1 - daysAgo;
+                    result.data[index] += parseFloat(order.total_amount || order.totalAmount || order.amount || 0);
+                }
             });
             
-            alertsList.innerHTML = alertsHTML;
+            return result;
         }
 
-        // Restock item function
-        function restockItem(itemId) {
-            const itemIndex = stockAlerts.findIndex(item => item.id === itemId);
+        // Prepare category data from orders
+        function prepareCategoryData() {
+            // Default categories
+            const categories = {
+                'Cocktails': 0,
+                'Whiskey': 0,
+                'Champagne': 0,
+                'Wine': 0,
+                'Beer': 0,
+                'Food': 0,
+                'Other': 0
+            };
             
-            if (itemIndex !== -1) {
-                // In a real app, this would make an API call
-                // For demo, we'll just update the UI
-                
-                // Update stock level (simulate restocking)
-                const item = stockAlerts[itemIndex];
-                const newStock = item.currentStock + 20; // Add 20 units
-                item.currentStock = newStock;
-                
-                // Update last restocked date
-                const today = new Date().toISOString().split('T')[0];
-                item.lastRestocked = today;
-                
-                // If stock is now above minimum, remove from alerts
-                if (newStock >= item.minStock * 2) {
-                    stockAlerts.splice(itemIndex, 1);
+            // Analyze order items to categorize
+            orders.forEach(order => {
+                // Check if items is an array
+                if (Array.isArray(order.items)) {
+                    // For each item in the array
+                    order.items.forEach(item => {
+                        if (item && typeof item === 'object') {
+                            // Get item name from object
+                            const itemName = (item.name || item.product_name || item.productName || '').toString().toLowerCase();
+                            const itemPrice = parseFloat(item.price || item.unit_price || 0) * (parseInt(item.quantity || 1));
+                            
+                            if (itemName.includes('cocktail') || itemName.includes('martini') || itemName.includes('mojito') || itemName.includes('margarita') || itemName.includes('daiquiri')) {
+                                categories['Cocktails'] += itemPrice;
+                            } else if (itemName.includes('whiskey') || itemName.includes('whisky') || itemName.includes('bourbon') || itemName.includes('scotch')) {
+                                categories['Whiskey'] += itemPrice;
+                            } else if (itemName.includes('champagne') || itemName.includes('sparkling')) {
+                                categories['Champagne'] += itemPrice;
+                            } else if (itemName.includes('wine') || itemName.includes('chardonnay') || itemName.includes('merlot') || itemName.includes('pinot') || itemName.includes('cabernet')) {
+                                categories['Wine'] += itemPrice;
+                            } else if (itemName.includes('beer') || itemName.includes('lager') || itemName.includes('ale') || itemName.includes('stout') || itemName.includes('pilsner')) {
+                                categories['Beer'] += itemPrice;
+                            } else if (itemName.includes('food') || itemName.includes('appetizer') || itemName.includes('snack') || itemName.includes('plate') || itemName.includes('burger') || itemName.includes('pizza')) {
+                                categories['Food'] += itemPrice;
+                            } else {
+                                categories['Other'] += itemPrice;
+                            }
+                        }
+                    });
                 }
-                
-                // Re-render alerts
-                renderStockAlerts();
-                
-                // Show notification
-                showNotification(`${item.name} restocked successfully!`);
-                
-                // Update the inventory stats
-                updateInventoryStats();
+            });
+            
+            // Filter out categories with zero revenue
+            const filteredLabels = [];
+            const filteredData = [];
+            
+            Object.entries(categories).forEach(([label, value]) => {
+                if (value > 0) {
+                    filteredLabels.push(label);
+                    filteredData.push(value);
+                }
+            });
+            
+            // If no data, use defaults
+            if (filteredLabels.length === 0) {
+                filteredLabels.push('Cocktails', 'Whiskey', 'Champagne', 'Other');
+                filteredData.push(35000, 22000, 18000, 25000);
             }
+            
+            return {
+                labels: filteredLabels,
+                data: filteredData
+            };
         }
 
-        // Update inventory stats (placeholder function)
-        function updateInventoryStats() {
-            // In a real app, you would update inventory-related statistics here
-            console.log("Inventory updated. Critical items remaining:", 
-                stockAlerts.filter(item => item.status === "critical").length);
-        }
-
-        // Update revenue chart based on period selection
+        // Update revenue chart based on period
         function updateRevenueChart() {
-            const period = document.getElementById('revenue-period').value;
-            let newData, newLabels;
+            const period = parseInt(document.getElementById('revenue-period').value);
+            const newData = prepareRevenueData(period);
             
-            if (period === '90') {
-                // Mock data for 90 days
-                newLabels = ['Aug', 'Sep', 'Oct', 'Nov'];
-                newData = [28500, 31200, 34500, 12400];
-            } else if (period === '365') {
-                // Mock data for 365 days
-                newLabels = ['Q1', 'Q2', 'Q3', 'Q4'];
-                newData = [102500, 118000, 124500, 95600];
-            } else {
-                // Default to 30 days
-                newLabels = revenueData.labels;
-                newData = revenueData.datasets[0].data;
-            }
-            
-            window.revenueChart.data.labels = newLabels;
-            window.revenueChart.data.datasets[0].data = newData;
-            window.revenueChart.update();
+            revenueChart.data.labels = newData.labels;
+            revenueChart.data.datasets[0].data = newData.data;
+            revenueChart.update();
         }
 
-        // Render customers table
-        function renderCustomers() {
+        // Render customers table with pagination
+        function renderCustomers(page = 1) {
+            currentPage = page;
             const customersBody = document.getElementById('customers-body');
+            
+            // Calculate pagination
+            const startIndex = (page - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const paginatedCustomers = customers.slice(startIndex, endIndex);
+            const totalPages = Math.ceil(customers.length / itemsPerPage);
+            
+            if (customers.length === 0) {
+                customersBody.innerHTML = `
+                    <tr>
+                        <td colspan="9" style="text-align: center; padding: 2rem;">
+                            <i class="fas fa-user-slash" style="font-size: 2rem; color: var(--accent-color); margin-bottom: 1rem; display: block;"></i>
+                            No customer data available.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
             let customersHTML = '';
             
-            // Sort customers by total spent (descending)
-            const sortedCustomers = [...customers].sort((a, b) => b.totalSpent - a.totalSpent);
-            
-            sortedCustomers.forEach((customer, index) => {
-                const rank = index + 1;
-                const lastVisitDate = new Date(customer.lastVisit);
+            paginatedCustomers.forEach((customer, index) => {
+                const globalIndex = startIndex + index;
+                const rank = globalIndex + 1;
+                const lastVisitDate = new Date(customer.lastOrder);
                 const formattedDate = lastVisitDate.toLocaleDateString('en-US', { 
                     month: 'short', 
                     day: 'numeric',
                     year: 'numeric'
                 });
                 
+                const isSelected = selectedForDubai.includes(customer.email.toLowerCase());
+                
+                // Get initials for avatar
+                const initials = customer.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+                
+                // Determine loyalty badge
+                let loyaltyClass = 'loyalty-low';
+                let loyaltyText = 'Low';
+                if (customer.loyaltyScore >= 80) {
+                    loyaltyClass = 'loyalty-high';
+                    loyaltyText = 'High';
+                } else if (customer.loyaltyScore >= 50) {
+                    loyaltyClass = 'loyalty-medium';
+                    loyaltyText = 'Medium';
+                }
+                
                 customersHTML += `
                 <tr>
                     <td>
-                        <div class="customer-rank rank-${rank}">${rank}</div>
+                        <div class="customer-rank ${rank <= 3 ? `rank-${rank}` : ''}">${rank}</div>
                     </td>
                     <td>
                         <div class="customer-info">
-                            <div class="customer-avatar">${customer.avatar}</div>
+                            <div class="customer-avatar">${initials}</div>
                             <div>
                                 <div class="customer-name">${customer.name}</div>
-                                <div style="font-size: 0.8rem; color: rgba(245,245,245,0.6);">ID: CAP-${1000 + customer.id}</div>
+                                <div style="font-size: 0.8rem; color: rgba(245,245,245,0.6);">${customer.averageDaysBetweenVisits < 999 ? `Avg ${Math.round(customer.averageDaysBetweenVisits)} days between visits` : 'Single visit'}</div>
                             </div>
                         </div>
                     </td>
+                    <td>${customer.phone}</td>
+                    <td>${customer.email}</td>
+                    <td><strong>${customer.orderCount}</strong></td>
+                    <td><strong>Ksh ${customer.totalSpent.toLocaleString()}</strong></td>
                     <td>
-                        <span class="customer-membership membership-${customer.membership.toLowerCase()}">
-                            ${customer.membership}
+                        <span class="loyalty-score ${loyaltyClass}">
+                            ${customer.loyaltyScore}/100
                         </span>
+                        <div style="font-size: 0.8rem; margin-top: 0.2rem;">${loyaltyText} Loyalty</div>
                     </td>
-                    <td><strong>$${customer.totalSpent.toLocaleString()}</strong></td>
-                    <td>${customer.visits}</td>
-                    <td>$${customer.avgSpend.toFixed(2)}</td>
                     <td>${formattedDate}</td>
                     <td>
-                        <button class="btn-select ${customer.selectedForDubai ? 'btn-selected' : ''}" 
-                                onclick="toggleDubaiSelection(${customer.id})"
-                                ${customer.selectedForDubai ? 'disabled' : ''}>
-                            ${customer.selectedForDubai ? 'Selected' : 'Select'}
+                        <button class="btn-select ${isSelected ? 'btn-selected' : ''}" 
+                                onclick="toggleDubaiSelection('${customer.email.replace(/'/g, "\\'")}')"
+                                ${isSelected ? 'disabled' : ''}>
+                            ${isSelected ? 'Selected' : 'Select'}
                         </button>
                     </td>
                 </tr>
@@ -1394,70 +1899,247 @@
             
             customersBody.innerHTML = customersHTML;
             
+            // Update pagination controls
+            updatePagination(totalPages);
+            
             // Update the trip indicator
             updateTripIndicator();
         }
 
-        // Toggle Dubai selection
-        function toggleDubaiSelection(customerId) {
-            // Count currently selected customers
-            const selectedCount = customers.filter(c => c.selectedForDubai).length;
+        // Update pagination controls
+        function updatePagination(totalPages) {
+            const paginationDiv = document.getElementById('customers-pagination');
             
-            // Find the customer
-            const customerIndex = customers.findIndex(c => c.id === customerId);
-            
-            if (customerIndex !== -1) {
-                // If already selected, deselect
-                if (customers[customerIndex].selectedForDubai) {
-                    customers[customerIndex].selectedForDubai = false;
-                } 
-                // If not selected and we have less than 2 selected, select
-                else if (selectedCount < 2) {
-                    customers[customerIndex].selectedForDubai = true;
-                }
-                // If already 2 selected, show alert
-                else {
-                    showNotification("Maximum of 2 customers can be selected for the Dubai trip.");
-                    return;
-                }
-                
-                // Re-render the table
-                renderCustomers();
-                
-                // Show notification
-                const action = customers[customerIndex].selectedForDubai ? "selected" : "deselected";
-                showNotification(`${customers[customerIndex].name} ${action} for Dubai trip`);
+            if (totalPages <= 1) {
+                paginationDiv.innerHTML = '';
+                return;
             }
+            
+            let paginationHTML = '';
+            
+            // Previous button
+            paginationHTML += `
+                <button onclick="renderCustomers(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            `;
+            
+            // Page numbers
+            const maxVisiblePages = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+            
+            // Adjust start page if we're at the end
+            if (endPage - startPage + 1 < maxVisiblePages) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+            
+            for (let i = startPage; i <= endPage; i++) {
+                paginationHTML += `
+                    <button onclick="renderCustomers(${i})" ${i === currentPage ? 'class="active"' : ''}>
+                        ${i}
+                    </button>
+                `;
+            }
+            
+            // Next button
+            paginationHTML += `
+                <button onclick="renderCustomers(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            `;
+            
+            // Page info
+            paginationHTML += `
+                <div style="margin-left: 1rem; font-size: 0.9rem; color: rgba(245,245,245,0.7);">
+                    Showing ${((currentPage - 1) * itemsPerPage) + 1} to ${Math.min(currentPage * itemsPerPage, customers.length)} of ${customers.length} customers
+                </div>
+            `;
+            
+            paginationDiv.innerHTML = paginationHTML;
+        }
+
+        // Toggle Dubai selection
+        function toggleDubaiSelection(customerEmail) {
+            const normalizedEmail = customerEmail.toLowerCase();
+            
+            // Count currently selected customers
+            if (selectedForDubai.includes(normalizedEmail)) {
+                // Deselect
+                selectedForDubai = selectedForDubai.filter(email => email !== normalizedEmail);
+            } else if (selectedForDubai.length < 2) {
+                // Select
+                selectedForDubai.push(normalizedEmail);
+            } else {
+                showNotification("Maximum of 2 customers can be selected for the Dubai trip.", "warning");
+                return;
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('dubaiSelections', JSON.stringify(selectedForDubai));
+            
+            // Re-render the table
+            renderCustomers(currentPage);
+            
+            // Find customer name
+            const customer = customers.find(c => c.email.toLowerCase() === normalizedEmail);
+            const action = selectedForDubai.includes(normalizedEmail) ? "selected" : "deselected";
+            
+            showNotification(`${customer ? customer.name : 'Customer'} ${action} for Dubai trip`, "success");
         }
 
         // Update trip indicator
         function updateTripIndicator() {
-            const selectedCount = customers.filter(c => c.selectedForDubai).length;
-            const tripIndicator = document.querySelector('.trip-indicator');
-            const seatsAvailable = 2 - selectedCount;
+            const seatsAvailable = 2 - selectedForDubai.length;
+            const tripIndicator = document.getElementById('trip-indicator');
             
-            tripIndicator.innerHTML = `<i class="fas fa-plane"></i> ${seatsAvailable} Seat${seatsAvailable !== 1 ? 's' : ''} Available`;
+            if (selectedForDubai.length === 0) {
+                tripIndicator.innerHTML = `<i class="fas fa-plane"></i> 2 Seats Available`;
+            } else if (selectedForDubai.length === 1) {
+                const customer = customers.find(c => c.email.toLowerCase() === selectedForDubai[0]);
+                tripIndicator.innerHTML = `<i class="fas fa-user-check"></i> 1 Selected, 1 Seat Available`;
+            } else {
+                tripIndicator.innerHTML = `<i class="fas fa-check-circle"></i> Dubai Trip Full`;
+            }
+        }
+
+        // Render all orders for customer management
+        function renderAllOrders() {
+            const allOrdersBody = document.getElementById('all-orders-body');
             
-            // Update stats
-            document.getElementById('total-revenue').textContent = `$${customers.reduce((sum, c) => sum + c.totalSpent, 0).toLocaleString()}`;
-            document.getElementById('total-orders').textContent = customers.reduce((sum, c) => sum + c.visits, 0).toLocaleString();
-            document.getElementById('active-customers').textContent = customers.length;
+            if (orders.length === 0) {
+                allOrdersBody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 2rem;">
+                            <i class="fas fa-shopping-cart" style="font-size: 2rem; color: var(--accent-color); margin-bottom: 1rem; display: block;"></i>
+                            No orders found in database
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            let ordersHTML = '';
+            
+            orders.slice(0, 20).forEach(order => { // Show first 20 orders
+                const orderDate = new Date(order.created_at);
+                const formattedDate = orderDate.toLocaleDateString('en-US', { 
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                const statusClass = `status-${order.status || 'pending'}`;
+                const statusText = (order.status || 'pending').charAt(0).toUpperCase() + (order.status || 'pending').slice(1);
+                
+                // Extract customer information
+                let customerName = order.customer_name || order.customerName || order.name || order.full_name || order.fullName || 'Unknown Customer';
+                let customerEmail = order.user_email || order.customer_email || order.customerEmail || order.email || 'No email';
+                let customerPhone = order.phone || order.customer_phone || order.phone_no || order.mobile || 'N/A';
+                
+                // Format items for display - handle array of objects
+                let itemsDisplay = 'No items';
+                if (order.items) {
+                    if (Array.isArray(order.items)) {
+                        itemsDisplay = order.items.map(item => {
+                            if (typeof item === 'object') {
+                                const name = item.name || item.product_name || item.productName || 'Unknown Item';
+                                const quantity = item.quantity || 1;
+                                return `${name} x${quantity}`;
+                            } else {
+                                return String(item);
+                            }
+                        }).join(', ');
+                    } else if (typeof order.items === 'string') {
+                        itemsDisplay = order.items;
+                    } else {
+                        itemsDisplay = JSON.stringify(order.items);
+                    }
+                }
+                
+                const totalAmount = parseFloat(order.total_amount || order.totalAmount || order.amount || 0);
+                
+                ordersHTML += `
+                <tr>
+                    <td>ORD-${order.id || 'N/A'}</td>
+                    <td>${customerName}</td>
+                    <td>${customerPhone}</td>
+                    <td>${customerEmail}</td>
+                    <td>${itemsDisplay}</td>
+                    <td><strong>Ksh ${totalAmount.toLocaleString()}</strong></td>
+                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                    <td>${formattedDate}</td>
+                </tr>
+                `;
+            });
+            
+            allOrdersBody.innerHTML = ordersHTML;
         }
 
         // Render top items
         function renderTopItems() {
             const topItemsList = document.getElementById('top-items-list');
+            
+            // Analyze items from orders
+            const itemSales = {};
+            orders.forEach(order => {
+                // Handle array of objects format
+                if (Array.isArray(order.items)) {
+                    // For each item object in the array
+                    order.items.forEach(item => {
+                        if (item && typeof item === 'object') {
+                            const itemName = item.name || item.product_name || item.productName || 'Unknown Item';
+                            const quantity = parseInt(item.quantity || 1);
+                            const price = parseFloat(item.price || item.unit_price || 0);
+                            const totalItemPrice = price * quantity;
+                            
+                            // Add to sales tracking
+                            if (!itemSales[itemName]) {
+                                itemSales[itemName] = { count: 0, revenue: 0 };
+                            }
+                            itemSales[itemName].count += quantity;
+                            itemSales[itemName].revenue += totalItemPrice;
+                        }
+                    });
+                }
+            });
+            
+            // Convert to array and sort by revenue
+            const topItemsArray = Object.entries(itemSales)
+                .map(([name, data]) => ({
+                    name,
+                    sales: data.count,
+                    revenue: data.revenue
+                }))
+                .sort((a, b) => b.revenue - a.revenue)
+                .slice(0, 5);
+            
+            // Show default items if no data
+            if (topItemsArray.length === 0) {
+                topItemsArray.push(
+                    { name: "Old Fashioned", sales: 12, revenue: 14400 },
+                    { name: "Signature Martini", sales: 8, revenue: 12000 },
+                    { name: "Whiskey Sour", sales: 6, revenue: 7200 },
+                    { name: "Champagne Bottle", sales: 3, revenue: 45000 },
+                    { name: "Macallan 18yr", sales: 2, revenue: 36000 }
+                );
+            }
+            
+            const colors = ['#D4AF37', '#8B4513', '#2e8b57', '#e74c3c', '#3498db'];
+            
             let itemsHTML = '';
             
-            topItems.forEach((item, index) => {
+            topItemsArray.forEach((item, index) => {
                 itemsHTML += `
                 <li class="breakdown-item">
                     <div class="breakdown-category">
-                        <div class="category-color" style="background-color: ${categoryData.datasets[0].backgroundColor[index]}"></div>
+                        <div class="category-color" style="background-color: ${colors[index]}"></div>
                         <span>${item.name}</span>
                     </div>
                     <div>
-                        <strong>${item.sales} sold</strong> ($${item.revenue.toLocaleString()})
+                        <strong>${item.sales} sold</strong> (Ksh ${item.revenue.toLocaleString()})
                     </div>
                 </li>
                 `;
@@ -1469,17 +2151,57 @@
         // Render peak hours
         function renderPeakHours() {
             const peakHoursList = document.getElementById('peak-hours-list');
+            
+            // Analyze order times
+            const hourCounts = {};
+            orders.forEach(order => {
+                const orderDate = new Date(order.created_at);
+                const hour = orderDate.getHours();
+                const hourLabel = `${hour}:00`;
+                
+                if (!hourCounts[hourLabel]) {
+                    hourCounts[hourLabel] = 0;
+                }
+                hourCounts[hourLabel]++;
+            });
+            
+            // Convert to array and sort by hour
+            const peakHoursArray = Object.entries(hourCounts)
+                .map(([hour, orders]) => ({ hour, orders }))
+                .sort((a, b) => {
+                    const hourA = parseInt(a.hour.split(':')[0]);
+                    const hourB = parseInt(b.hour.split(':')[0]);
+                    return hourA - hourB;
+                });
+            
+            // Default peak hours if no data
+            if (peakHoursArray.length === 0) {
+                peakHoursArray.push(
+                    { hour: "20:00", orders: 14, percentage: 25 },
+                    { hour: "21:00", orders: 18, percentage: 32 },
+                    { hour: "22:00", orders: 12, percentage: 21 },
+                    { hour: "23:00", orders: 8, percentage: 14 },
+                    { hour: "00:00", orders: 4, percentage: 7 }
+                );
+            } else {
+                // Calculate percentages
+                const totalOrders = peakHoursArray.reduce((sum, item) => sum + item.orders, 0);
+                peakHoursArray.forEach(item => {
+                    item.percentage = Math.round((item.orders / totalOrders) * 100);
+                });
+            }
+            
             let hoursHTML = '';
             
-            peakHours.forEach(hour => {
+            peakHoursArray.forEach(hourData => {
                 hoursHTML += `
                 <li class="breakdown-item">
                     <div class="breakdown-category">
                         <div class="category-color" style="background-color: #D4AF37"></div>
-                        <span>${hour.hour}</span>
+                        <span>${hourData.hour}</span>
                     </div>
                     <div>
-                        <strong>${hour.orders} orders</strong> (${hour.percentage}%)
+                        <strong>${hourData.orders} orders</strong> (${hourData.percentage}%)
                     </div>
                 </li>
                 `;
@@ -1488,15 +2210,255 @@
             peakHoursList.innerHTML = hoursHTML;
         }
 
+        // Update sales tracking
+        function updateSalesTracking() {
+            // Format currency in Ksh
+            const formatKsh = (amount) => {
+                if (amount >= 1000000) {
+                    return `Ksh ${(amount/1000000).toFixed(1)}M`;
+                } else if (amount >= 1000) {
+                    return `Ksh ${(amount/1000).toFixed(1)}K`;
+                }
+                return `Ksh ${amount.toFixed(2)}`;
+            };
+            
+            // Today's date
+            const today = new Date();
+            const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+            const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+            
+            // This week's start (Monday)
+            const weekStart = new Date(today);
+            weekStart.setDate(today.getDate() - today.getDay() + 1);
+            weekStart.setHours(0, 0, 0, 0);
+            
+            // Filter today's orders
+            const todayOrders = orders.filter(order => {
+                const orderDate = new Date(order.created_at);
+                return orderDate >= todayStart && orderDate < todayEnd;
+            });
+            
+            // Filter this week's orders
+            const weekOrders = orders.filter(order => {
+                const orderDate = new Date(order.created_at);
+                return orderDate >= weekStart;
+            });
+            
+            // Calculate today's stats
+            const todayRevenue = todayOrders.reduce((sum, order) => sum + (parseFloat(order.total_amount || order.totalAmount || order.amount || 0)), 0);
+            const todayOrderCount = todayOrders.length;
+            
+            // Calculate this week's stats
+            const weekRevenue = weekOrders.reduce((sum, order) => sum + (parseFloat(order.total_amount || order.totalAmount || order.amount || 0)), 0);
+            
+            // Find best selling day
+            const dailySales = {};
+            orders.forEach(order => {
+                const orderDate = new Date(order.created_at);
+                const dateKey = orderDate.toISOString().split('T')[0];
+                if (!dailySales[dateKey]) {
+                    dailySales[dateKey] = 0;
+                }
+                dailySales[dateKey] += parseFloat(order.total_amount || order.totalAmount || order.amount || 0);
+            });
+            
+            let bestDay = { date: null, revenue: 0 };
+            Object.entries(dailySales).forEach(([date, revenue]) => {
+                if (revenue > bestDay.revenue) {
+                    bestDay = { date, revenue };
+                }
+            });
+            
+            // Update DOM elements
+            document.getElementById('today-revenue').textContent = formatKsh(todayRevenue);
+            document.getElementById('today-orders').textContent = todayOrderCount;
+            document.getElementById('week-revenue').textContent = formatKsh(weekRevenue);
+            
+            if (bestDay.date) {
+                const bestDate = new Date(bestDay.date);
+                const formattedDate = bestDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+                document.getElementById('best-day').textContent = formattedDate;
+                document.getElementById('best-day-change').innerHTML = 
+                    `<i class="fas fa-trophy"></i> ${formatKsh(bestDay.revenue)} revenue`;
+            }
+            
+            // Update change indicators
+            const todayHasOrders = todayOrderCount > 0;
+            const todayIcon = todayHasOrders ? 'fa-arrow-up' : 'fa-minus';
+            const todayColor = todayHasOrders ? 'change-positive' : '';
+            
+            document.getElementById('today-revenue-change').innerHTML = 
+                `<i class="fas ${todayIcon}"></i> ${todayOrderCount} order${todayOrderCount !== 1 ? 's' : ''} today`;
+            document.getElementById('today-revenue-change').className = `stat-change ${todayColor}`;
+            
+            document.getElementById('today-orders-change').innerHTML = 
+                `<i class="fas ${todayIcon}"></i> ${todayRevenue > 0 ? formatKsh(todayRevenue) : 'No revenue'}`;
+            document.getElementById('today-orders-change').className = `stat-change ${todayColor}`;
+            
+            document.getElementById('week-revenue-change').innerHTML = 
+                `<i class="fas ${weekOrders.length > 0 ? 'fa-arrow-up' : 'fa-minus'}"></i> ${weekOrders.length} order${weekOrders.length !== 1 ? 's' : ''} this week`;
+            document.getElementById('week-revenue-change').className = `stat-change ${weekOrders.length > 0 ? 'change-positive' : ''}`;
+            
+            // Update sales tracking table
+            updateSalesTrackingTable();
+        }
+
+        // Update sales tracking table
+        function updateSalesTrackingTable() {
+            const salesTrackingBody = document.getElementById('sales-tracking-body');
+            
+            // Format currency in Ksh
+            const formatKsh = (amount) => {
+                if (amount >= 1000000) {
+                    return `Ksh ${(amount/1000000).toFixed(1)}M`;
+                } else if (amount >= 1000) {
+                    return `Ksh ${(amount/1000).toFixed(1)}K`;
+                }
+                return `Ksh ${amount.toFixed(0)}`;
+            };
+            
+            // Group orders by date
+            const ordersByDate = {};
+            orders.forEach(order => {
+                const orderDate = new Date(order.created_at);
+                const dateKey = orderDate.toISOString().split('T')[0];
+                
+                if (!ordersByDate[dateKey]) {
+                    ordersByDate[dateKey] = {
+                        date: dateKey,
+                        orders: [],
+                        customers: new Set()
+                    };
+                }
+                
+                ordersByDate[dateKey].orders.push(order);
+                
+                // Extract customer email
+                const customerEmail = order.user_email || order.customer_email || order.customerEmail || order.email;
+                if (customerEmail) {
+                    ordersByDate[dateKey].customers.add(customerEmail.toLowerCase());
+                }
+            });
+            
+            // Convert to array and sort by date (descending)
+            const sortedDates = Object.values(ordersByDate)
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .slice(0, 10); // Show last 10 days
+            
+            if (sortedDates.length === 0) {
+                salesTrackingBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 2rem;">
+                            <i class="fas fa-chart-line" style="font-size: 2rem; color: var(--accent-color); margin-bottom: 1rem; display: block;"></i>
+                            No sales data available
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            let salesHTML = '';
+            
+            sortedDates.forEach(dateData => {
+                const dateObj = new Date(dateData.date);
+                const formattedDate = dateObj.toLocaleDateString('en-US', { 
+                    weekday: 'short',
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+                
+                const totalRevenue = dateData.orders.reduce((sum, order) => sum + (parseFloat(order.total_amount || order.totalAmount || order.amount || 0)), 0);
+                const totalOrders = dateData.orders.length;
+                const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+                const uniqueCustomers = dateData.customers.size;
+                
+                salesHTML += `
+                <tr>
+                    <td>${formattedDate}</td>
+                    <td><strong>${totalOrders}</strong></td>
+                    <td><strong>${formatKsh(totalRevenue)}</strong></td>
+                    <td>${formatKsh(avgOrderValue)}</td>
+                    <td>${uniqueCustomers}</td>
+                    <td>
+                        <button class="btn-select" onclick="viewDayDetails('${dateData.date}')" style="padding: 0.3rem 0.8rem; font-size: 0.9rem;">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                    </td>
+                </tr>
+                `;
+            });
+            
+            salesTrackingBody.innerHTML = salesHTML;
+        }
+
+        // View day details
+        function viewDayDetails(date) {
+            const dateObj = new Date(date);
+            const formattedDate = dateObj.toLocaleDateString('en-US', { 
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            // Filter orders for this date
+            const dayOrders = orders.filter(order => {
+                const orderDate = new Date(order.created_at);
+                return orderDate.toISOString().split('T')[0] === date;
+            });
+            
+            // Calculate stats
+            const totalRevenue = dayOrders.reduce((sum, order) => sum + (parseFloat(order.total_amount || order.totalAmount || order.amount || 0)), 0);
+            const totalOrders = dayOrders.length;
+            const customers = new Set();
+            dayOrders.forEach(order => {
+                const customerEmail = order.user_email || order.customer_email || order.customerEmail || order.email;
+                if (customerEmail) {
+                    customers.add(customerEmail.toLowerCase());
+                }
+            });
+            
+            // Show details in a modal or alert
+            let detailsMessage = `
+            <strong>${formattedDate}</strong><br><br>
+            Total Orders: <strong>${totalOrders}</strong><br>
+            Total Revenue: <strong>Ksh ${totalRevenue.toLocaleString()}</strong><br>
+            Unique Customers: <strong>${customers.size}</strong><br><br>
+            <strong>Recent Orders:</strong><br>
+            `;
+            
+            dayOrders.slice(0, 5).forEach(order => {
+                const orderDate = new Date(order.created_at);
+                const time = orderDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                const customerName = order.customer_name || order.customerName || order.name || order.full_name || order.fullName || 'Customer';
+                detailsMessage += `• ${time}: ${customerName} - Ksh ${(parseFloat(order.total_amount || order.totalAmount || order.amount || 0)).toLocaleString()}<br>`;
+            });
+            
+            if (dayOrders.length > 5) {
+                detailsMessage += `... and ${dayOrders.length - 5} more orders`;
+            }
+            
+            showNotification(detailsMessage, "info");
+        }
+
         // Show notification
-        function showNotification(message) {
+        function showNotification(message, type = "info") {
             // Create notification element
             const notification = document.createElement('div');
+            
+            let icon = 'info-circle';
+            if (type === 'error') icon = 'exclamation-circle';
+            if (type === 'success') icon = 'check-circle';
+            if (type === 'warning') icon = 'exclamation-triangle';
+            
             notification.style.cssText = `
                 position: fixed;
                 top: 20px;
                 right: 20px;
-                background-color: var(--accent-color);
+                background-color: ${type === 'error' ? 'var(--danger-color)' : 
+                                type === 'success' ? 'var(--success-color)' : 
+                                type === 'warning' ? 'var(--warning-color)' : 'var(--accent-color)'};
                 color: white;
                 padding: 1rem 1.5rem;
                 border-radius: 8px;
@@ -1509,14 +2471,16 @@
                 align-items: center;
                 gap: 0.8rem;
             `;
-            notification.innerHTML = `<i class="fas fa-info-circle"></i> ${message}`;
+            notification.innerHTML = `<i class="fas fa-${icon}"></i> ${message}`;
             document.body.appendChild(notification);
             
             // Remove after 3 seconds
             setTimeout(() => {
                 notification.style.animation = 'slideOut 0.3s ease';
                 setTimeout(() => {
-                    document.body.removeChild(notification);
+                    if (notification.parentNode) {
+                        document.body.removeChild(notification);
+                    }
                 }, 300);
             }, 3000);
             
@@ -1538,57 +2502,84 @@
             }
         }
 
-        // Simulate real-time updates (for demo)
-        setInterval(() => {
-            // Randomly update a customer's total spent (simulating new purchases)
-            const randomCustomerIndex = Math.floor(Math.random() * customers.length);
-            const randomIncrease = Math.floor(Math.random() * 200) + 50;
+        // Show/hide sections
+        function showSection(sectionId) {
+            // Hide all sections
+            document.getElementById('analytics-section').style.display = 'none';
+            document.getElementById('customer-management-section').classList.remove('active');
+            document.getElementById('sales-tracking-section').classList.remove('active');
             
-            customers[randomCustomerIndex].totalSpent += randomIncrease;
-            customers[randomCustomerIndex].visits += 1;
-            customers[randomCustomerIndex].lastVisit = new Date().toISOString().split('T')[0];
-            
-            // Recalculate average spend
-            customers[randomCustomerIndex].avgSpend = 
-                customers[randomCustomerIndex].totalSpent / customers[randomCustomerIndex].visits;
-            
-            // Re-render customers if they're in the top 8
-            if (randomCustomerIndex < 8) {
-                renderCustomers();
+            // Show selected section
+            if (sectionId === 'analytics') {
+                document.getElementById('analytics-section').style.display = 'block';
+            } else if (sectionId === 'customer-management') {
+                document.getElementById('customer-management-section').classList.add('active');
+            } else if (sectionId === 'sales-tracking') {
+                document.getElementById('sales-tracking-section').classList.add('active');
             }
-            
-            // Update total revenue
-            const totalRevenue = customers.reduce((sum, c) => sum + c.totalSpent, 0);
-            document.getElementById('total-revenue').textContent = `$${totalRevenue.toLocaleString()}`;
-            
-            // Update total orders
-            const totalOrders = customers.reduce((sum, c) => sum + c.visits, 0);
-            document.getElementById('total-orders').textContent = totalOrders.toLocaleString();
-            
-            // Randomly decrease stock for some items (simulating sales)
-            if (Math.random() > 0.7 && stockAlerts.length > 0) {
-                const randomStockIndex = Math.floor(Math.random() * stockAlerts.length);
-                const item = stockAlerts[randomStockIndex];
+        }
+
+        // Refresh data
+        async function refreshData() {
+            try {
+                showNotification('Refreshing data...', 'info');
+                await loadAllData();
                 
-                if (item.currentStock > 0) {
-                    item.currentStock -= Math.floor(Math.random() * 3) + 1;
-                    
-                    // Update status if needed
-                    if (item.currentStock <= 0) {
-                        item.status = "critical";
-                        item.currentStock = 0;
-                    } else if (item.currentStock < item.minStock) {
-                        item.status = "critical";
-                    } else if (item.currentStock < item.minStock * 2) {
-                        item.status = "low";
-                    }
-                    
-                    // Re-render alerts if this item is in the displayed alerts
-                    renderStockAlerts();
-                }
+                // Re-initialize charts with new data
+                initCharts();
+                
+                showNotification('Data refreshed successfully!', 'success');
+            } catch (error) {
+                console.error('Error refreshing data:', error);
+                showNotification('Error refreshing data', 'error');
             }
+        }
+
+        // Add refresh button to header
+        setTimeout(() => {
+            const header = document.querySelector('.header');
+            const refreshButton = document.createElement('button');
+            refreshButton.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Data';
+            refreshButton.style.cssText = `
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                background-color: var(--accent-color);
+                color: white;
+                border: none;
+                padding: 0.5rem 1rem;
+                border-radius: 6px;
+                cursor: pointer;
+                font-weight: 600;
+                transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            `;
+            refreshButton.onmouseover = () => {
+                refreshButton.style.backgroundColor = '#a0522d';
+                refreshButton.style.transform = 'translateY(-2px)';
+            };
+            refreshButton.onmouseout = () => {
+                refreshButton.style.backgroundColor = 'var(--accent-color)';
+                refreshButton.style.transform = 'translateY(0)';
+            };
+            refreshButton.onclick = refreshData;
             
-        }, 10000); // Update every 10 seconds
+            header.style.position = 'relative';
+            header.appendChild(refreshButton);
+        }, 1000);
+
+        // Auto-refresh data every 30 seconds
+        setInterval(async () => {
+            try {
+                await loadAllData();
+                console.log('Data auto-refreshed');
+            } catch (error) {
+                console.error('Auto-refresh error:', error);
+            }
+        }, 30000); // 30 seconds
+
     </script>
 </body>
 </html>
