@@ -6,6 +6,7 @@
     <title>Al Capone Club - Bar Menu</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* ALL YOUR CSS STYLES REMAIN THE SAME - NOT CHANGED */
         * {
             margin: 0;
             padding: 0;
@@ -1362,7 +1363,6 @@
         <div class="menu-section" id="menu-section">
             <h2 class="section-title">Our Drink Categories</h2>
             <div class="buttons-container">
-                <!-- Buttons will be loaded dynamically from database -->
                 <div class="loading-message" id="loading-message" style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: #888;">
                     <i class="fas fa-spinner fa-spin fa-2x"></i>
                     <p>Loading drink categories...</p>
@@ -1378,7 +1378,6 @@
             </div>
             
             <div class="orders-list">
-                <!-- Orders will be loaded here dynamically -->
                 <div class="no-orders" id="no-orders">
                     <p>No orders found</p>
                 </div>
@@ -1395,9 +1394,7 @@
                 <div class="success-message">
                     Your order has been placed successfully. Your drinks will be delivered to your table shortly.
                 </div>
-                <div class="success-details" id="success-details">
-                    <!-- Order details will be inserted here -->
-                </div>
+                <div class="success-details" id="success-details"></div>
                 <button class="close-success" id="close-success">Continue partying, DONT DRINK & DRIVE</button>
             </div>
         </div>
@@ -1423,18 +1420,19 @@
         let drinkData = {};
         let drinkCategories = [];
 
-        // Initialize the app - FIXED: No redirect to index.html
+        // Initialize the app
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('Al Capone Club Bar Menu Loading...');
             
-            // Load or create user data - NO REDIRECT TO INDEX
+            // Load or create user data
             const userData = localStorage.getItem('alCaponeClubUser');
             if (!userData) {
                 // Create guest user if not logged in
                 currentUser = {
                     username: 'Guest',
                     email: 'guest@alcapone.com',
-                    userId: 'guest_' + Date.now()
+                    userId: 'guest_' + Date.now(),
+                    phone: ''
                 };
                 localStorage.setItem('alCaponeClubUser', JSON.stringify(currentUser));
                 console.log('Created guest user:', currentUser);
@@ -1443,20 +1441,12 @@
                 console.log('Loaded existing user:', currentUser);
             }
             
-            // Initialize Supabase with your credentials
             try {
                 const supabaseUrl = "https://tfuwozhljthmxxcztfws.supabase.co";
                 const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRmdXdvemhsanRobXh4Y3p0ZndzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5OTA0NjEsImV4cCI6MjA4MTU2NjQ2MX0.7stJZibmLvBk0-oEQk6XSfjsfXaqYf9_O3308ZBOTjc";
                 
                 supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
                 console.log("Supabase initialized");
-                
-                // Test database connection
-                const isConnected = await testDatabaseConnection();
-                if (!isConnected) {
-                    console.warn("Database connection issues. Working in offline mode.");
-                    showNotification("Working in offline mode - some features limited");
-                }
                 
                 // Initialize UI first
                 initUI();
@@ -1465,20 +1455,17 @@
                 // Load drink data from database
                 await loadDrinkDataFromDatabase();
                 
-            } catch (error) {
-                console.error("Failed to initialize Supabase:", error);
-                showNotification('Working in offline mode - some features limited');
+                // Load pending orders count
+                await loadPendingOrdersCount();
                 
-                // Initialize UI even if database fails
+            } catch (error) {
+                console.error("Failed to initialize:", error);
+                showNotification('Working in offline mode - some features limited');
                 initUI();
                 initEventListeners();
-                
-                // Load fallback drink data
                 loadFallbackDrinkData();
             }
 
-            loadPendingOrdersCount();
-            
             // Try to load logo
             const clubLogo = document.getElementById('club-logo');
             const logoPlaceholder = document.getElementById('logo-placeholder');
@@ -1496,7 +1483,6 @@
             clubLogo.src = 'images/logo.png';
         });
 
-        // Load fallback drink data for offline mode
         function loadFallbackDrinkData() {
             console.log('Loading fallback drink data...');
             
@@ -1539,54 +1525,8 @@
             updateMenuCategories();
         }
 
-        // Test database connection
-        async function testDatabaseConnection() {
-            try {
-                const { data, error } = await supabase
-                    .from('orders')
-                    .select('count')
-                    .limit(1);
-                
-                if (error) {
-                    console.error("Orders table may not exist:", error);
-                    // Try to check if drinks table exists instead
-                    const { data: drinksData, error: drinksError } = await supabase
-                        .from('drinks')
-                        .select('count')
-                        .limit(1);
-                    
-                    if (drinksError) {
-                        console.error("Database connection failed:", drinksError);
-                        return false;
-                    }
-                }
-                
-                console.log("Database connection successful");
-                return true;
-            } catch (error) {
-                console.error("Database connection failed:", error);
-                return false;
-            }
-        }
-
-        // Load drink data from Supabase database - FIXED VERSION
         async function loadDrinkDataFromDatabase() {
             try {
-                console.log("Loading drink data from Supabase...");
-                
-                // Test database connection first
-                const { data: testData, error: testError } = await supabase
-                    .from('drinks')
-                    .select('count')
-                    .limit(1);
-                
-                if (testError) {
-                    console.error("Database connection error:", testError);
-                    loadFallbackDrinkData();
-                    return;
-                }
-                
-                // Fetch all drinks from the 'drinks' table
                 const { data: drinks, error } = await supabase
                     .from('drinks')
                     .select('*')
@@ -1594,31 +1534,23 @@
                     .order('name');
                 
                 if (error) {
-                    console.error("Error loading drinks from database:", error);
+                    console.error("Error loading drinks:", error);
                     loadFallbackDrinkData();
                     return;
                 }
                 
                 if (!drinks || drinks.length === 0) {
-                    console.warn("No drinks found in database");
                     loadFallbackDrinkData();
                     return;
                 }
                 
-                console.log(`Loaded ${drinks.length} drinks from database`);
-                
-                // Clear existing drink data
                 drinkData = {};
                 drinkCategories = [];
                 
-                // Group drinks by category
                 drinks.forEach(drink => {
                     const category = drink.category.toLowerCase().trim();
-                    
-                    // Clean up category name
                     let cleanCategory = category;
                     
-                    // Map common category names
                     if (category.includes('cocktail')) {
                         cleanCategory = 'cocktails';
                     } else if (category.includes('mocktail')) {
@@ -1637,32 +1569,23 @@
                         cleanCategory = 'hotdrinks';
                     }
                     
-                    // Create category if it doesn't exist
                     if (!drinkData[cleanCategory]) {
                         drinkData[cleanCategory] = [];
                         drinkCategories.push(cleanCategory);
                     }
                     
-                    // FIXED: Get price from any available field
                     const price = drink.price || drink.price_glass || drink.price_bottle || 500;
                     
-                    // Add drink to appropriate category
                     drinkData[cleanCategory].push({
                         id: drink.id,
                         name: drink.name,
                         description: drink.description || 'Premium drink',
                         price: price,
                         category: cleanCategory,
-                        db_id: drink.id // Keep original database ID
+                        db_id: drink.id
                     });
                 });
                 
-                // Log counts for debugging
-                Object.keys(drinkData).forEach(category => {
-                    console.log(`Category ${category}: ${drinkData[category].length} items`);
-                });
-                
-                // Update menu categories
                 updateMenuCategories();
                 
             } catch (error) {
@@ -1671,29 +1594,24 @@
             }
         }
 
-        // Update menu categories based on database data
         function updateMenuCategories() {
             const buttonsContainer = document.querySelector('.buttons-container');
             if (!buttonsContainer) return;
             
-            // Remove loading message
             const loadingMessage = document.getElementById('loading-message');
             if (loadingMessage) {
                 loadingMessage.remove();
             }
             
-            // Check which categories actually have data
             const availableCategories = Object.keys(drinkData).filter(category => 
                 drinkData[category].length > 0
             );
             
-            // If no categories found, use fallback
             if (availableCategories.length === 0) {
                 loadFallbackDrinkData();
                 return;
             }
             
-            // Define category metadata
             const categoryMetadata = {
                 'cocktails': { icon: 'fas fa-cocktail', text: 'Cocktails' },
                 'mocktails': { icon: 'fas fa-seedling', text: 'Mocktails' },
@@ -1724,7 +1642,6 @@
             
             buttonsContainer.innerHTML = buttonsHTML;
             
-            // Re-attach event listeners
             document.querySelectorAll('.menu-button').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const category = btn.getAttribute('data-category');
@@ -1733,11 +1650,9 @@
             });
         }
 
-        // Show category page with database data
         function showCategoryPage(category) {
             const menuSection = document.getElementById('menu-section');
             
-            // Get category display name
             const categoryNames = {
                 'cocktails': 'Cocktails',
                 'mocktails': 'Mocktails',
@@ -1753,7 +1668,6 @@
             
             const displayName = categoryNames[category] || category.charAt(0).toUpperCase() + category.slice(1).replace('-', ' ');
             
-            // Check if category has drinks
             if (!drinkData[category] || drinkData[category].length === 0) {
                 menuSection.innerHTML = `
                     <button class="back-button" id="back-button">
@@ -1816,7 +1730,6 @@
             });
         }
 
-        // Add to cart with database reference
         function addToCart(drink, category, dbId) {
             const existingItem = shoppingCart.find(item => 
                 item.db_id === dbId || (item.id === drink.id && item.category === category)
@@ -1830,7 +1743,7 @@
                     name: drink.name,
                     price: drink.price,
                     category: category,
-                    db_id: dbId || drink.id, // Store database ID for reference
+                    db_id: dbId || drink.id,
                     quantity: 1
                 });
             }
@@ -1841,19 +1754,16 @@
         }
 
         function initUI() {
-            // Set username - handle guest case
             const username = currentUser?.username || currentUser?.email?.split('@')[0] || 'Guest';
             document.getElementById('username-display').textContent = username;
             document.getElementById('menu-username').textContent = username;
             
-            // Load table number
             const savedTable = localStorage.getItem('alCaponeTableNumber');
             if (savedTable) {
                 tableNumber = savedTable;
             }
             document.getElementById('current-table-number').textContent = tableNumber;
             
-            // Load cart
             const savedCart = localStorage.getItem('alCaponeCart');
             if (savedCart) {
                 shoppingCart = JSON.parse(savedCart);
@@ -1862,10 +1772,8 @@
         }
 
         function initEventListeners() {
-            // Hamburger menu
             document.getElementById('hamburger-menu').addEventListener('click', toggleSideMenu);
             
-            // Side menu items
             document.getElementById('menu-drinks').addEventListener('click', () => {
                 showDrinksMenu();
                 closeSideMenu();
@@ -1881,14 +1789,13 @@
                 closeSideMenu();
             });
             
+            // FIXED: Logout now redirects to index.html
             document.getElementById('menu-logout').addEventListener('click', logout);
             
-            // Edit table
             document.getElementById('edit-table-btn').addEventListener('click', showEditTableModal);
             document.getElementById('save-table-btn').addEventListener('click', saveTableNumber);
             document.getElementById('cancel-table-btn').addEventListener('click', hideEditTableModal);
             
-            // Cart functionality
             document.getElementById('cart-button').addEventListener('click', () => {
                 document.getElementById('cart-panel').classList.add('active');
             });
@@ -1899,7 +1806,6 @@
             
             document.getElementById('checkout-button').addEventListener('click', checkout);
             
-            // Orders tabs
             document.querySelectorAll('.orders-tab').forEach(tab => {
                 tab.addEventListener('click', function() {
                     const tabName = this.getAttribute('data-tab');
@@ -1909,7 +1815,6 @@
                 });
             });
             
-            // Success modal
             document.getElementById('close-success').addEventListener('click', () => {
                 document.getElementById('success-modal').classList.remove('active');
                 showDrinksMenu();
@@ -2019,7 +1924,6 @@
             
             cartTotal.innerHTML = `Total: Ksh ${totalPrice.toLocaleString()}`;
             
-            // Add event listeners
             document.querySelectorAll('.decrease-quantity').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const index = parseInt(this.dataset.index);
@@ -2146,7 +2050,6 @@
             });
         }
 
-        // Process payment function
         async function processPayment(totalPrice) {
             const phone = document.getElementById('phone').value;
             const name = document.getElementById('name').value;
@@ -2163,18 +2066,20 @@
                 return;
             }
             
-            // Update table number
             tableNumber = tableNumberInput;
             localStorage.setItem('alCaponeTableNumber', tableNumber);
             document.getElementById('current-table-number').textContent = tableNumber;
             
-            // Create order ID
+            currentUser.phone = phone;
+            currentUser.username = name;
+            if (email) currentUser.email = email;
+            localStorage.setItem('alCaponeClubUser', JSON.stringify(currentUser));
+            
             const orderId = 'AC-' + Date.now().toString().slice(-8);
             
-            // Prepare order data for database
             const orderData = {
                 order_id: orderId,
-                user_id: currentUser.userId || currentUser.email,
+                user_id: currentUser.userId,
                 username: name,
                 user_email: email,
                 phone: phone,
@@ -2190,7 +2095,6 @@
             console.log('Saving order to database:', orderData);
             
             try {
-                // Save order to Supabase
                 const { data, error } = await supabase
                     .from('orders')
                     .insert([orderData]);
@@ -2203,20 +2107,15 @@
                 
                 console.log('Order saved successfully:', data);
                 
-                // Show processing notification
                 showNotification(`Processing M-Pesa payment of Ksh ${totalPrice.toLocaleString()}...`);
                 
-                // Simulate M-Pesa payment processing
                 setTimeout(() => {
-                    // Show success modal
                     showSuccessModal(orderData);
                     
-                    // Clear cart
                     shoppingCart = [];
                     saveCart();
                     updateCartDisplay();
                     
-                    // Update pending orders count
                     loadPendingOrdersCount();
                     
                 }, 3000);
@@ -2255,37 +2154,35 @@
             document.getElementById('success-modal').classList.add('active');
         }
 
-        // Load orders from database
+        // Load orders from database - SIMPLIFIED AND FIXED
         async function loadOrders(type) {
             const ordersList = document.querySelector('.orders-list');
             const noOrders = document.getElementById('no-orders');
             
             ordersList.innerHTML = '';
+            noOrders.style.display = 'none';
             
             try {
-                if (!currentUser || (!currentUser.userId && !currentUser.email)) {
-                    console.error('No user data available');
+                if (!currentUser || !currentUser.userId) {
                     ordersList.innerHTML = '<div class="no-orders"><p>Please login to view orders</p></div>';
                     return;
                 }
                 
-                const userId = currentUser.userId || currentUser.email;
+                const userId = currentUser.userId;
+                const status = type === 'pending' ? 'pending' : 'delivered';
                 
-                console.log(`Loading ${type} orders for user:`, userId);
-                
-                // Use the correct status condition
-                const statusCondition = type === 'pending' ? 'pending' : 'delivered';
+                console.log(`Loading ${status} orders for user: ${userId}`);
                 
                 const { data: orders, error } = await supabase
                     .from('orders')
                     .select('*')
                     .eq('user_id', userId)
-                    .eq('status', statusCondition)
+                    .eq('status', status)
                     .order('created_at', { ascending: false });
                 
                 if (error) {
                     console.error('Error loading orders:', error);
-                    ordersList.innerHTML = '<div class="no-orders"><p>Error loading orders</p></div>';
+                    ordersList.innerHTML = '<div class="no-orders"><p>No orders found</p></div>';
                     return;
                 }
                 
@@ -2297,8 +2194,6 @@
                     }
                     return;
                 }
-                
-                noOrders.style.display = 'none';
                 
                 if (type === 'pending') {
                     pendingOrdersCount = orders.length;
@@ -2316,8 +2211,6 @@
                                 </div>
                             `;
                         });
-                    } else {
-                        itemsHTML = '<div class="order-item"><span>No items details</span></div>';
                     }
                     
                     const orderCard = document.createElement('div');
@@ -2330,7 +2223,7 @@
                             </div>
                         </div>
                         <div class="order-details">
-                            ${itemsHTML}
+                            ${itemsHTML || '<div class="order-item"><span>No items details</span></div>'}
                         </div>
                         <div class="order-total">
                             <span>Total:</span>
@@ -2346,20 +2239,18 @@
                 
             } catch (error) {
                 console.error('Error loading orders:', error);
-                ordersList.innerHTML = '<div class="no-orders"><p>Error loading orders. Please try again.</p></div>';
+                ordersList.innerHTML = '<div class="no-orders"><p>No orders found</p></div>';
             }
         }
 
-        // Load pending orders count
         async function loadPendingOrdersCount() {
             try {
-                if (!currentUser || (!currentUser.userId && !currentUser.email)) {
-                    console.error('No user data available for pending orders count');
+                if (!currentUser || !currentUser.userId) {
                     document.getElementById('pending-count').textContent = '0';
                     return;
                 }
                 
-                const userId = currentUser.userId || currentUser.email;
+                const userId = currentUser.userId;
                 
                 const { data: orders, error } = await supabase
                     .from('orders')
@@ -2380,34 +2271,12 @@
             }
         }
 
+        // FIXED: Logout now redirects to index.html
         function logout() {
-            // Clear user data
-            localStorage.removeItem('alCaponeClubUser');
-            localStorage.removeItem('alCaponeCart');
-            localStorage.removeItem('alCaponeTableNumber');
-            
-            // Set as guest user instead of redirecting
-            currentUser = {
-                username: 'Guest',
-                email: 'guest@alcapone.com',
-                userId: 'guest_' + Date.now()
-            };
-            localStorage.setItem('alCaponeClubUser', JSON.stringify(currentUser));
-            
-            // Clear cart
-            shoppingCart = [];
-            saveCart();
-            updateCartDisplay();
-            
-            // Update UI
-            document.getElementById('username-display').textContent = 'Guest';
-            document.getElementById('menu-username').textContent = 'Guest';
-            
-            // Show notification
-            showNotification('Logged out. You are now browsing as Guest');
-            
-            // Reload to show default menu
-            showDrinksMenu();
+            // Clear all local storage
+            localStorage.clear();
+            // Redirect to index.html
+            window.location.href = 'index.html';
         }
 
         function showNotification(message) {
@@ -2435,21 +2304,23 @@
                     document.body.removeChild(notification);
                 }, 300);
             }, 2000);
+            
+            if (!document.querySelector('#notification-styles')) {
+                const style = document.createElement('style');
+                style.id = 'notification-styles';
+                style.textContent = `
+                    @keyframes slideIn {
+                        from { top: -50px; opacity: 0; }
+                        to { top: 20px; opacity: 1; }
+                    }
+                    @keyframes slideOut {
+                        from { top: 20px; opacity: 1; }
+                        to { top: -50px; opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
         }
-
-        // Add CSS for notifications
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideIn {
-                from { top: -50px; opacity: 0; }
-                to { top: 20px; opacity: 1; }
-            }
-            @keyframes slideOut {
-                from { top: 20px; opacity: 1; }
-                to { top: -50px; opacity: 0; }
-            }
-        `;
-        document.head.appendChild(style);
     </script>
 </body>
 </html>

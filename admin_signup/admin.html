@@ -179,6 +179,7 @@
             text-decoration: none;
             transition: all 0.3s ease;
             font-weight: 500;
+            cursor: pointer;
         }
 
         .nav-link:hover, .nav-link.active {
@@ -283,19 +284,19 @@
         }
 
         .icon-revenue {
-            background-color: var(--success-color);
+            background: linear-gradient(135deg, #FFD700, #FFA500);
         }
 
         .icon-orders {
-            background-color: var(--info-color);
+            background: linear-gradient(135deg, #32CD32, #228B22);
         }
 
         .icon-customers {
-            background-color: var(--highlight-color);
+            background: linear-gradient(135deg, #4169E1, #191970);
         }
 
         .icon-avg {
-            background-color: var(--warning-color);
+            background: linear-gradient(135deg, #FF6347, #8B0000);
         }
 
         .stat-value {
@@ -1061,6 +1062,52 @@
             display: block;
             opacity: 1;
         }
+
+        /* Back to Admin Button Styles */
+        .back-to-admin-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 1rem auto;
+            text-decoration: none;
+            width: fit-content;
+        }
+
+        .back-to-admin-btn:hover {
+            background-color: #a0522d;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .admin-action-btn {
+            background: linear-gradient(135deg, var(--accent-color), var(--highlight-color));
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            width: fit-content;
+            margin: 0.5rem 0;
+        }
+
+        .admin-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
     </style>
 </head>
 <body>
@@ -1068,14 +1115,14 @@
         <!-- Header Section -->
         <div class="header">
             <div class="header-top">
-                <h1 class="header-title">Super Admin Dashboard</h1>
+                <h1 class="header-title">Management Dashboard</h1>
                 <button class="refresh-btn" onclick="refreshData()">
                     <i class="fas fa-sync-alt"></i> Refresh Data
                 </button>
             </div>
-            <p class="header-subtitle">Comprehensive analytics and insights for Al Capone Club. Track sales, customer loyalty, and identify top performers for the Dubai trip.</p>
+            <p class="header-subtitle">Comprehensive analytics and insights for Al Capone - Thika Rd Club. Track sales, customer loyalty, and identify top performers.</p>
             <div class="dubai-trip-banner">
-                <i class="fas fa-gift"></i> Dubai Trip Reward: Select Top 2 Loyal Customers by December 31st
+                <i class="fas fa-gift"></i> Trip Reward: Select Top  Loyal Customers by December 31st
             </div>
         </div>
 
@@ -1098,7 +1145,7 @@
                         <li class="nav-item"><a href="#" class="nav-link active" onclick="showSection('analytics')"><i class="fas fa-chart-line"></i> Analytics Overview</a></li>
                         <li class="nav-item"><a href="#" class="nav-link" onclick="showSection('customer-management')"><i class="fas fa-users"></i> Customer Management</a></li>
                         <li class="nav-item"><a href="#" class="nav-link" onclick="showSection('sales-tracking')"><i class="fas fa-cash-register"></i> Sales Tracking</a></li>
-                        <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-glass-cheers"></i> Inventory & Menu</a></li>
+                        <li class="nav-item"><a href="#" class="nav-link" onclick="openDrinkManagement()"><i class="fas fa-glass-cheers"></i> Inventory & Menu</a></li>
                         <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-calendar-alt"></i> Events & Promotions</a></li>
                         <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-user-tie"></i> Staff Management</a></li>
                         <li class="nav-item"><a href="#" class="nav-link"><i class="fas fa-cog"></i> Settings</a></li>
@@ -1121,7 +1168,9 @@
                     </ul>
                     
                     <div class="view-all-alerts">
-                        <a href="#"><i class="fas fa-arrow-right"></i> View All Inventory</a>
+                        <a href="#" onclick="openDrinkManagement()" style="color: var(--highlight-color); text-decoration: none; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-arrow-right"></i> Manage Inventory
+                        </a>
                     </div>
                 </div>
             </div>
@@ -1136,7 +1185,7 @@
                             <div class="stat-header">
                                 <h3 class="stat-title">Total Revenue</h3>
                                 <div class="stat-icon icon-revenue">
-                                    <i class="fas fa-money-bill-wave"></i>
+                                    <i class="fas fa-coins"></i>
                                 </div>
                             </div>
                             <div class="stat-value" id="total-revenue">Ksh 0</div>
@@ -1149,7 +1198,7 @@
                             <div class="stat-header">
                                 <h3 class="stat-title">Total Orders</h3>
                                 <div class="stat-icon icon-orders">
-                                    <i class="fas fa-shopping-cart"></i>
+                                    <i class="fas fa-shopping-bag"></i>
                                 </div>
                             </div>
                             <div class="stat-value" id="total-orders">0</div>
@@ -1162,7 +1211,7 @@
                             <div class="stat-header">
                                 <h3 class="stat-title">Active Customers</h3>
                                 <div class="stat-icon icon-customers">
-                                    <i class="fas fa-users"></i>
+                                    <i class="fas fa-user-friends"></i>
                                 </div>
                             </div>
                             <div class="stat-value" id="active-customers">0</div>
@@ -1214,7 +1263,7 @@
                     <!-- Top Customers Section -->
                     <div class="top-customers-section">
                         <div class="section-title">
-                            <span><i class="fas fa-crown"></i> Top Loyal Customers - Dubai Trip Selection</span>
+                            <span><i class="fas fa-crown"></i> Top Loyal Customers </span>
                             <div class="trip-indicator" id="trip-indicator">
                                 <i class="fas fa-spinner fa-spin"></i> Loading...
                             </div>
@@ -1329,7 +1378,7 @@
                                 <div class="stat-header">
                                     <h3 class="stat-title">Today's Revenue</h3>
                                     <div class="stat-icon icon-revenue">
-                                        <i class="fas fa-money-bill-wave"></i>
+                                        <i class="fas fa-coins"></i>
                                     </div>
                                 </div>
                                 <div class="stat-value" id="today-revenue">Ksh 0</div>
@@ -1342,7 +1391,7 @@
                                 <div class="stat-header">
                                     <h3 class="stat-title">Today's Orders</h3>
                                     <div class="stat-icon icon-orders">
-                                        <i class="fas fa-shopping-cart"></i>
+                                        <i class="fas fa-shopping-bag"></i>
                                     </div>
                                 </div>
                                 <div class="stat-value" id="today-orders">0</div>
@@ -1450,7 +1499,7 @@
                 
                 // Show success notification
                 setTimeout(() => {
-                    showNotification('Connected to Supabase database successfully!', 'success');
+                    showNotification('Connected to database successfully!', 'success');
                 }, 1000);
                 
             } catch (error) {
@@ -1485,6 +1534,20 @@
             sidebar.classList.remove('active');
             overlay.classList.remove('active');
             document.body.style.overflow = 'auto';
+        }
+
+        // Open Drink Management
+        function openDrinkManagement() {
+            // Close sidebar on mobile
+            closeSidebar();
+            
+            // Show confirmation
+            showNotification('Opening Drink Management System...', 'info');
+            
+            // Open in new tab after a short delay
+            setTimeout(() => {
+                window.open('../Management/drinksmanagement.html', '_blank');
+            }, 500);
         }
 
         // Load all data from Supabase
@@ -1812,7 +1875,7 @@
                 } else if (amount >= 1000) {
                     return `Ksh ${(amount/1000).toFixed(1)}K`;
                 }
-                return `Ksh ${amount.toFixed(2)}`;
+                return `Ksh ${amount.toFixed(0)}`;
             };
             
             document.getElementById('total-revenue').textContent = formatKsh(totalRevenue);
@@ -2513,7 +2576,7 @@
                 } else if (amount >= 1000) {
                     return `Ksh ${(amount/1000).toFixed(1)}K`;
                 }
-                return `Ksh ${amount.toFixed(2)}`;
+                return `Ksh ${amount.toFixed(0)}`;
             };
             
             // Today's date

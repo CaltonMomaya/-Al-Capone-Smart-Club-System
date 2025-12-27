@@ -260,14 +260,12 @@
             margin-bottom: 2rem;
         }
 
-        /* Tablet and larger screens */
         @media (min-width: 768px) {
             .main-content {
                 grid-template-columns: 1fr 1fr;
             }
         }
 
-        /* Desktop screens */
         @media (min-width: 1024px) {
             .main-content {
                 grid-template-columns: 1fr 450px;
@@ -542,7 +540,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* Table Arrangement with Pagination - YOUR ORIGINAL STYLE */
+        /* Table Arrangement with Pagination */
         .table-arrangement {
             margin-top: 1.5rem;
         }
@@ -599,7 +597,7 @@
             justify-items: center;
         }
 
-        /* Table Mockup Styling - YOUR ORIGINAL STYLE */
+        /* Table Mockup Styling */
         .table-mockup {
             width: 120px;
             height: 120px;
@@ -1007,9 +1005,7 @@
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="orders-body">
-                            <!-- Orders will be populated here by JavaScript -->
-                        </tbody>
+                        <tbody id="orders-body"></tbody>
                     </table>
                     
                     <div id="empty-orders-message" class="empty-orders" style="display: none;">
@@ -1020,7 +1016,7 @@
                 </div>
             </div>
             
-            <!-- Overview Section - YOUR ORIGINAL TABLE ARRANGEMENT -->
+            <!-- Overview Section -->
             <div class="overview-section">
                 <div class="section-title">
                     <span>Club Overview</span>
@@ -1059,9 +1055,7 @@
                         </div>
                     </h3>
                     
-                    <div class="table-grid" id="table-grid">
-                        <!-- Table mockups will be populated here by JavaScript -->
-                    </div>
+                    <div class="table-grid" id="table-grid"></div>
                     
                     <div class="legend">
                         <div class="legend-item">
@@ -1099,31 +1093,17 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/dist/umd/supabase.min.js"></script>
     
     <script>
-        // ==============================================
-        // REAL-TIME WAITERBAY WITH YOUR ORIGINAL TABLE ARRANGEMENT
-        // ==============================================
-        
-        // Initialize Supabase
         let supabase;
-        
-        // Global variables
         let orders = [];
         let tables = [];
         let deliveredToday = 0;
         let currentPage = 1;
         const tablesPerPage = 6;
-        
-        // VIP tables - YOUR ORIGINAL CONFIGURATION
         const vipTables = [1, 6, 7];
-        
-        // Track new orders for highlighting
         let newOrderIds = new Set();
-        
-        // Auto-refresh interval
         let refreshInterval;
-        const REFRESH_INTERVAL = 3000; // 3 seconds
+        const REFRESH_INTERVAL = 3000;
         
-        // DOM elements
         const ordersBody = document.getElementById('orders-body');
         const emptyOrdersMessage = document.getElementById('empty-orders-message');
         const ordersCount = document.getElementById('orders-count');
@@ -1136,7 +1116,6 @@
         const pageInfo = document.getElementById('page-info');
         const realTimeStatus = document.getElementById('realTimeStatus');
         
-        // Initialize the page
         document.addEventListener('DOMContentLoaded', async function() {
             console.log("🚀 Initializing WaiterBay REAL-TIME System...");
             
@@ -1147,20 +1126,13 @@
                 supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
                 console.log("✅ Supabase initialized");
                 
-                // Initialize UI
                 initUI();
                 initEventListeners();
-                
-                // Load initial data
                 await loadOrdersFromDatabase();
                 initializeTables();
                 renderTableMockups();
                 updateStats();
-                
-                // Start real-time auto-refresh
                 startAutoRefresh();
-                
-                // Try WebSocket connection
                 tryWebSocketConnection();
                 
                 console.log("✅ System ready - Auto-refresh every 3 seconds");
@@ -1171,7 +1143,6 @@
             }
         });
 
-        // Initialize UI
         function initUI() {
             const savedDelivered = localStorage.getItem('waiterbayDeliveredToday');
             if (savedDelivered) {
@@ -1180,12 +1151,9 @@
             }
         }
 
-        // Initialize event listeners
         function initEventListeners() {
-            // Hamburger menu
             document.getElementById('hamburger-menu').addEventListener('click', toggleSideMenu);
             
-            // Side menu items
             document.getElementById('menu-orders').addEventListener('click', () => {
                 closeSideMenu();
             });
@@ -1200,7 +1168,6 @@
             
             document.getElementById('menu-logout').addEventListener('click', logout);
             
-            // Pagination buttons
             prevPageBtn.addEventListener('click', () => {
                 if (currentPage > 1) {
                     currentPage--;
@@ -1218,7 +1185,6 @@
                 }
             });
             
-            // Close side menu when clicking outside
             document.addEventListener('click', (e) => {
                 const sideMenu = document.getElementById('side-menu');
                 const hamburger = document.getElementById('hamburger-menu');
@@ -1229,7 +1195,6 @@
             });
         }
 
-        // Toggle side menu
         function toggleSideMenu() {
             const menu = document.getElementById('side-menu');
             const hamburger = document.getElementById('hamburger-menu');
@@ -1237,13 +1202,11 @@
             hamburger.classList.toggle('active');
         }
 
-        // Close side menu
         function closeSideMenu() {
             document.getElementById('side-menu').classList.remove('active');
             document.getElementById('hamburger-menu').classList.remove('active');
         }
 
-        // Initialize tables - YOUR ORIGINAL FUNCTION
         function initializeTables() {
             tables = [];
             for (let i = 1; i <= 12; i++) {
@@ -1262,12 +1225,10 @@
             updateTableStatusFromOrders();
         }
 
-        // Load orders from database
         async function loadOrdersFromDatabase() {
             try {
                 console.log("📥 Loading orders from database...");
                 
-                // Get all pending orders
                 const { data: ordersData, error } = await supabase
                     .from('orders')
                     .select('*')
@@ -1283,7 +1244,6 @@
                 orders = ordersData || [];
                 console.log(`✅ Loaded ${orders.length} orders`);
                 
-                // Mark new orders
                 orders.forEach(order => {
                     newOrderIds.add(order.order_id);
                 });
@@ -1297,7 +1257,6 @@
             }
         }
 
-        // Start auto-refresh
         function startAutoRefresh() {
             console.log(`🔄 Starting auto-refresh every ${REFRESH_INTERVAL/1000} seconds`);
             
@@ -1316,10 +1275,8 @@
             }, REFRESH_INTERVAL);
         }
 
-        // Check for new orders
         async function checkForNewOrders() {
             try {
-                // Get latest orders to check for changes
                 const { data: latestOrders, error } = await supabase
                     .from('orders')
                     .select('order_id, status, created_at')
@@ -1330,15 +1287,12 @@
                 if (error) throw error;
                 
                 if (latestOrders && latestOrders.length > 0) {
-                    // Check if we have any new orders
                     let hasChanges = false;
                     
                     for (const order of latestOrders) {
-                        // Check if this order is already in our list
                         const existingOrder = orders.find(o => o.order_id === order.order_id);
                         
                         if (!existingOrder) {
-                            // New order found!
                             hasChanges = true;
                             console.log(`🆕 Found new order: ${order.order_id}`);
                             newOrderIds.add(order.order_id);
@@ -1346,11 +1300,9 @@
                         }
                     }
                     
-                    // Also check if any orders were delivered
                     const currentOrderIds = orders.map(o => o.order_id);
                     const latestOrderIds = latestOrders.map(o => o.order_id);
                     
-                    // Find orders that are in our list but not in latest (delivered)
                     const deliveredOrders = currentOrderIds.filter(id => !latestOrderIds.includes(id));
                     if (deliveredOrders.length > 0) {
                         hasChanges = true;
@@ -1358,12 +1310,10 @@
                     }
                     
                     if (hasChanges) {
-                        // Reload all orders
                         await loadOrdersFromDatabase();
                         renderTableMockups();
                         updateStats();
                         
-                        // Update status
                         realTimeStatus.classList.remove('disconnected');
                         realTimeStatus.innerHTML = '<div class="pulse"></div><span>LIVE</span>';
                     }
@@ -1375,7 +1325,6 @@
             }
         }
 
-        // Try WebSocket connection
         function tryWebSocketConnection() {
             try {
                 console.log('🔔 Attempting WebSocket connection...');
@@ -1391,22 +1340,16 @@
                         (payload) => {
                             console.log('🎯 WebSocket: New order!', payload.new);
                             
-                            // Add to new orders
                             newOrderIds.add(payload.new.order_id);
-                            
-                            // Add to orders array
                             orders.unshift(payload.new);
                             
-                            // Update UI
                             renderOrders();
                             updateTableStatusFromOrders();
                             renderTableMockups();
                             updateStats();
                             
-                            // Show notification
                             showNotification(`🆕 New order from Table ${payload.new.table_number}!`);
                             
-                            // VIP special handling
                             if (vipTables.includes(payload.new.table_number)) {
                                 showNotification(`👑 VIP ORDER! Table ${payload.new.table_number}`, 'vip');
                             }
@@ -1424,7 +1367,6 @@
             }
         }
 
-        // Update table status based on current orders
         function updateTableStatusFromOrders() {
             tables.forEach(table => {
                 table.status = 'vacant';
@@ -1449,7 +1391,6 @@
             });
         }
 
-        // Render orders to the table
         function renderOrders() {
             if (orders.length === 0) {
                 ordersBody.innerHTML = '';
@@ -1461,7 +1402,6 @@
             emptyOrdersMessage.style.display = 'none';
             ordersCount.textContent = `${orders.length} Order${orders.length !== 1 ? 's' : ''}`;
             
-            // Sort orders: VIP tables first, then by time
             const sortedOrders = [...orders].sort((a, b) => {
                 const aIsVip = vipTables.includes(a.table_number);
                 const bIsVip = vipTables.includes(b.table_number);
@@ -1484,7 +1424,6 @@
                 const isVipTable = vipTables.includes(order.table_number);
                 const vipBadge = isVipTable ? '<span class="vip-table-badge">VIP</span>' : '';
                 
-                // Check if this is a new order
                 const isNewOrder = newOrderIds.has(order.order_id);
                 const newOrderClass = isNewOrder ? 'new-order-row' : '';
                 
@@ -1511,7 +1450,6 @@
             
             ordersBody.innerHTML = ordersHTML;
             
-            // Remove new order highlight after 3 seconds
             if (newOrderIds.size > 0) {
                 setTimeout(() => {
                     const newRows = document.querySelectorAll('.new-order-row');
@@ -1523,9 +1461,7 @@
             }
         }
 
-        // Render table mockups with pagination - YOUR ORIGINAL FUNCTION
         function renderTableMockups() {
-            // Sort tables: tables with orders first, then VIP tables, then by ID
             const sortedTables = [...tables].sort((a, b) => {
                 if (a.hasOrder && !b.hasOrder) return -1;
                 if (!a.hasOrder && b.hasOrder) return 1;
@@ -1536,13 +1472,11 @@
                 return a.id - b.id;
             });
             
-            // Calculate pagination
             const totalPages = Math.ceil(sortedTables.length / tablesPerPage);
             const startIndex = (currentPage - 1) * tablesPerPage;
             const endIndex = Math.min(startIndex + tablesPerPage, sortedTables.length);
             const currentTables = sortedTables.slice(startIndex, endIndex);
             
-            // Update pagination info
             pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
             updatePaginationButtons();
             
@@ -1577,7 +1511,6 @@
             tableGrid.innerHTML = tableHTML;
         }
 
-        // Update pagination buttons
         function updatePaginationButtons() {
             const totalPages = Math.ceil(tables.length / tablesPerPage);
             
@@ -1585,7 +1518,6 @@
             nextPageBtn.disabled = currentPage === totalPages || totalPages === 0;
         }
 
-        // Show table details when clicked
         function showTableDetails(tableId) {
             const table = tables.find(t => t.id === tableId);
             if (!table) return;
@@ -1622,15 +1554,12 @@
             showTableModal(message);
         }
 
-        // Custom modal for table details
         function showTableModal(content) {
-            // Remove existing modal if any
             const existingModal = document.getElementById('table-details-modal');
             if (existingModal) {
                 document.body.removeChild(existingModal);
             }
             
-            // Create modal
             const modal = document.createElement('div');
             modal.id = 'table-details-modal';
             modal.style.cssText = `
@@ -1650,7 +1579,6 @@
                 -webkit-overflow-scrolling: touch;
             `;
             
-            // Modal content
             const modalContent = document.createElement('div');
             modalContent.style.cssText = `
                 background-color: var(--button-color);
@@ -1666,7 +1594,6 @@
                 word-wrap: break-word;
             `;
             
-            // Close button
             const closeButton = document.createElement('button');
             closeButton.innerHTML = '<i class="fas fa-times"></i>';
             closeButton.style.cssText = `
@@ -1703,14 +1630,12 @@
             modal.appendChild(modalContent);
             document.body.appendChild(modal);
             
-            // Close modal when clicking outside content
             modal.onclick = function(e) {
                 if (e.target === modal) {
                     document.body.removeChild(modal);
                 }
             };
             
-            // Add animation keyframes if not already added
             if (!document.querySelector('#modal-animations')) {
                 const style = document.createElement('style');
                 style.id = 'modal-animations';
@@ -1727,35 +1652,24 @@
                 document.head.appendChild(style);
             }
             
-            // Add CSS for modal animation
             modalContent.style.animation = 'slideIn 0.3s ease';
         }
 
-        // Update statistics
         function updateStats() {
-            // Update pending orders count
             pendingOrdersElement.textContent = orders.length;
             
-            // Update occupied tables count
             const occupiedTables = tables.filter(table => table.status === 'occupied').length;
             occupiedTablesElement.textContent = occupiedTables;
             
-            // Update total tables
             document.getElementById('total-tables').textContent = tables.length;
-            
-            // Update delivered today count
             deliveredTodayElement.textContent = deliveredToday;
-            
-            // Update pending count in menu
             document.getElementById('pending-count').textContent = orders.length;
         }
 
-        // Deliver an order
         async function deliverOrder(orderId) {
             console.log("🚚 Delivering order:", orderId);
             
             try {
-                // Find the order in the local array
                 const orderIndex = orders.findIndex(order => order.order_id === orderId);
                 
                 if (orderIndex === -1) {
@@ -1769,7 +1683,6 @@
                 
                 console.log("Updating order in database:", orderId, "to status: delivered");
                 
-                // Update database: set status to 'delivered' and add delivered_at timestamp
                 const { data, error } = await supabase
                     .from('orders')
                     .update({ 
@@ -1785,22 +1698,18 @@
                 
                 console.log("Database update successful");
                 
-                // Remove the order from the local array
                 orders.splice(orderIndex, 1);
                 newOrderIds.delete(orderId);
                 
-                // Update delivered count and save to localStorage
                 deliveredToday++;
                 localStorage.setItem('waiterbayDeliveredToday', deliveredToday);
                 deliveredTodayElement.textContent = deliveredToday;
                 
-                // Update UI immediately
                 updateTableStatusFromOrders();
                 renderOrders();
                 renderTableMockups();
                 updateStats();
                 
-                // Show confirmation
                 showNotification(`✅ Order ${orderId} from Table ${order.table_number} delivered!`);
                 
             } catch (error) {
@@ -1809,7 +1718,6 @@
             }
         }
 
-        // Show notification
         function showNotification(message, type = 'info') {
             const notification = document.createElement('div');
             
@@ -1864,9 +1772,7 @@
             }
         }
 
-        // Logout function
         function logout() {
-            // Cleanup
             if (refreshInterval) {
                 clearInterval(refreshInterval);
             }

@@ -6,11 +6,12 @@
     <title>Al Capone Club - Drink Management</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Reset and Base Styles */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             -webkit-tap-highlight-color: transparent;
             -webkit-text-size-adjust: 100%;
             -ms-text-size-adjust: 100%;
@@ -28,12 +29,15 @@
             --info-color: #1565c0;
             --card-bg: rgba(30, 30, 30, 0.98);
             --menu-bg: rgba(30, 30, 30, 0.98);
+            --glass-border: rgba(212, 175, 55, 0.2);
         }
 
         html {
             font-size: 16px;
             height: 100%;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         body {
@@ -41,6 +45,7 @@
             color: var(--secondary-color);
             min-height: 100vh;
             min-height: -webkit-fill-available;
+            min-height: 100dvh;
             width: 100vw;
             overflow-x: hidden;
             background-image: 
@@ -55,34 +60,27 @@
             bottom: 0;
         }
 
-        @media (max-width: 768px) {
-            html {
-                font-size: 14px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            html {
-                font-size: 13px;
-            }
-        }
-
+        /* Container */
         .container {
             width: 100%;
             height: 100vh;
             height: -webkit-fill-available;
+            height: 100dvh;
             margin: 0 auto;
             padding: clamp(10px, 2vw, 20px);
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
             position: relative;
+            overscroll-behavior: contain;
         }
 
+        /* Header */
         .header {
             text-align: center;
             margin-bottom: clamp(1rem, 2vh, 2rem);
             padding-bottom: clamp(0.5rem, 1vh, 1rem);
             border-bottom: 2px solid var(--highlight-color);
+            position: relative;
         }
 
         .header h1 {
@@ -92,6 +90,7 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             line-height: 1.2;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .header p {
@@ -102,12 +101,48 @@
             font-size: clamp(0.9rem, 2vw, 1rem);
         }
 
-        /* Main Dashboard */
+        /* Back to Admin Button */
+        .back-to-admin {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 10;
+        }
+
+        .back-to-admin-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: clamp(8px, 1.5vh, 10px) clamp(12px, 2vw, 16px);
+            border-radius: clamp(4px, 0.5vw, 5px);
+            font-size: clamp(0.8rem, 1.5vw, 0.9rem);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: clamp(6px, 1vw, 8px);
+            min-height: 44px;
+            min-width: 44px;
+            text-decoration: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .back-to-admin-btn:hover {
+            background-color: #a0522d;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .back-to-admin-btn i {
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+        /* Dashboard Layout */
         .dashboard {
             display: flex;
             flex-direction: column;
             width: 100%;
-            height: calc(100vh - 150px);
             height: calc(100dvh - 150px);
             gap: clamp(1rem, 2vh, 2rem);
         }
@@ -115,7 +150,6 @@
         @media (min-width: 769px) {
             .dashboard {
                 flex-direction: row;
-                height: calc(100vh - 120px);
                 height: calc(100dvh - 120px);
             }
         }
@@ -125,8 +159,10 @@
             background: var(--menu-bg);
             border-radius: clamp(8px, 1vw, 10px);
             padding: clamp(1rem, 2vw, 1.5rem);
-            border: 1px solid rgba(212, 175, 55, 0.2);
+            border: 1px solid var(--glass-border);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             min-width: 250px;
             max-width: 300px;
             flex-shrink: 0;
@@ -167,9 +203,11 @@
             align-items: center;
             gap: clamp(8px, 1vw, 10px);
             white-space: nowrap;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .nav-item:hover {
+        .nav-item:hover, .nav-item:active {
             background: rgba(255, 255, 255, 0.1);
             transform: translateX(5px);
         }
@@ -185,12 +223,15 @@
             background: var(--card-bg);
             border-radius: clamp(8px, 1vw, 10px);
             padding: clamp(1rem, 2vw, 2rem);
-            border: 1px solid rgba(212, 175, 55, 0.2);
+            border: 1px solid var(--glass-border);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             flex: 1;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
             min-height: 400px;
+            overscroll-behavior: contain;
         }
 
         .content-title {
@@ -214,11 +255,11 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Drink Form */
+        /* Form Styles */
         .form-container {
             width: 100%;
             max-width: min(800px, 100%);
@@ -250,7 +291,7 @@
 
         .form-input, .form-select, .form-textarea {
             width: 100%;
-            padding: clamp(10px, 2vh, 12px);
+            padding: clamp(12px, 2vh, 14px);
             border-radius: clamp(4px, 0.5vw, 5px);
             border: 1px solid #555;
             background: #333;
@@ -259,6 +300,7 @@
             transition: all 0.3s ease;
             -webkit-appearance: none;
             appearance: none;
+            touch-action: manipulation;
         }
 
         .form-input:focus, .form-select:focus, .form-textarea:focus {
@@ -271,6 +313,7 @@
             min-height: clamp(80px, 15vh, 100px);
             resize: vertical;
             max-height: 200px;
+            line-height: 1.4;
         }
 
         .form-row {
@@ -287,6 +330,7 @@
             min-width: 200px;
         }
 
+        /* Price Inputs */
         .price-inputs {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -390,10 +434,12 @@
             background: rgba(42, 42, 42, 0.9);
             border-radius: clamp(8px, 1vw, 10px);
             padding: clamp(1rem, 2vw, 1.5rem);
-            border: 1px solid rgba(212, 175, 55, 0.2);
+            border: 1px solid var(--glass-border);
             transition: all 0.3s ease;
             position: relative;
             min-height: 200px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
 
         .drink-card:hover {
@@ -428,6 +474,7 @@
             font-size: clamp(0.75rem, 1.5vw, 0.85rem);
             font-weight: 500;
             white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .drink-desc {
@@ -482,10 +529,11 @@
 
         .price-value {
             font-weight: bold;
-            color: #fff;
+            color: var(--highlight-color);
             font-size: clamp(0.85rem, 1.5vw, 0.95rem);
         }
 
+        /* Buttons */
         .drink-actions {
             display: flex;
             gap: clamp(8px, 1.5vw, 10px);
@@ -509,6 +557,8 @@
             min-height: 44px;
             min-width: 44px;
             justify-content: center;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .btn-primary {
@@ -516,7 +566,7 @@
             color: #000;
         }
 
-        .btn-primary:hover {
+        .btn-primary:hover, .btn-primary:active {
             background: #c9a52c;
             transform: translateY(-2px);
         }
@@ -526,7 +576,7 @@
             color: white;
         }
 
-        .btn-secondary:hover {
+        .btn-secondary:hover, .btn-secondary:active {
             background: #666;
         }
 
@@ -535,7 +585,7 @@
             color: white;
         }
 
-        .btn-success:hover {
+        .btn-success:hover, .btn-success:active {
             background: #1b5e20;
             transform: translateY(-2px);
         }
@@ -545,7 +595,7 @@
             color: white;
         }
 
-        .btn-danger:hover {
+        .btn-danger:hover, .btn-danger:active {
             background: #b71c1c;
         }
 
@@ -577,6 +627,7 @@
             min-width: 44px;
             flex: 1;
             max-width: 200px;
+            touch-action: manipulation;
         }
 
         /* Conditional Fields */
@@ -605,20 +656,27 @@
             gap: clamp(8px, 1.5vw, 10px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             font-size: clamp(0.9rem, 2vw, 1rem);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
 
         .notification.success {
-            background: var(--success-color);
+            background: rgba(46, 125, 50, 0.95);
             color: white;
         }
 
         .notification.error {
-            background: var(--danger-color);
+            background: rgba(198, 40, 40, 0.95);
             color: white;
         }
 
         .notification.warning {
-            background: var(--warning-color);
+            background: rgba(245, 124, 0, 0.95);
+            color: white;
+        }
+
+        .notification.info {
+            background: rgba(33, 150, 243, 0.95);
             color: white;
         }
 
@@ -640,6 +698,8 @@
             justify-content: center;
             align-items: center;
             z-index: 2000;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
         }
 
         .loading-overlay.active {
@@ -698,14 +758,16 @@
             background: #c9a52c;
         }
 
-        /* Prevent zoom on mobile */
-        input, select, textarea, button {
-            font-size: 16px !important;
-        }
-
-        @media (max-width: 768px) {
-            input, select, textarea, button {
-                font-size: 14px !important;
+        /* iOS Safe Areas */
+        @supports (padding: max(0px)) {
+            .container {
+                padding-left: max(clamp(10px, 2vw, 20px), env(safe-area-inset-left));
+                padding-right: max(clamp(10px, 2vw, 20px), env(safe-area-inset-right));
+                padding-bottom: max(clamp(10px, 2vh, 20px), env(safe-area-inset-bottom));
+            }
+            
+            .header {
+                padding-top: env(safe-area-inset-top);
             }
         }
 
@@ -726,11 +788,6 @@
             color: var(--highlight-color);
         }
 
-        .price-group input::placeholder {
-            color: #999;
-            font-weight: normal;
-        }
-
         /* Responsive Design */
         @media (max-width: 1024px) {
             .dashboard {
@@ -749,6 +806,10 @@
         }
 
         @media (max-width: 768px) {
+            html {
+                font-size: 15px;
+            }
+            
             .form-grid {
                 grid-template-columns: 1fr;
             }
@@ -786,11 +847,32 @@
                 max-width: 100%;
                 width: 100%;
             }
+            
+            /* Prevent zoom on mobile inputs */
+            input, select, textarea {
+                font-size: 16px !important;
+            }
+            
+            /* Adjust back button for mobile */
+            .back-to-admin {
+                position: static;
+                margin-bottom: 1rem;
+            }
+            
+            .back-to-admin-btn {
+                width: 100%;
+                justify-content: center;
+            }
         }
 
         @media (max-width: 480px) {
+            html {
+                font-size: 14px;
+            }
+            
             .header h1 {
                 font-size: clamp(1.3rem, 5vw, 1.5rem);
+                margin-top: 1.5rem;
             }
             
             .drink-actions {
@@ -817,44 +899,85 @@
             }
         }
 
-        /* Fix for iOS Safari */
-        @supports (-webkit-touch-callout: none) {
-            body {
-                height: -webkit-fill-available;
-            }
-            
-            .container {
-                height: -webkit-fill-available;
-            }
-            
-            .dashboard {
-                height: -webkit-fill-available;
-            }
-            
-            .main-content {
-                max-height: -webkit-fill-available;
+        /* Dark mode optimizations */
+        @media (prefers-color-scheme: dark) {
+            .form-input, .form-select, .form-textarea {
+                background: #222;
+                border-color: #444;
             }
         }
 
-        /* Prevent text selection */
-        .no-select {
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            -khtml-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
+        /* High contrast mode */
+        @media (prefers-contrast: high) {
+            :root {
+                --highlight-color: #FFD700;
+                --accent-color: #A0522D;
+            }
+            
+            .btn-primary {
+                color: #000;
+            }
         }
 
-        /* Fix for Android Chrome */
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Touch device optimizations */
         @media (hover: none) and (pointer: coarse) {
             .btn, .nav-item, .form-btn {
                 min-height: 48px;
+                padding: 12px 16px;
             }
             
             .form-input, .form-select, .form-textarea {
-                font-size: 16px;
                 padding: 14px;
+                font-size: 16px;
+            }
+            
+            .drink-card:hover {
+                transform: none;
+            }
+            
+            .nav-item:hover {
+                transform: none;
+            }
+            
+            .btn:hover, .btn:active {
+                transform: none;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            .sidebar, .form-buttons, .drink-actions, .notification {
+                display: none !important;
+            }
+            
+            .container {
+                height: auto;
+                position: static;
+            }
+            
+            .dashboard {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            body {
+                background: white;
+                color: black;
+                position: static;
+            }
+            
+            .main-content {
+                box-shadow: none;
+                border: 1px solid #ccc;
             }
         }
     </style>
@@ -865,6 +988,13 @@
     </div>
 
     <div class="container">
+        <!-- Back to Admin Button -->
+        <div class="back-to-admin">
+            <button class="back-to-admin-btn" onclick="goBackToAdmin()">
+                <i class="fas fa-arrow-left"></i> Back to Admin Panel
+            </button>
+        </div>
+
         <div class="header">
             <h1><i class="fas fa-cocktail"></i> Al Capone Club - Drink Management</h1>
             <p>Complete control over your drink menu. Add categories, subcategories, and manage all drink items.</p>
@@ -911,9 +1041,6 @@
                                     <label class="form-label" for="category">Main Category *</label>
                                     <select id="category" class="form-select" required>
                                         <option value="">Select Category</option>
-                                        <option value="cocktails">Cocktails</option>
-                                        <option value="wine">Wine</option>
-                                        <option value="drinks">Other Drinks</option>
                                     </select>
                                 </div>
                                 
@@ -963,7 +1090,6 @@
                             <div class="form-group full-width">
                                 <label class="form-label">Pricing *</label>
                                 <div class="price-inputs">
-                                    <!-- Single Price Field - FIXED for client-side compatibility -->
                                     <div class="price-group" id="price-field-group">
                                         <label for="price">Price (Ksh) *</label>
                                         <input type="number" id="price" class="form-input" min="0" step="50" placeholder="0.00" required>
@@ -982,7 +1108,7 @@
                                     Cancel Edit
                                 </button>
                                 <button type="submit" class="form-btn btn-primary">
-                                    Save Drink
+                                    <i class="fas fa-save"></i> Save Drink
                                 </button>
                             </div>
                         </form>
@@ -1108,7 +1234,7 @@
         let currentCategories = {};
         let editingDrinkId = null;
 
-        // Default categories structure with N/A option
+        // Default categories structure
         const defaultCategories = {
             'cocktails': ['N/A'],
             'wine': ['red', 'white', 'rosé'],
@@ -1117,14 +1243,7 @@
 
         // Initialize the application
         document.addEventListener('DOMContentLoaded', async function() {
-            // Check if user is authenticated
-            const userData = localStorage.getItem('alCaponeClubUser');
-            if (!userData) {
-                window.location.href = 'admin-login.html';
-                return;
-            }
-
-            // Prevent zooming
+            // Prevent zooming on mobile
             document.addEventListener('touchstart', function(event) {
                 if (event.touches.length > 1) {
                     event.preventDefault();
@@ -1139,6 +1258,10 @@
             try {
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 console.log("Supabase initialized successfully");
+                
+                // Check database schema
+                await checkDrinkSchema();
+                
             } catch (error) {
                 console.error("Failed to initialize Supabase:", error);
                 showNotification('Failed to connect to database.', 'error');
@@ -1151,6 +1274,56 @@
             await loadCategories();
             await loadDrinks();
         });
+
+        // Utility function to format price
+        function formatPrice(price) {
+            if (price === null || price === undefined || price === '') return 0;
+            
+            // Convert to number if it's a string
+            let numPrice = price;
+            if (typeof price === 'string') {
+                numPrice = parseFloat(price.replace(/[^\d.-]/g, ''));
+            }
+            
+            // Ensure it's a valid number
+            return isNaN(numPrice) ? 0 : Math.max(0, numPrice);
+        }
+
+        // Go back to Admin Panel
+        function goBackToAdmin() {
+            showNotification('Returning to Admin Panel...', 'info');
+            setTimeout(() => {
+                window.open('../admin_signup/admin.html', '_self');
+            }, 500);
+        }
+
+        // Check database schema
+        async function checkDrinkSchema() {
+            try {
+                const { data, error } = await supabase
+                    .from('drinks')
+                    .select('*')
+                    .limit(1);
+                
+                if (error) throw error;
+                
+                if (data && data.length > 0) {
+                    console.log('Current drink schema:', Object.keys(data[0]));
+                    console.log('Sample drink data:', data[0]);
+                    
+                    // Check if price field exists
+                    const hasPriceField = 'price' in data[0];
+                    console.log('Has price field:', hasPriceField);
+                    
+                    if (!hasPriceField) {
+                        console.warn('Warning: price field not found in drinks table. Using price_glass as fallback.');
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Error checking schema:', error);
+            }
+        }
 
         function initUI() {
             // Set up category change handler
@@ -1175,7 +1348,7 @@
         }
 
         function initEventListeners() {
-            // Navigation - FIXED: Proper event listener setup
+            // Navigation
             document.querySelectorAll('.nav-item').forEach(btn => {
                 btn.addEventListener('click', function(e) {
                     e.preventDefault();
@@ -1228,7 +1401,7 @@
                 }
             });
 
-            // Hide edit drink nav item if not editing
+            // Handle edit drink nav item
             const editNav = document.querySelector('.nav-item[data-section="edit-drink"]');
             if (sectionId !== 'edit-drink') {
                 editNav.style.display = 'none';
@@ -1239,19 +1412,29 @@
             // Show selected section
             document.querySelectorAll('.content-section').forEach(section => {
                 section.classList.remove('active');
+                
                 if (section.id === sectionId + '-section') {
+                    section.classList.add('active');
+                } else if (sectionId === 'edit-drink' && section.id === 'add-drink-section') {
+                    // Show add drink section for editing
                     section.classList.add('active');
                 }
             });
 
+            // Update form title for edit mode
+            const formTitle = document.querySelector('#add-drink-section .content-title');
+            if (sectionId === 'edit-drink') {
+                formTitle.textContent = 'Edit Drink';
+            } else if (sectionId === 'add-drink') {
+                formTitle.textContent = 'Add New Drink';
+            }
+
             // Load data if needed
             if (sectionId === 'manage-categories') {
                 displayCategories();
-                // Hide quick add form when switching to this section
                 document.getElementById('add-category-form').style.display = 'none';
                 document.getElementById('quick-category-name').value = '';
             } else if (sectionId === 'view-drinks') {
-                // Refresh drinks list
                 loadDrinks();
             }
         }
@@ -1274,7 +1457,6 @@
                 });
             }
             
-            // Default to N/A if no subcategories
             if (!category || !currentCategories[category] || currentCategories[category].length === 0) {
                 subcategorySelect.value = 'N/A';
             }
@@ -1282,7 +1464,6 @@
 
         function updateConditionalFields() {
             const category = document.getElementById('category').value;
-            const servingType = document.getElementById('serving-type').value;
             
             // Show wine type for wine category
             const wineTypeGroup = document.getElementById('wine-type-group');
@@ -1293,21 +1474,14 @@
             // Show shot type only for shooters & liquors
             const shotTypeGroup = document.getElementById('shot-type-group');
             if (shotTypeGroup) {
-                shotTypeGroup.classList.toggle('active', false); // Disable for now
+                shotTypeGroup.classList.toggle('active', false); // Disabled for now
             }
-            
-            // Hide glass and bottle price groups - we use single price
-            const glassPriceGroup = document.getElementById('glass-price-group');
-            const bottlePriceGroup = document.getElementById('bottle-price-group');
-            if (glassPriceGroup) glassPriceGroup.style.display = 'none';
-            if (bottlePriceGroup) bottlePriceGroup.style.display = 'none';
         }
 
         function updateShotTypeField() {
             const subcategory = document.getElementById('subcategory').value;
             const shotTypeGroup = document.getElementById('shot-type-group');
             
-            // Show shot type only for shooters & liquors
             if (shotTypeGroup) {
                 shotTypeGroup.classList.toggle('active', 
                     subcategory === 'shooters & liquors');
@@ -1316,7 +1490,7 @@
 
         async function loadCategories() {
             try {
-                // First try to load from database
+                // Load from database
                 const { data: dbCategories, error } = await supabase
                     .from('drink_categories')
                     .select('*');
@@ -1330,7 +1504,9 @@
                         if (!currentCategories[item.main_category]) {
                             currentCategories[item.main_category] = [];
                         }
-                        currentCategories[item.main_category].push(item.subcategory);
+                        if (!currentCategories[item.main_category].includes(item.subcategory)) {
+                            currentCategories[item.main_category].push(item.subcategory);
+                        }
                     });
                 } else {
                     // Use default categories
@@ -1356,7 +1532,6 @@
                 
             } catch (error) {
                 console.error('Error loading categories:', error);
-                // Use default categories as fallback
                 currentCategories = JSON.parse(JSON.stringify(defaultCategories));
                 updateCategorySelects();
             }
@@ -1415,7 +1590,7 @@
                 if (error) throw error;
                 
                 currentDrinks = drinks || [];
-                console.log('Loaded drinks:', currentDrinks);
+                console.log('Loaded drinks:', currentDrinks.length);
                 displayDrinks(currentDrinks);
                 
             } catch (error) {
@@ -1429,10 +1604,7 @@
         function displayDrinks(drinks) {
             const container = document.getElementById('drinks-list-container');
             
-            if (!container) {
-                console.error('Drinks list container not found');
-                return;
-            }
+            if (!container) return;
             
             if (!drinks || drinks.length === 0) {
                 container.innerHTML = `
@@ -1456,7 +1628,7 @@
                 // Format subcategory display
                 const subcategoryDisplay = drink.subcategory === 'N/A' ? 'No Subcategory' : drink.subcategory;
                 
-                // FIXED: Calculate price for display - use price field for client compatibility
+                // Get price for display - prioritize the main price field
                 const price = drink.price || drink.price_glass || drink.price_bottle || 0;
                 
                 // Format price display
@@ -1468,60 +1640,37 @@
                             <span class="price-value">Ksh ${parseFloat(price).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
                         </div>
                     `;
-                } else if (drink.price_glass || drink.price_bottle) {
-                    // Fallback for existing drinks with old price structure
-                    const glassPrice = drink.price_glass || 0;
-                    const bottlePrice = drink.price_bottle || 0;
-                    if (glassPrice > 0 && bottlePrice > 0) {
-                        priceDisplay = `
-                            <div class="price-row">
-                                <span class="price-label">Glass:</span>
-                                <span class="price-value">Ksh ${parseFloat(glassPrice).toLocaleString()}</span>
-                            </div>
-                            <div class="price-row">
-                                <span class="price-label">Bottle:</span>
-                                <span class="price-value">Ksh ${parseFloat(bottlePrice).toLocaleString()}</span>
-                            </div>
-                        `;
-                    } else if (glassPrice > 0) {
-                        priceDisplay = `
-                            <div class="price-row">
-                                <span class="price-label">Price:</span>
-                                <span class="price-value">Ksh ${parseFloat(glassPrice).toLocaleString()} per glass</span>
-                            </div>
-                        `;
-                    } else if (bottlePrice > 0) {
-                        priceDisplay = `
-                            <div class="price-row">
-                                <span class="price-label">Price:</span>
-                                <span class="price-value">Ksh ${parseFloat(bottlePrice).toLocaleString()} per bottle</span>
-                            </div>
-                        `;
-                    }
+                } else {
+                    priceDisplay = `
+                        <div class="price-row">
+                            <span class="price-label">Price:</span>
+                            <span class="price-value" style="color: var(--warning-color);">Not set</span>
+                        </div>
+                    `;
                 }
                 
                 html += `
                     <div class="drink-card">
                         <div class="drink-header">
-                            <h3 class="drink-title">${drink.name}</h3>
-                            <span class="drink-category">${drink.category}</span>
+                            <h3 class="drink-title">${escapeHtml(drink.name)}</h3>
+                            <span class="drink-category">${escapeHtml(drink.category)}</span>
                         </div>
-                        <p class="drink-desc">${drink.description || 'No description'}</p>
+                        <p class="drink-desc">${escapeHtml(drink.description || 'No description')}</p>
                         
                         <div class="drink-details">
                             <span class="detail-tag">
-                                <i class="fas fa-tag"></i> ${subcategoryDisplay}
+                                <i class="fas fa-tag"></i> ${escapeHtml(subcategoryDisplay)}
                             </span>
                             ${drink.wine_type ? `
                             <span class="detail-tag">
-                                <i class="fas fa-wine-glass"></i> ${drink.wine_type}
+                                <i class="fas fa-wine-glass"></i> ${escapeHtml(drink.wine_type)}
                             </span>` : ''}
                             <span class="detail-tag">
-                                <i class="fas fa-glass-whiskey"></i> ${drink.serving_type}
+                                <i class="fas fa-glass-whiskey"></i> ${escapeHtml(drink.serving_type)}
                             </span>
                             ${shotTypeDisplay ? `
                             <span class="detail-tag">
-                                <i class="fas fa-wine-bottle"></i> ${shotTypeDisplay}
+                                <i class="fas fa-wine-bottle"></i> ${escapeHtml(shotTypeDisplay)}
                             </span>` : ''}
                             <span class="detail-tag">
                                 <i class="fas fa-box"></i> ${drink.quantity} available
@@ -1552,10 +1701,12 @@
             showLoading(true);
             
             try {
-                // Get price value
+                // Get form values
                 const priceInput = document.getElementById('price').value;
                 
-                // Parse form data - FIXED: Use single price field
+                // Format the price properly
+                const formattedPrice = formatPrice(priceInput);
+                
                 const formData = {
                     name: document.getElementById('drink-name').value.trim(),
                     description: document.getElementById('description').value.trim(),
@@ -1564,28 +1715,32 @@
                     wine_type: document.getElementById('wine-type').value || null,
                     serving_type: document.getElementById('serving-type').value,
                     shot_type: document.getElementById('shot-type').value || null,
-                    price: priceInput ? parseFloat(priceInput) : 0, // Single price field for client compatibility
+                    price: formattedPrice,  // Use formatted price
                     quantity: parseInt(document.getElementById('quantity').value) || 0,
                     updated_at: new Date().toISOString()
                 };
+                
+                console.log('Saving drink data:', formData);
                 
                 // Validation
                 if (!formData.name || !formData.category || !formData.subcategory) {
                     throw new Error('Please fill in all required fields');
                 }
                 
-                if (!formData.price || formData.price <= 0) {
-                    throw new Error('Please enter a valid price');
+                if (!formData.price || formData.price <= 0 || isNaN(formData.price)) {
+                    throw new Error('Please enter a valid price (must be a positive number)');
                 }
                 
-                if (formData.quantity < 0) {
+                if (formData.quantity < 0 || isNaN(formData.quantity)) {
                     throw new Error('Quantity cannot be negative');
                 }
                 
                 let result;
                 
                 if (editingDrinkId) {
-                    // Update existing
+                    console.log('Updating drink:', editingDrinkId, 'with data:', formData);
+                    
+                    // Update existing - use the full formData object
                     const { data, error } = await supabase
                         .from('drinks')
                         .update(formData)
@@ -1595,10 +1750,13 @@
                     if (error) throw error;
                     result = data;
                     
-                    showNotification('Drink updated successfully!', 'success');
+                    showNotification('Drink updated successfully! Price: Ksh ' + formattedPrice.toLocaleString(), 'success');
+                    console.log('Drink update result:', result);
                 } else {
                     // Create new
                     formData.created_at = new Date().toISOString();
+                    
+                    console.log('Creating new drink with data:', formData);
                     
                     const { data, error } = await supabase
                         .from('drinks')
@@ -1608,7 +1766,7 @@
                     if (error) throw error;
                     result = data;
                     
-                    showNotification('Drink added successfully!', 'success');
+                    showNotification('Drink added successfully! Price: Ksh ' + formattedPrice.toLocaleString(), 'success');
                 }
                 
                 // Refresh and reset
@@ -1636,9 +1794,9 @@
                 
                 if (error) throw error;
                 
-                console.log('Editing drink:', drink);
+                console.log('Loading drink for editing:', drink);
                 
-                // Populate form - FIXED: Use price field for client compatibility
+                // Populate form
                 document.getElementById('drink-id').value = drink.id;
                 document.getElementById('drink-name').value = drink.name;
                 document.getElementById('description').value = drink.description || '';
@@ -1648,8 +1806,9 @@
                 document.getElementById('serving-type').value = drink.serving_type;
                 document.getElementById('shot-type').value = drink.shot_type || '';
                 
-                // Use price field if exists, otherwise use price_glass as fallback
-                const priceValue = drink.price || drink.price_glass || '';
+                // Use price field - ensure it's properly retrieved
+                const priceValue = drink.price || drink.price_glass || drink.price_bottle || 0;
+                console.log('Price value for editing:', priceValue);
                 document.getElementById('price').value = priceValue;
                 
                 document.getElementById('quantity').value = drink.quantity || 0;
@@ -1664,6 +1823,10 @@
                 document.querySelector('.nav-item[data-section="edit-drink"]').style.display = 'flex';
                 editingDrinkId = drinkId;
                 
+                // Update form title
+                document.querySelector('#add-drink-section .content-title').textContent = 'Edit Drink';
+                
+                // Switch to edit section
                 switchSection('edit-drink');
                 
             } catch (error) {
@@ -1853,12 +2016,12 @@
                 html += `
                     <div class="category-section" style="margin-bottom: 1rem; background: rgba(0,0,0,0.4);">
                         <div class="category-header">
-                            <h3 class="category-name" style="color: var(--highlight-color);">${category.charAt(0).toUpperCase() + category.slice(1)}</h3>
+                            <h3 class="category-name" style="color: var(--highlight-color);">${escapeHtml(category.charAt(0).toUpperCase() + category.slice(1))}</h3>
                             <div class="category-actions">
-                                <button class="btn btn-success btn-small" onclick="addSubcategoryToCategory('${category}')">
+                                <button class="btn btn-success btn-small" onclick="addSubcategoryToCategory('${escapeHtml(category)}')">
                                     <i class="fas fa-plus"></i> Add Subcategory
                                 </button>
-                                <button class="btn btn-danger btn-small" onclick="deleteCategory('${category}')">
+                                <button class="btn btn-danger btn-small" onclick="deleteCategory('${escapeHtml(category)}')">
                                     <i class="fas fa-trash"></i> Delete
                                 </button>
                             </div>
@@ -1867,8 +2030,8 @@
                         <div class="subcategory-list">
                             ${displaySubcategories.map(sub => `
                                 <div class="subcategory-item">
-                                    <span class="subcategory-name">${sub.charAt(0).toUpperCase() + sub.slice(1)}</span>
-                                    <button class="btn btn-danger btn-small" onclick="deleteSubcategory('${category}', '${sub}')">
+                                    <span class="subcategory-name">${escapeHtml(sub.charAt(0).toUpperCase() + sub.slice(1))}</span>
+                                    <button class="btn btn-danger btn-small" onclick="deleteSubcategory('${escapeHtml(category)}', '${escapeHtml(sub)}')">
                                         <i class="fas fa-times"></i>
                                     </button>
                                 </div>
@@ -1878,7 +2041,7 @@
                         <div style="text-align: center; padding: 1rem; color: #888; background: rgba(0,0,0,0.2); border-radius: 5px; margin-top: 0.5rem;">
                             <i class="fas fa-info-circle"></i>
                             <p>No subcategories (uses N/A)</p>
-                            <button class="btn btn-primary btn-small" onclick="addSubcategoryToCategory('${category}')" style="margin-top: 0.5rem;">
+                            <button class="btn btn-primary btn-small" onclick="addSubcategoryToCategory('${escapeHtml(category)}')" style="margin-top: 0.5rem;">
                                 <i class="fas fa-plus"></i> Add First Subcategory
                             </button>
                         </div>
@@ -2022,6 +2185,9 @@
             document.getElementById('cancel-edit-btn').style.display = 'none';
             editingDrinkId = null;
             
+            // Reset form title
+            document.querySelector('#add-drink-section .content-title').textContent = 'Add New Drink';
+            
             // Reset selects to defaults
             document.getElementById('category').value = '';
             document.getElementById('subcategory').innerHTML = '<option value="">Select Subcategory</option><option value="N/A">N/A (No Subcategory)</option>';
@@ -2049,8 +2215,8 @@
             const notification = document.createElement('div');
             notification.className = `notification ${type}`;
             notification.innerHTML = `
-                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
-                <span>${message}</span>
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'}"></i>
+                <span>${escapeHtml(message)}</span>
             `;
             
             document.body.appendChild(notification);
@@ -2063,12 +2229,20 @@
             }, 5000);
         }
 
+        // Utility function to escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
         // Make functions globally available for onclick events
         window.editDrink = editDrink;
         window.deleteDrink = deleteDrink;
         window.addSubcategoryToCategory = addSubcategoryToCategory;
         window.deleteCategory = deleteCategory;
         window.deleteSubcategory = deleteSubcategory;
+        window.goBackToAdmin = goBackToAdmin;
     </script>
 </body>
 </html>
