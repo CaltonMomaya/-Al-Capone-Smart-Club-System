@@ -1569,7 +1569,7 @@
             }
         }
 
-        // Load drink data from Supabase database
+        // Load drink data from Supabase database - FIXED VERSION
         async function loadDrinkDataFromDatabase() {
             try {
                 console.log("Loading drink data from Supabase...");
@@ -1629,6 +1629,12 @@
                         cleanCategory = 'champagne';
                     } else if (category.includes('shooter') || category.includes('liquor') || category.includes('spirit')) {
                         cleanCategory = 'shooters';
+                    } else if (category.includes('beer')) {
+                        cleanCategory = 'beers';
+                    } else if (category.includes('spirit')) {
+                        cleanCategory = 'spirits';
+                    } else if (category.includes('hot')) {
+                        cleanCategory = 'hotdrinks';
                     }
                     
                     // Create category if it doesn't exist
@@ -1637,12 +1643,15 @@
                         drinkCategories.push(cleanCategory);
                     }
                     
+                    // FIXED: Get price from any available field
+                    const price = drink.price || drink.price_glass || drink.price_bottle || 500;
+                    
                     // Add drink to appropriate category
                     drinkData[cleanCategory].push({
                         id: drink.id,
                         name: drink.name,
                         description: drink.description || 'Premium drink',
-                        price: drink.price || 500,
+                        price: price,
                         category: cleanCategory,
                         db_id: drink.id // Keep original database ID
                     });

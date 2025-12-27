@@ -709,6 +709,28 @@
             }
         }
 
+        /* Fix number input styling */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        .price-group input {
+            font-size: 1rem !important;
+            font-weight: bold;
+            color: var(--highlight-color);
+        }
+
+        .price-group input::placeholder {
+            color: #999;
+            font-weight: normal;
+        }
+
         /* Responsive Design */
         @media (max-width: 1024px) {
             .dashboard {
@@ -939,19 +961,15 @@
                             </div>
                             
                             <div class="form-group full-width">
-                                <label class="form-label">Pricing</label>
+                                <label class="form-label">Pricing *</label>
                                 <div class="price-inputs">
-                                    <div class="price-group" id="glass-price-group">
-                                        <label for="price-glass">Price per Glass (Ksh)</label>
-                                        <input type="number" id="price-glass" class="form-input" min="0" step="50" placeholder="0.00">
-                                    </div>
-                                    
-                                    <div class="price-group conditional-field" id="bottle-price-group">
-                                        <label for="price-bottle">Price per Bottle (Ksh)</label>
-                                        <input type="number" id="price-bottle" class="form-input" min="0" step="100" placeholder="0.00">
+                                    <!-- Single Price Field - FIXED for client-side compatibility -->
+                                    <div class="price-group" id="price-field-group">
+                                        <label for="price">Price (Ksh) *</label>
+                                        <input type="number" id="price" class="form-input" min="0" step="50" placeholder="0.00" required>
                                     </div>
                                 </div>
-                                <small style="color: #aaa; display: block; margin-top: 5px;">* At least one price is required</small>
+                                <small style="color: #aaa; display: block; margin-top: 5px;">* Required for all drinks</small>
                             </div>
                             
                             <div class="form-group">
@@ -1157,9 +1175,10 @@
         }
 
         function initEventListeners() {
-            // Navigation
+            // Navigation - FIXED: Proper event listener setup
             document.querySelectorAll('.nav-item').forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
                     const sectionId = this.getAttribute('data-section');
                     switchSection(sectionId);
                 });
@@ -1199,20 +1218,30 @@
         }
 
         function switchSection(sectionId) {
+            console.log('Switching to section:', sectionId);
+            
             // Update active nav item
             document.querySelectorAll('.nav-item').forEach(btn => {
-                btn.classList.toggle('active', btn.getAttribute('data-section') === sectionId);
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-section') === sectionId) {
+                    btn.classList.add('active');
+                }
             });
 
             // Hide edit drink nav item if not editing
             const editNav = document.querySelector('.nav-item[data-section="edit-drink"]');
             if (sectionId !== 'edit-drink') {
                 editNav.style.display = 'none';
+            } else {
+                editNav.style.display = 'flex';
             }
 
             // Show selected section
             document.querySelectorAll('.content-section').forEach(section => {
-                section.classList.toggle('active', section.id === sectionId + '-section');
+                section.classList.remove('active');
+                if (section.id === sectionId + '-section') {
+                    section.classList.add('active');
+                }
             });
 
             // Load data if needed
@@ -1221,6 +1250,9 @@
                 // Hide quick add form when switching to this section
                 document.getElementById('add-category-form').style.display = 'none';
                 document.getElementById('quick-category-name').value = '';
+            } else if (sectionId === 'view-drinks') {
+                // Refresh drinks list
+                loadDrinks();
             }
         }
 
@@ -1254,17 +1286,21 @@
             
             // Show wine type for wine category
             const wineTypeGroup = document.getElementById('wine-type-group');
-            wineTypeGroup.classList.toggle('active', category === 'wine');
+            if (wineTypeGroup) {
+                wineTypeGroup.classList.toggle('active', category === 'wine');
+            }
             
-            // Show bottle price for bottle or both serving types
-            const bottlePriceGroup = document.getElementById('bottle-price-group');
-            bottlePriceGroup.classList.toggle('active', 
-                servingType === 'bottle' || servingType === 'both');
+            // Show shot type only for shooters & liquors
+            const shotTypeGroup = document.getElementById('shot-type-group');
+            if (shotTypeGroup) {
+                shotTypeGroup.classList.toggle('active', false); // Disable for now
+            }
             
-            // Show glass price for glass or both serving types
+            // Hide glass and bottle price groups - we use single price
             const glassPriceGroup = document.getElementById('glass-price-group');
-            glassPriceGroup.classList.toggle('active', 
-                servingType === 'glass' || servingType === 'both');
+            const bottlePriceGroup = document.getElementById('bottle-price-group');
+            if (glassPriceGroup) glassPriceGroup.style.display = 'none';
+            if (bottlePriceGroup) bottlePriceGroup.style.display = 'none';
         }
 
         function updateShotTypeField() {
@@ -1272,8 +1308,10 @@
             const shotTypeGroup = document.getElementById('shot-type-group');
             
             // Show shot type only for shooters & liquors
-            shotTypeGroup.classList.toggle('active', 
-                subcategory === 'shooters & liquors');
+            if (shotTypeGroup) {
+                shotTypeGroup.classList.toggle('active', 
+                    subcategory === 'shooters & liquors');
+            }
         }
 
         async function loadCategories() {
@@ -1327,36 +1365,42 @@
         function updateCategorySelects() {
             // Update category select in add drink form
             const categorySelect = document.getElementById('category');
-            categorySelect.innerHTML = '<option value="">Select Category</option>';
-            
-            Object.keys(currentCategories).forEach(category => {
-                const option = document.createElement('option');
-                option.value = category;
-                option.textContent = category.charAt(0).toUpperCase() + category.slice(1);
-                categorySelect.appendChild(option);
-            });
+            if (categorySelect) {
+                categorySelect.innerHTML = '<option value="">Select Category</option>';
+                
+                Object.keys(currentCategories).forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category;
+                    option.textContent = category.charAt(0).toUpperCase() + category.slice(1);
+                    categorySelect.appendChild(option);
+                });
+            }
             
             // Update filter category select
             const filterSelect = document.getElementById('filter-category');
-            filterSelect.innerHTML = '<option value="">All Categories</option>';
-            
-            Object.keys(currentCategories).forEach(category => {
-                const option = document.createElement('option');
-                option.value = category;
-                option.textContent = category.charAt(0).toUpperCase() + category.slice(1);
-                filterSelect.appendChild(option);
-            });
+            if (filterSelect) {
+                filterSelect.innerHTML = '<option value="">All Categories</option>';
+                
+                Object.keys(currentCategories).forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category;
+                    option.textContent = category.charAt(0).toUpperCase() + category.slice(1);
+                    filterSelect.appendChild(option);
+                });
+            }
             
             // Update parent category select for subcategory addition
             const parentSelect = document.getElementById('parent-category');
-            parentSelect.innerHTML = '<option value="">Choose Category</option>';
-            
-            Object.keys(currentCategories).forEach(category => {
-                const option = document.createElement('option');
-                option.value = category;
-                option.textContent = category.charAt(0).toUpperCase() + category.slice(1);
-                parentSelect.appendChild(option);
-            });
+            if (parentSelect) {
+                parentSelect.innerHTML = '<option value="">Choose Category</option>';
+                
+                Object.keys(currentCategories).forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category;
+                    option.textContent = category.charAt(0).toUpperCase() + category.slice(1);
+                    parentSelect.appendChild(option);
+                });
+            }
         }
 
         async function loadDrinks() {
@@ -1371,6 +1415,7 @@
                 if (error) throw error;
                 
                 currentDrinks = drinks || [];
+                console.log('Loaded drinks:', currentDrinks);
                 displayDrinks(currentDrinks);
                 
             } catch (error) {
@@ -1383,6 +1428,11 @@
 
         function displayDrinks(drinks) {
             const container = document.getElementById('drinks-list-container');
+            
+            if (!container) {
+                console.error('Drinks list container not found');
+                return;
+            }
             
             if (!drinks || drinks.length === 0) {
                 container.innerHTML = `
@@ -1406,33 +1456,48 @@
                 // Format subcategory display
                 const subcategoryDisplay = drink.subcategory === 'N/A' ? 'No Subcategory' : drink.subcategory;
                 
+                // FIXED: Calculate price for display - use price field for client compatibility
+                const price = drink.price || drink.price_glass || drink.price_bottle || 0;
+                
                 // Format price display
                 let priceDisplay = '';
-                if (drink.price_glass && drink.price_bottle) {
-                    priceDisplay = `
-                        <div class="price-row">
-                            <span class="price-label">Glass:</span>
-                            <span class="price-value">Ksh ${drink.price_glass.toLocaleString()}</span>
-                        </div>
-                        <div class="price-row">
-                            <span class="price-label">Bottle:</span>
-                            <span class="price-value">Ksh ${drink.price_bottle.toLocaleString()}</span>
-                        </div>
-                    `;
-                } else if (drink.price_glass) {
+                if (price && price > 0) {
                     priceDisplay = `
                         <div class="price-row">
                             <span class="price-label">Price:</span>
-                            <span class="price-value">Ksh ${drink.price_glass.toLocaleString()} per glass</span>
+                            <span class="price-value">Ksh ${parseFloat(price).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
                         </div>
                     `;
-                } else if (drink.price_bottle) {
-                    priceDisplay = `
-                        <div class="price-row">
-                            <span class="price-label">Price:</span>
-                            <span class="price-value">Ksh ${drink.price_bottle.toLocaleString()} per bottle</span>
-                        </div>
-                    `;
+                } else if (drink.price_glass || drink.price_bottle) {
+                    // Fallback for existing drinks with old price structure
+                    const glassPrice = drink.price_glass || 0;
+                    const bottlePrice = drink.price_bottle || 0;
+                    if (glassPrice > 0 && bottlePrice > 0) {
+                        priceDisplay = `
+                            <div class="price-row">
+                                <span class="price-label">Glass:</span>
+                                <span class="price-value">Ksh ${parseFloat(glassPrice).toLocaleString()}</span>
+                            </div>
+                            <div class="price-row">
+                                <span class="price-label">Bottle:</span>
+                                <span class="price-value">Ksh ${parseFloat(bottlePrice).toLocaleString()}</span>
+                            </div>
+                        `;
+                    } else if (glassPrice > 0) {
+                        priceDisplay = `
+                            <div class="price-row">
+                                <span class="price-label">Price:</span>
+                                <span class="price-value">Ksh ${parseFloat(glassPrice).toLocaleString()} per glass</span>
+                            </div>
+                        `;
+                    } else if (bottlePrice > 0) {
+                        priceDisplay = `
+                            <div class="price-row">
+                                <span class="price-label">Price:</span>
+                                <span class="price-value">Ksh ${parseFloat(bottlePrice).toLocaleString()} per bottle</span>
+                            </div>
+                        `;
+                    }
                 }
                 
                 html += `
@@ -1487,6 +1552,10 @@
             showLoading(true);
             
             try {
+                // Get price value
+                const priceInput = document.getElementById('price').value;
+                
+                // Parse form data - FIXED: Use single price field
                 const formData = {
                     name: document.getElementById('drink-name').value.trim(),
                     description: document.getElementById('description').value.trim(),
@@ -1495,8 +1564,7 @@
                     wine_type: document.getElementById('wine-type').value || null,
                     serving_type: document.getElementById('serving-type').value,
                     shot_type: document.getElementById('shot-type').value || null,
-                    price_glass: parseFloat(document.getElementById('price-glass').value) || null,
-                    price_bottle: parseFloat(document.getElementById('price-bottle').value) || null,
+                    price: priceInput ? parseFloat(priceInput) : 0, // Single price field for client compatibility
                     quantity: parseInt(document.getElementById('quantity').value) || 0,
                     updated_at: new Date().toISOString()
                 };
@@ -1506,8 +1574,8 @@
                     throw new Error('Please fill in all required fields');
                 }
                 
-                if (!formData.price_glass && !formData.price_bottle) {
-                    throw new Error('Please provide at least one price');
+                if (!formData.price || formData.price <= 0) {
+                    throw new Error('Please enter a valid price');
                 }
                 
                 if (formData.quantity < 0) {
@@ -1568,7 +1636,9 @@
                 
                 if (error) throw error;
                 
-                // Populate form
+                console.log('Editing drink:', drink);
+                
+                // Populate form - FIXED: Use price field for client compatibility
                 document.getElementById('drink-id').value = drink.id;
                 document.getElementById('drink-name').value = drink.name;
                 document.getElementById('description').value = drink.description || '';
@@ -1577,8 +1647,11 @@
                 document.getElementById('wine-type').value = drink.wine_type || '';
                 document.getElementById('serving-type').value = drink.serving_type;
                 document.getElementById('shot-type').value = drink.shot_type || '';
-                document.getElementById('price-glass').value = drink.price_glass || '';
-                document.getElementById('price-bottle').value = drink.price_bottle || '';
+                
+                // Use price field if exists, otherwise use price_glass as fallback
+                const priceValue = drink.price || drink.price_glass || '';
+                document.getElementById('price').value = priceValue;
+                
                 document.getElementById('quantity').value = drink.quantity || 0;
                 
                 // Update UI
@@ -1769,6 +1842,8 @@
 
         function displayCategories() {
             const container = document.getElementById('categories-list');
+            if (!container) return;
+            
             let html = '';
             
             Object.keys(currentCategories).forEach(category => {
@@ -1952,16 +2027,18 @@
             document.getElementById('subcategory').innerHTML = '<option value="">Select Subcategory</option><option value="N/A">N/A (No Subcategory)</option>';
             document.getElementById('serving-type').value = '';
             document.getElementById('quantity').value = '10';
+            document.getElementById('price').value = '';
             
             // Hide conditional fields
             document.getElementById('wine-type-group').classList.remove('active');
             document.getElementById('shot-type-group').classList.remove('active');
-            document.getElementById('bottle-price-group').classList.remove('active');
-            document.getElementById('glass-price-group').classList.add('active');
         }
 
         function showLoading(show) {
-            document.getElementById('loading-overlay').classList.toggle('active', show);
+            const overlay = document.getElementById('loading-overlay');
+            if (overlay) {
+                overlay.classList.toggle('active', show);
+            }
         }
 
         function showNotification(message, type = 'success') {
@@ -1985,6 +2062,13 @@
                 }
             }, 5000);
         }
+
+        // Make functions globally available for onclick events
+        window.editDrink = editDrink;
+        window.deleteDrink = deleteDrink;
+        window.addSubcategoryToCategory = addSubcategoryToCategory;
+        window.deleteCategory = deleteCategory;
+        window.deleteSubcategory = deleteSubcategory;
     </script>
 </body>
 </html>
