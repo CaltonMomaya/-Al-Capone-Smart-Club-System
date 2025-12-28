@@ -19,6 +19,9 @@
             --accent-color: #333333;
             --waiter-color: #1a73e8;
             --management-color: #d32f2f;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --error-color: #dc3545;
         }
 
         body {
@@ -331,6 +334,21 @@
             box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
         }
 
+        .input-group .error-message {
+            color: var(--error-color);
+            font-size: 0.85rem;
+            margin-top: 0.3rem;
+            display: none;
+        }
+
+        .input-group.error input {
+            border-color: var(--error-color);
+        }
+
+        .input-group.error .error-message {
+            display: block;
+        }
+
         .role-selection {
             margin-bottom: 2rem;
         }
@@ -402,6 +420,14 @@
             box-shadow: none !important;
         }
 
+        .btn-primary {
+            background-color: var(--primary-color);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background-color: #333;
+        }
+
         .btn-waiter {
             background-color: var(--waiter-color);
         }
@@ -464,7 +490,7 @@
             text-decoration: underline;
         }
 
-        /* Status Messages - Clean version without left border */
+        /* Status Messages */
         .status-message {
             padding: 1rem;
             border-radius: 8px;
@@ -473,16 +499,31 @@
             color: #333;
             font-size: 0.95rem;
             line-height: 1.5;
+            border-left: 4px solid transparent;
         }
 
         .status-message.info {
             background-color: #f0f8ff;
             color: #0c5460;
+            border-left-color: #17a2b8;
         }
 
         .status-message.warning {
             background-color: #fff3cd;
             color: #856404;
+            border-left-color: #ffc107;
+        }
+
+        .status-message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border-left-color: #28a745;
+        }
+
+        .status-message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-left-color: #dc3545;
         }
 
         /* Modal Styles */
@@ -578,9 +619,7 @@
 
         /* Animations */
         @keyframes fadeIn {
-            to {
-                opacity: 1;
-            }
+            to { opacity: 1; }
         }
 
         @keyframes logoSlideDown {
@@ -601,101 +640,33 @@
 
         /* Responsive Styles */
         @media (max-width: 1024px) {
-            .club-name {
-                font-size: 3rem;
-            }
-            
-            .portal-title {
-                font-size: 1.8rem;
-            }
-            
-            .logo-display-area {
-                height: 200px;
-            }
+            .club-name { font-size: 3rem; }
+            .portal-title { font-size: 1.8rem; }
+            .logo-display-area { height: 200px; }
         }
 
         @media (max-width: 768px) {
-            .container {
-                flex-direction: column;
-                min-height: auto;
-            }
-
-            .left-section {
-                padding-top: 3rem;
-                padding-bottom: 3rem;
-                justify-content: center;
-                border-right: none;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            }
-
-            .logo-display-area {
-                height: 180px;
-                margin-bottom: 1.5rem;
-            }
-
-            .club-name {
-                font-size: 2.5rem;
-            }
-
-            .club-location {
-                font-size: 1.1rem;
-            }
-
-            .portal-title {
-                font-size: 1.6rem;
-            }
-
-            .portal-subtitle {
-                font-size: 1rem;
-                margin-bottom: 2rem;
-            }
-
-            .staff-portal-info {
-                padding: 1.5rem;
-            }
-
-            .form-container {
-                padding: 2rem;
-                margin-top: 1rem;
-            }
-
-            .role-options {
-                flex-direction: column;
-            }
+            .container { flex-direction: column; min-height: auto; }
+            .left-section { padding: 3rem; border-right: none; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+            .logo-display-area { height: 180px; margin-bottom: 1.5rem; }
+            .club-name { font-size: 2.5rem; }
+            .club-location { font-size: 1.1rem; }
+            .portal-title { font-size: 1.6rem; }
+            .portal-subtitle { font-size: 1rem; margin-bottom: 2rem; }
+            .staff-portal-info { padding: 1.5rem; }
+            .form-container { padding: 2rem; margin-top: 1rem; }
+            .role-options { flex-direction: column; }
         }
 
         @media (max-width: 480px) {
-            .left-section {
-                padding: 1.5rem;
-            }
-            
-            .logo-display-area {
-                height: 150px;
-            }
-            
-            .club-name {
-                font-size: 2rem;
-            }
-            
-            .portal-title {
-                font-size: 1.4rem;
-            }
-            
-            .form-title {
-                font-size: 1.5rem;
-            }
-
-            .form-container {
-                padding: 1.5rem;
-            }
-
-            .modal-content {
-                padding: 2rem;
-            }
-
-            .feature {
-                min-width: 100px;
-            }
+            .left-section { padding: 1.5rem; }
+            .logo-display-area { height: 150px; }
+            .club-name { font-size: 2rem; }
+            .portal-title { font-size: 1.4rem; }
+            .form-title { font-size: 1.5rem; }
+            .form-container { padding: 1.5rem; }
+            .modal-content { padding: 2rem; }
+            .feature { min-width: 100px; }
         }
     </style>
 </head>
@@ -721,7 +692,6 @@
                     Secure staff authentication for Al Capone Club operations.
                 </div>
                 
-                <!-- Role display after login -->
                 <div id="role-display" class="role-display">
                     <div class="role-name" id="display-role-name">Role</div>
                     <div id="display-staff-info">Staff information will appear here after login</div>
@@ -730,26 +700,14 @@
             </div>
 
             <div class="portal-features">
-                <div class="feature">
-                    <i class="fas fa-shield-alt"></i>
-                    <span>Secure Access</span>
-                </div>
-                <div class="feature">
-                    <i class="fas fa-bolt"></i>
-                    <span>Real-time Updates</span>
-                </div>
-                <div class="feature">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Performance Analytics</span>
-                </div>
-                <div class="feature">
-                    <i class="fas fa-history"></i>
-                    <span>24/7 History</span>
-                </div>
+                <div class="feature"><i class="fas fa-shield-alt"></i><span>Secure Access</span></div>
+                <div class="feature"><i class="fas fa-bolt"></i><span>Real-time Updates</span></div>
+                <div class="feature"><i class="fas fa-chart-line"></i><span>Performance Analytics</span></div>
+                <div class="feature"><i class="fas fa-history"></i><span>24/7 History</span></div>
             </div>
         </div>
 
-        <!-- Right Section with Login/Register Forms -->
+        <!-- Right Section -->
         <div class="right-section">
             <div class="pattern"></div>
             <div class="form-container">
@@ -762,20 +720,21 @@
                 <form class="form active" id="signin-form">
                     <h2 class="form-title">Staff Access</h2>
                     
-                    <!-- Clean status message without left border -->
-                    <div class="status-message info">
-                        Sign in with your registered email and password. Your role will be determined automatically.
+                    <div class="status-message info" id="signin-status">
+                        Sign in with your registered email and password.
                     </div>
                     
                     <div class="input-group">
                         <label for="signin-email">Email Address</label>
                         <input type="email" id="signin-email" required placeholder="your.email@alcaponeclub.com">
+                        <div class="error-message" id="signin-email-error"></div>
                     </div>
                     <div class="input-group">
                         <label for="signin-password">Password</label>
                         <input type="password" id="signin-password" required placeholder="Enter your password">
+                        <div class="error-message" id="signin-password-error"></div>
                     </div>
-                    <button type="submit" class="btn" id="signin-btn" style="background-color: var(--primary-color);">
+                    <button type="submit" class="btn btn-primary" id="signin-btn">
                         <span class="spinner"></span>
                         <span class="btn-text">Sign In</span>
                     </button>
@@ -800,39 +759,42 @@
                         </div>
                     </div>
                     
-                    <!-- Clean status message without left border -->
-                    <div class="status-message warning">
-                        <strong>Note:</strong> Staff ID will be auto-generated. Management accounts require admin verification.
+                    <div class="status-message warning" id="signup-status">
+                        <strong>Note:</strong> Staff ID will be auto-generated.
                     </div>
                     
                     <div class="input-group">
                         <label for="signup-username">Full Name</label>
                         <input type="text" id="signup-username" required placeholder="John Doe">
+                        <div class="error-message" id="signup-username-error"></div>
                     </div>
                     <div class="input-group">
                         <label for="signup-email">Email Address</label>
                         <input type="email" id="signup-email" required placeholder="your.email@example.com">
+                        <div class="error-message" id="signup-email-error"></div>
                     </div>
                     <div class="input-group">
                         <label for="signup-phone">Phone Number</label>
                         <input type="tel" id="signup-phone" placeholder="+254 XXX XXX XXX" required>
+                        <div class="error-message" id="signup-phone-error"></div>
                     </div>
                     
                     <div class="input-group">
                         <label for="signup-password">Password</label>
-                        <input type="password" id="signup-password" required placeholder="Minimum 6 characters">
+                        <input type="password" id="signup-password" required placeholder="Minimum 8 characters">
+                        <div class="error-message" id="signup-password-error"></div>
                     </div>
                     <div class="input-group">
                         <label for="signup-confirm">Confirm Password</label>
                         <input type="password" id="signup-confirm" required placeholder="Re-enter password">
+                        <div class="error-message" id="signup-confirm-error"></div>
                     </div>
                     
-                    <!-- Management info -->
                     <div class="status-message info" id="management-info" style="display: none;">
                         Management accounts require admin approval before access is granted.
                     </div>
                     
-                    <button type="submit" class="btn" id="signup-btn" style="background-color: var(--primary-color);">
+                    <button type="submit" class="btn btn-primary" id="signup-btn">
                         <span class="spinner"></span>
                         <span class="btn-text">Sign Up</span>
                     </button>
@@ -849,13 +811,14 @@
             
             <div id="email-display-section">
                 <p style="margin-bottom: 1.5rem; color: #555; line-height: 1.6;">
-                    Enter your registered email address. We'll send you a password reset link to restore access to your account.
+                    Enter your registered email address. We'll send you a password reset link.
                 </p>
                 <div class="input-group">
                     <label for="reset-email">Email Address</label>
                     <input type="email" id="reset-email" required placeholder="Enter your email">
+                    <div class="error-message" id="reset-email-error"></div>
                 </div>
-                <button type="button" class="btn" id="send-reset-link-btn" style="background-color: var(--primary-color); margin-top: 1rem;">
+                <button type="button" class="btn btn-primary" id="send-reset-link-btn">
                     <span class="spinner"></span>
                     <span class="btn-text">Send Reset Link</span>
                 </button>
@@ -863,196 +826,290 @@
         </div>
     </div>
 
-    <!-- Load Supabase from CDN -->
+    <!-- Load Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/dist/umd/supabase.min.js"></script>
     
     <script>
-        // Wait for DOM to load
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize Supabase with error handling
+            // Initialize Supabase
             let supabase;
-            let currentRole = 'waiter'; // Default role for signup only
+            let currentRole = 'waiter';
             
             try {
-                // ✅ USE YOUR EXACT SUPABASE CREDENTIALS
                 const supabaseUrl = "https://tfuwozhljthmxxcztfws.supabase.co";
                 const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRmdXdvemhsanRobXh4Y3p0ZndzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5OTA0NjEsImV4cCI6MjA4MTU2NjQ2MX0.7stJZibmLvBk0-oEQk6XSfjsfXaqYf9_O3308ZBOTjc";
                 
-                // Check if Supabase is loaded
-                if (typeof window.supabase === 'undefined') {
-                    console.error('Supabase library not loaded');
-                    alert('Error: Authentication service not available. Please refresh the page.');
-                    return;
-                }
-                
                 supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-                console.log("Supabase initialized successfully");
-                
+                console.log("✅ Supabase initialized");
             } catch (error) {
-                console.error("Failed to initialize Supabase:", error);
-                alert('Authentication service temporarily unavailable. Please try again later.');
+                console.error("❌ Supabase init failed:", error);
+                showAlert('Authentication service unavailable. Please refresh.', 'error');
                 return;
             }
 
-            // Function to generate staff ID
+            // ============ HELPER FUNCTIONS ============
+            
+            // Generate staff ID with proper format
             function generateStaffId(role) {
                 const prefix = role === 'waiter' ? 'AC-WA' : 'AC-MG';
-                const randomNum = Math.floor(100 + Math.random() * 900); // 100-999
-                return `${prefix}-${randomNum}`;
+                const randomNum = Math.floor(1000 + Math.random() * 9000);
+                const timestamp = Date.now().toString().slice(-4);
+                return `${prefix}-${randomNum}-${timestamp}`;
             }
 
-            // ✅ FIXED: Function to create staff record with proper return object
+            // Show alert message
+            function showAlert(message, type = 'info') {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `status-message ${type}`;
+                alertDiv.textContent = message;
+                alertDiv.style.position = 'fixed';
+                alertDiv.style.top = '20px';
+                alertDiv.style.right = '20px';
+                alertDiv.style.zIndex = '10000';
+                alertDiv.style.maxWidth = '400px';
+                alertDiv.style.animation = 'fadeIn 0.3s ease';
+                
+                document.body.appendChild(alertDiv);
+                
+                setTimeout(() => {
+                    alertDiv.style.opacity = '0';
+                    alertDiv.style.transition = 'opacity 0.3s ease';
+                    setTimeout(() => {
+                        if (alertDiv.parentNode) {
+                            alertDiv.parentNode.removeChild(alertDiv);
+                        }
+                    }, 300);
+                }, 5000);
+            }
+
+            // Validate email
+            function validateEmail(email) {
+                const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return re.test(email);
+            }
+
+            // Validate phone
+            function validatePhone(phone) {
+                const re = /^\+?[\d\s\-\(\)]{10,}$/;
+                return re.test(phone);
+            }
+
+            // Show input error
+            function showInputError(inputId, message) {
+                const inputGroup = document.getElementById(inputId).closest('.input-group');
+                const errorElement = inputGroup.querySelector('.error-message');
+                
+                inputGroup.classList.add('error');
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+            }
+
+            // Clear input error
+            function clearInputError(inputId) {
+                const inputGroup = document.getElementById(inputId).closest('.input-group');
+                const errorElement = inputGroup.querySelector('.error-message');
+                
+                inputGroup.classList.remove('error');
+                errorElement.textContent = '';
+                errorElement.style.display = 'none';
+            }
+
+            // Validate signup form
+            function validateSignupForm(username, email, phone, password, confirmPassword) {
+                let isValid = true;
+                
+                // Clear previous errors
+                clearInputError('signup-username');
+                clearInputError('signup-email');
+                clearInputError('signup-phone');
+                clearInputError('signup-password');
+                clearInputError('signup-confirm');
+                
+                // Validate username
+                if (!username || username.length < 2) {
+                    showInputError('signup-username', 'Full name must be at least 2 characters');
+                    isValid = false;
+                }
+                
+                // Validate email
+                if (!email) {
+                    showInputError('signup-email', 'Email is required');
+                    isValid = false;
+                } else if (!validateEmail(email)) {
+                    showInputError('signup-email', 'Please enter a valid email address');
+                    isValid = false;
+                }
+                
+                // Validate phone
+                if (!phone) {
+                    showInputError('signup-phone', 'Phone number is required');
+                    isValid = false;
+                } else if (!validatePhone(phone)) {
+                    showInputError('signup-phone', 'Please enter a valid phone number');
+                    isValid = false;
+                }
+                
+                // Validate password
+                if (!password) {
+                    showInputError('signup-password', 'Password is required');
+                    isValid = false;
+                } else if (password.length < 8) {
+                    showInputError('signup-password', 'Password must be at least 8 characters');
+                    isValid = false;
+                }
+                
+                // Validate confirm password
+                if (!confirmPassword) {
+                    showInputError('signup-confirm', 'Please confirm your password');
+                    isValid = false;
+                } else if (password !== confirmPassword) {
+                    showInputError('signup-confirm', 'Passwords do not match');
+                    isValid = false;
+                }
+                
+                return isValid;
+            }
+
+            // ✅ FIXED: Get correct base path for redirects
+            function getBasePath() {
+                const currentPath = window.location.pathname;
+                console.log("Current path:", currentPath);
+                
+                // Check if we're in the waiter_login folder
+                if (currentPath.includes('/waiter_login/')) {
+                    // We're in waiter_login folder, need to go up one level
+                    return '../';
+                } else if (currentPath.includes('/waiter_login')) {
+                    // We're in waiter_login folder (without trailing slash)
+                    return '../';
+                }
+                
+                // Default: we're in root or same directory
+                return './';
+            }
+
+            // ✅ PROFESSIONAL: Create staff record with proper error handling
             async function createStaffRecord(authData, role, username, phone) {
                 try {
-                    console.log("Creating staff record for:", authData.user.email, "Role:", role);
+                    console.log("🔧 Creating staff record for:", authData.user?.email || authData.email);
                     
+                    // Check session
+                    const { data: { session } } = await supabase.auth.getSession();
+                    
+                    if (!session) {
+                        console.error("❌ No active session found");
+                        return { success: false, error: "No active session. Please sign in first." };
+                    }
+                    
+                    // Generate staff ID
                     const staffId = generateStaffId(role);
-                    const isVerified = role === 'waiter'; // Waiters auto-verified
+                    console.log("Generated Staff ID:", staffId);
                     
-                    // Get role_id from staff_roles table
-                    const { data: roleData, error: roleError } = await supabase
-                        .from('staff_roles')
-                        .select('id')
-                        .eq('role_name', role)
-                        .single();
-                    
+                    // Get role ID
                     let roleId;
-                    if (roleError) {
-                        console.error("Error getting role_id:", roleError);
-                        // Default to waiter role (id: 1) or management (id: 2)
-                        roleId = role === 'waiter' ? 1 : 2;
-                    } else {
-                        roleId = roleData.id;
-                    }
+                    const { data: allRoles } = await supabase
+                        .from('staff_roles')
+                        .select('id, role_name')
+                        .eq('is_active', true);
                     
-                    // Insert into staff_members table
-                    const { data, error } = await supabase
-                        .from('staff_members')
-                        .insert({
-                            auth_user_id: authData.user.id,
-                            staff_id: staffId,
-                            full_name: username,
-                            email: authData.user.email,
-                            phone: phone,
-                            role_id: roleId,
-                            is_active: true,
-                            is_verified: isVerified,
-                            hire_date: new Date().toISOString().split('T')[0]
-                        })
-                        .select();
-                    
-                    if (error) {
-                        console.error("Error creating staff record:", error);
-                        // If constraint violation, try different ID
-                        if (error.code === '23505') { // Unique violation
-                            const newStaffId = generateStaffId(role);
-                            const { data: retryData, error: retryError } = await supabase
-                                .from('staff_members')
-                                .insert({
-                                    auth_user_id: authData.user.id,
-                                    staff_id: newStaffId,
-                                    full_name: username,
-                                    email: authData.user.email,
-                                    phone: phone,
-                                    role_id: roleId,
-                                    is_active: true,
-                                    is_verified: isVerified,
-                                    hire_date: new Date().toISOString().split('T')[0]
-                                })
-                                .select();
-                            
-                            if (retryError) {
-                                console.error("Retry also failed:", retryError);
-                                return null;
-                            }
-                            
-                            // ✅ Return proper object structure
-                            return { 
-                                ...retryData[0], 
-                                staff_id: newStaffId,
-                                role_name: role === 'waiter' ? 'waiter' : 'management',
-                                role_id: roleId,
-                                is_verified: isVerified,
-                                is_active: true
-                            };
+                    if (allRoles && allRoles.length > 0) {
+                        // Try to find matching role
+                        const targetRole = allRoles.find(r => {
+                            const roleName = r.role_name.toLowerCase();
+                            return roleName.includes(role) || 
+                                   (role === 'waiter' && (roleName.includes('wait') || roleName.includes('serv'))) ||
+                                   (role === 'management' && (roleName.includes('manag') || roleName.includes('admin')));
+                        });
+                        
+                        if (targetRole) {
+                            roleId = targetRole.id;
+                            console.log(`✅ Found role: ${targetRole.role_name} (${roleId})`);
+                        } else {
+                            // Use default waiter role
+                            roleId = allRoles[0].id;
+                            console.log(`⚠️ Using default role: ${allRoles[0].role_name}`);
                         }
-                        return null;
+                    } else {
+                        console.error("❌ No active roles found");
+                        return { success: false, error: "No staff roles configured in system." };
                     }
                     
-                    // ✅ Return proper object structure
-                    return { 
-                        ...data[0], 
+                    // Prepare staff data
+                    const userId = authData.user?.id || authData.id;
+                    const userEmail = (authData.user?.email || authData.email).toLowerCase();
+                    
+                    const staffData = {
+                        auth_user_id: userId,
                         staff_id: staffId,
-                        role_name: role === 'waiter' ? 'waiter' : 'management',
+                        full_name: username.trim(),
+                        email: userEmail,
                         role_id: roleId,
-                        is_verified: isVerified,
-                        is_active: true
+                        is_active: true,
+                        is_verified: role === 'waiter', // Waiters auto-verified
+                        hire_date: new Date().toISOString().split('T')[0]
                     };
                     
+                    // Add phone if valid
+                    if (phone && phone.trim() && validatePhone(phone)) {
+                        staffData.phone = phone.trim();
+                    }
+                    
+                    console.log("📝 Attempting to insert staff record...");
+                    
+                    // Try to insert with authenticated session
+                    const { data: insertedRecord, error: insertError } = await supabase
+                        .from('staff_members')
+                        .insert([staffData])
+                        .select(`
+                            *,
+                            staff_roles:role_id (role_name)
+                        `)
+                        .single();
+                    
+                    if (insertError) {
+                        console.error("❌ Insert error:", insertError);
+                        
+                        // Check if record already exists
+                        if (insertError.code === '23505') { // Unique violation
+                            console.log("⚠️ Record may already exist, checking...");
+                            
+                            const { data: existingRecord } = await supabase
+                                .from('staff_members')
+                                .select(`
+                                    *,
+                                    staff_roles:role_id (role_name)
+                                `)
+                                .eq('email', userEmail)
+                                .or(`auth_user_id.eq.${userId},email.eq.${userEmail}`)
+                                .maybeSingle();
+                            
+                            if (existingRecord) {
+                                console.log("✅ Found existing staff record");
+                                return { success: true, data: existingRecord };
+                            }
+                        }
+                        
+                        return { 
+                            success: false, 
+                            error: insertError.message,
+                            details: insertError
+                        };
+                    }
+                    
+                    console.log("✅ Staff record created successfully:", insertedRecord);
+                    return { success: true, data: insertedRecord };
+                    
                 } catch (error) {
-                    console.error("Unexpected error creating staff record:", error);
-                    return null;
+                    console.error("❌ Unexpected error in createStaffRecord:", error);
+                    return { 
+                        success: false, 
+                        error: "System error creating staff profile. Please contact administrator.",
+                        details: error
+                    };
                 }
             }
 
-            // Role selection functionality - ONLY for signup
-            document.querySelectorAll('#signup-form .role-option').forEach(option => {
-                option.addEventListener('click', function() {
-                    // Remove active class from all role options
-                    document.querySelectorAll('#signup-form .role-option').forEach(opt => opt.classList.remove('active'));
-                    
-                    // Add active class to clicked option
-                    this.classList.add('active');
-                    
-                    // Update current role for signup
-                    currentRole = this.getAttribute('data-role');
-                    
-                    // Show/hide management info
-                    const managementInfo = document.getElementById('management-info');
-                    if (currentRole === 'management') {
-                        managementInfo.style.display = 'block';
-                    } else {
-                        managementInfo.style.display = 'none';
-                    }
-                });
-            });
-
-            // Tab switching functionality
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.addEventListener('click', () => {
-                    // Remove active class from all tabs and forms
-                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                    document.querySelectorAll('.form').forEach(f => f.classList.remove('active'));
-                    
-                    // Add active class to clicked tab
-                    tab.classList.add('active');
-                    
-                    // Show corresponding form
-                    const tabId = tab.getAttribute('data-tab');
-                    document.getElementById(`${tabId}-form`).classList.add('active');
-                });
-            });
-
-            // Forgot Password Modal
-            document.getElementById('forgot-password-link').addEventListener('click', function(e) {
-                e.preventDefault();
-                document.getElementById('forgot-password-modal').classList.add('active');
-                document.getElementById('reset-email').focus();
-            });
-
-            // Close modal
-            document.getElementById('close-forgot-modal').addEventListener('click', function() {
-                document.getElementById('forgot-password-modal').classList.remove('active');
-            });
-
-            // Close modal when clicking outside
-            document.getElementById('forgot-password-modal').addEventListener('click', function(e) {
-                if (e.target === this) {
-                    document.getElementById('forgot-password-modal').classList.remove('active');
-                }
-            });
-
-            // Button loading state utility
+            // Button loading state
             function setButtonLoading(button, isLoading) {
                 if (isLoading) {
                     button.classList.add('loading');
@@ -1063,17 +1120,66 @@
                 }
             }
 
-            // Send password reset email
+            // ============ EVENT LISTENERS ============
+            
+            // Tab switching
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.form').forEach(f => f.classList.remove('active'));
+                    
+                    tab.classList.add('active');
+                    const tabId = tab.getAttribute('data-tab');
+                    document.getElementById(`${tabId}-form`).classList.add('active');
+                });
+            });
+
+            // Role selection
+            document.querySelectorAll('#signup-form .role-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('#signup-form .role-option').forEach(opt => opt.classList.remove('active'));
+                    this.classList.add('active');
+                    currentRole = this.getAttribute('data-role');
+                    
+                    const managementInfo = document.getElementById('management-info');
+                    managementInfo.style.display = currentRole === 'management' ? 'block' : 'none';
+                });
+            });
+
+            // Forgot password modal
+            document.getElementById('forgot-password-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('forgot-password-modal').classList.add('active');
+                document.getElementById('reset-email').focus();
+            });
+
+            document.getElementById('close-forgot-modal').addEventListener('click', function() {
+                document.getElementById('forgot-password-modal').classList.remove('active');
+                clearInputError('reset-email');
+                document.getElementById('reset-email').value = '';
+            });
+
+            document.getElementById('forgot-password-modal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    document.getElementById('forgot-password-modal').classList.remove('active');
+                    clearInputError('reset-email');
+                    document.getElementById('reset-email').value = '';
+                }
+            });
+
+            // Send reset email
             document.getElementById('send-reset-link-btn').addEventListener('click', async function() {
                 const email = document.getElementById('reset-email').value.trim();
                 
+                clearInputError('reset-email');
+                
                 if (!email) {
-                    alert('Please enter your email address');
+                    showInputError('reset-email', 'Email is required');
                     return;
                 }
                 
-                if (!supabase) {
-                    alert('Authentication service not available');
+                if (!validateEmail(email)) {
+                    showInputError('reset-email', 'Please enter a valid email address');
                     return;
                 }
                 
@@ -1081,31 +1187,27 @@
                 setButtonLoading(btn, true);
                 
                 try {
-                    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+                    const { error } = await supabase.auth.resetPasswordForEmail(email, {
                         redirectTo: window.location.origin + '/reset-password.html'
                     });
                     
                     if (error) throw error;
                     
-                    alert('Password reset link has been sent to your email. Please check your inbox.');
+                    showAlert('Password reset link has been sent to your email.', 'success');
                     document.getElementById('forgot-password-modal').classList.remove('active');
                     document.getElementById('reset-email').value = '';
                     
                 } catch (error) {
-                    alert('Failed to send reset email: ' + error.message);
+                    console.error("Reset password error:", error);
+                    showAlert('Failed to send reset email. Please try again.', 'error');
                 } finally {
                     setButtonLoading(btn, false);
                 }
             });
 
-            // ✅ SIGNUP FORM - CREATES STAFF RECORD IMMEDIATELY
+            // ============ SIGNUP FORM HANDLER ============
             document.getElementById('signup-form').addEventListener('submit', async function(e) {
                 e.preventDefault();
-
-                if (!supabase) {
-                    alert('Authentication service not available');
-                    return;
-                }
 
                 const username = document.getElementById('signup-username').value.trim();
                 const email = document.getElementById('signup-email').value.trim().toLowerCase();
@@ -1113,32 +1215,8 @@
                 const password = document.getElementById('signup-password').value;
                 const confirmPassword = document.getElementById('signup-confirm').value;
 
-                // Validation
-                if (!username || !email || !phone || !password || !confirmPassword) {
-                    alert('Please fill in all required fields');
-                    return;
-                }
-
-                if (password !== confirmPassword) {
-                    alert('Passwords do not match!');
-                    return;
-                }
-
-                if (password.length < 6) {
-                    alert('Password must be at least 6 characters long');
-                    return;
-                }
-
-                // Email validation
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(email)) {
-                    alert('Please enter a valid email address');
-                    return;
-                }
-
-                // Phone validation (basic)
-                if (phone.length < 10) {
-                    alert('Please enter a valid phone number');
+                // Validate form
+                if (!validateSignupForm(username, email, phone, password, confirmPassword)) {
                     return;
                 }
 
@@ -1146,9 +1224,29 @@
                 setButtonLoading(submitBtn, true);
 
                 try {
-                    console.log("Starting staff registration for:", email, "Role:", currentRole);
+                    console.log("🚀 Starting professional registration for:", email);
                     
-                    // ✅ Step 1: Create Auth User
+                    // ✅ STEP 1: Check if user already exists
+                    const { data: existingUsers } = await supabase
+                        .from('staff_members')
+                        .select('email')
+                        .eq('email', email)
+                        .limit(1);
+                    
+                    if (existingUsers && existingUsers.length > 0) {
+                        showAlert('An account with this email already exists. Please sign in.', 'warning');
+                        setButtonLoading(submitBtn, false);
+                        
+                        // Switch to signin
+                        this.reset();
+                        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                        document.querySelectorAll('.form').forEach(f => f.classList.remove('active'));
+                        document.querySelector('.tab[data-tab="signin"]').classList.add('active');
+                        document.getElementById('signin-form').classList.add('active');
+                        return;
+                    }
+                    
+                    // ✅ STEP 2: Create auth user
                     const { data: authData, error: authError } = await supabase.auth.signUp({
                         email: email,
                         password: password,
@@ -1156,93 +1254,171 @@
                             data: { 
                                 username: username, 
                                 phone: phone,
-                                role: currentRole
-                            }
+                                role: currentRole,
+                                full_name: username
+                            },
+                            emailRedirectTo: window.location.origin
                         }
                     });
 
                     if (authError) {
-                        console.error("Auth signup error:", authError);
-                        alert('Registration failed: ' + authError.message);
+                        console.error("❌ Auth registration error:", authError);
+                        
+                        if (authError.message.includes('already registered')) {
+                            showAlert('This email is already registered. Please sign in.', 'warning');
+                            
+                            // Switch to signin
+                            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                            document.querySelectorAll('.form').forEach(f => f.classList.remove('active'));
+                            document.querySelector('.tab[data-tab="signin"]').classList.add('active');
+                            document.getElementById('signin-form').classList.add('active');
+                        } else {
+                            showAlert('Registration failed: ' + authError.message, 'error');
+                        }
+                        
                         setButtonLoading(submitBtn, false);
                         return;
                     }
 
-                    console.log("Auth registration successful:", authData);
+                    console.log("✅ Auth user created:", authData.user?.id);
                     
-                    // ✅ Step 2: Create Staff Record Immediately
-                    const staffRecord = await createStaffRecord(authData, currentRole, username, phone);
-                    
-                    if (!staffRecord && currentRole === 'waiter') {
-                        alert('Account created but staff record creation failed. Please contact admin.');
+                    // ✅ STEP 3: Sign in to establish session
+                    console.log("🔐 Signing in to establish session...");
+                    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+                        email: email,
+                        password: password
+                    });
+
+                    if (signInError) {
+                        console.error("❌ Auto-signin error:", signInError);
+                        
+                        // User might need to confirm email first
+                        if (signInError.message.includes('Email not confirmed')) {
+                            showAlert('Account created! Please check your email for confirmation link.', 'info');
+                            
+                            // Store pending registration
+                            localStorage.setItem('AlCaponeClubPending', JSON.stringify({
+                                username: username,
+                                email: email,
+                                phone: phone,
+                                role: currentRole,
+                                created: new Date().toISOString()
+                            }));
+                        } else {
+                            showAlert('Account created! Please sign in manually.', 'info');
+                        }
+                        
+                        // Switch to signin
+                        this.reset();
+                        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                        document.querySelectorAll('.form').forEach(f => f.classList.remove('active'));
+                        document.querySelector('.tab[data-tab="signin"]').classList.add('active');
+                        document.getElementById('signin-form').classList.add('active');
                         setButtonLoading(submitBtn, false);
                         return;
                     }
+
+                    console.log("✅ Session established:", signInData.user.id);
                     
-                    // ✅ Step 3: Handle Different Roles
-                    if (currentRole === 'management') {
-                        alert('Management account registration submitted! Your account requires admin approval before access is granted.');
+                    // ✅ STEP 4: Create staff record
+                    const staffResult = await createStaffRecord(authData, currentRole, username, phone);
+                    
+                    if (!staffResult.success) {
+                        console.error("❌ Staff record creation failed:", staffResult.error);
                         
-                        // Store minimal info for potential login attempt
-                        localStorage.setItem('AlCaponeClubStaff', JSON.stringify({
-                            username: username,
-                            email: email,
-                            role: 'management',
-                            needsVerification: true
-                        }));
-                    } else {
-                        // Waiter - immediate access
-                        alert(`Welcome ${username}! Your waiter account has been created successfully.`);
-                        
-                        // Store complete staff info
-                        localStorage.setItem('AlCaponeClubStaff', JSON.stringify({
+                        // Store for later completion
+                        localStorage.setItem('AlCaponeClubPending', JSON.stringify({
                             username: username,
                             email: email,
                             phone: phone,
-                            staffId: staffRecord?.staff_id || 'Pending',
-                            role: 'waiter',
-                            userId: authData.user.id,
-                            sessionStart: new Date().toISOString()
+                            role: currentRole,
+                            userId: authData.user?.id,
+                            created: new Date().toISOString(),
+                            error: staffResult.error
                         }));
                         
-                        // Auto-login waiter immediately
-                        setTimeout(() => {
-                            window.location.href = './management/waiterbay.html';
-                        }, 1500);
-                        return; // Don't switch tabs since we're redirecting
+                        showAlert(`Account created for ${username}! Staff profile setup incomplete. Please contact administrator.`, 'warning');
+                        
+                        // Still allow sign in
+                        this.reset();
+                        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                        document.querySelectorAll('.form').forEach(f => f.classList.remove('active'));
+                        document.querySelector('.tab[data-tab="signin"]').classList.add('active');
+                        document.getElementById('signin-form').classList.add('active');
+                        setButtonLoading(submitBtn, false);
+                        return;
                     }
                     
-                    // Clear form
-                    this.reset();
+                    // ✅ STEP 5: SUCCESS - Complete registration
+                    console.log("🎉 Registration COMPLETE");
                     
-                    // Switch to signin tab (for management)
-                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                    document.querySelectorAll('.form').forEach(f => f.classList.remove('active'));
-                    document.querySelector('.tab[data-tab="signin"]').classList.add('active');
-                    document.getElementById('signin-form').classList.add('active');
+                    const staffInfo = {
+                        username: username,
+                        email: email,
+                        phone: phone,
+                        staffId: staffResult.data.staff_id,
+                        role: currentRole,
+                        userId: authData.user?.id,
+                        roleName: staffResult.data.staff_roles?.role_name || currentRole,
+                        sessionStart: new Date().toISOString()
+                    };
+                    
+                    localStorage.setItem('AlCaponeClubStaff', JSON.stringify(staffInfo));
+                    
+                    // Show success message
+                    const roleDisplayName = currentRole === 'waiter' ? 'Waiter' : 'Management';
+                    showAlert(`🎉 Welcome ${username}! Your ${roleDisplayName} account has been created successfully. Staff ID: ${staffResult.data.staff_id}`, 'success');
+                    
+                    // ✅ FIXED: Determine correct redirect path
+                    const basePath = getBasePath();
+                    console.log("Base path determined:", basePath);
+                    
+                    let redirectPath;
+                    if (currentRole === 'waiter') {
+                        redirectPath = basePath + 'management/waiterbay.html';
+                    } else {
+                        redirectPath = basePath + 'admin_signup/admin.html';
+                    }
+                    
+                    console.log("📍 Redirecting to:", redirectPath);
+                    
+                    // Redirect with delay
+                    setTimeout(() => {
+                        window.location.href = redirectPath;
+                    }, 2000);
 
                 } catch (error) {
-                    console.error("Unexpected error:", error);
-                    alert('Error: ' + error.message);
+                    console.error("❌ Unexpected error in registration:", error);
+                    showAlert('Registration failed due to system error. Please try again.', 'error');
                 } finally {
                     setButtonLoading(submitBtn, false);
                 }
             });
 
-            // ✅ FIXED SIGNIN FORM with proper staff lookup and creation
+            // ============ SIGNIN FORM HANDLER ============
             document.getElementById('signin-form').addEventListener('submit', async function(e) {
                 e.preventDefault();
-
-                if (!supabase) {
-                    alert('Authentication service not available');
-                    return;
-                }
 
                 const email = document.getElementById('signin-email').value.trim().toLowerCase();
                 const password = document.getElementById('signin-password').value;
 
-                if (!email || !password) {
-                    alert('Please fill in all fields');
+                // Clear errors
+                clearInputError('signin-email');
+                clearInputError('signin-password');
+
+                // Basic validation
+                if (!email) {
+                    showInputError('signin-email', 'Email is required');
+                    return;
+                }
+                
+                if (!validateEmail(email)) {
+                    showInputError('signin-email', 'Please enter a valid email address');
+                    return;
+                }
+                
+                if (!password) {
+                    showInputError('signin-password', 'Password is required');
                     return;
                 }
 
@@ -1250,158 +1426,174 @@
                 setButtonLoading(submitBtn, true);
 
                 try {
-                    console.log("Starting staff login for:", email);
+                    console.log("🔐 Professional sign in attempt for:", email);
                     
-                    // ✅ Step 1: Authenticate with Supabase
+                    // ✅ STEP 1: Authenticate
                     const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
                         email: email,
                         password: password
                     });
 
                     if (authError) {
-                        console.error("Login error:", authError);
-                        alert('Login failed: ' + authError.message);
+                        console.error("❌ Authentication error:", authError);
+                        
+                        if (authError.message.includes('Invalid login credentials')) {
+                            showAlert('Invalid email or password. Please try again.', 'error');
+                        } else if (authError.message.includes('Email not confirmed')) {
+                            showAlert('Please confirm your email address before signing in.', 'warning');
+                        } else {
+                            showAlert('Sign in failed: ' + authError.message, 'error');
+                        }
+                        
                         setButtonLoading(submitBtn, false);
                         return;
                     }
 
-                    console.log("Auth successful:", authData);
+                    console.log("✅ Authentication successful:", authData.user.id);
                     
-                    // ✅ FIXED: Step 2: Fetch staff profile from staff_members table (not view)
-                    let staffData; // We'll assign staff data here
-                    const { data: staff, error: staffError } = await supabase
-                        .from('staff_members') // Use table, not view
-                        .select('role_id, is_active, is_verified, staff_id, full_name')
-                        .eq('email', email)
+                    // ✅ STEP 2: Get staff profile
+                    let staffData = null;
+                    
+                    // Try to find staff record
+                    const { data: existingStaff } = await supabase
+                        .from('staff_members')
+                        .select(`
+                            *,
+                            staff_roles:role_id (role_name, is_management)
+                        `)
+                        .or(`email.eq.${email},auth_user_id.eq.${authData.user.id}`)
+                        .eq('is_active', true)
                         .maybeSingle();
-
-                    if (staffError) {
-                        console.error("Staff fetch error:", staffError);
-                    }
-
-                    console.log("Staff profile check:", staff, "Error:", staffError);
                     
-                    // ✅ FIXED: Step 3: If no staff row exists, create one for waiters
-                    if (!staff) {
-                        console.log("No staff record found, checking user metadata...");
+                    if (existingStaff) {
+                        staffData = existingStaff;
+                        console.log("✅ Found staff record:", staffData);
+                    } else {
+                        console.log("⚠️ No staff record found, checking for pending registration...");
                         
-                        const userRole = authData.user.user_metadata?.role || 'waiter';
+                        // Check for pending registration
+                        const pendingRegistration = JSON.parse(localStorage.getItem('AlCaponeClubPending') || 'null');
                         
-                        // Allow first-time waiters to proceed
-                        if (userRole === 'waiter') {
-                            console.log("First-time waiter detected, creating staff record...");
+                        if (pendingRegistration && pendingRegistration.email === email) {
+                            // Create staff record from pending registration
+                            const userRole = authData.user.user_metadata?.role || pendingRegistration.role || 'waiter';
+                            const userName = authData.user.user_metadata?.username || pendingRegistration.username || email.split('@')[0];
+                            const userPhone = authData.user.user_metadata?.phone || pendingRegistration.phone || '';
                             
-                            // Create staff record for first-time waiter
-                            const staffRecord = await createStaffRecord(
-                                authData, 
-                                'waiter',
-                                authData.user.user_metadata?.username || email.split('@')[0],
-                                authData.user.user_metadata?.phone || ''
-                            );
+                            const staffResult = await createStaffRecord(authData, userRole, userName, userPhone);
                             
-                            if (!staffRecord) {
-                                alert('Could not create staff profile. Contact admin.');
+                            if (staffResult.success) {
+                                staffData = staffResult.data;
+                                console.log("✅ Created staff record from pending registration:", staffData);
+                                
+                                // Clear pending registration
+                                localStorage.removeItem('AlCaponeClubPending');
+                            } else {
+                                showAlert('Unable to complete staff profile setup. Please contact administrator.', 'warning');
                                 setButtonLoading(submitBtn, false);
                                 return;
                             }
-
-                            // Use this new record for the session
-                            staffData = {
-                                ...staffRecord,
-                                role_name: 'waiter' // Add role_name for consistency
-                            };
                         } else {
-                            // For management without staff record
-                            alert('Staff profile not found. Please contact administration.');
-                            await supabase.auth.signOut();
-                            setButtonLoading(submitBtn, false);
-                            return;
+                            // Create new staff record
+                            const userRole = authData.user.user_metadata?.role || 'waiter';
+                            const userName = authData.user.user_metadata?.username || email.split('@')[0];
+                            const userPhone = authData.user.user_metadata?.phone || '';
+                            
+                            const staffResult = await createStaffRecord(authData, userRole, userName, userPhone);
+                            
+                            if (staffResult.success) {
+                                staffData = staffResult.data;
+                                console.log("✅ Created new staff record:", staffData);
+                            } else {
+                                showAlert('Unable to create staff profile. Please contact administrator.', 'error');
+                                setButtonLoading(submitBtn, false);
+                                return;
+                            }
                         }
-                    } else {
-                        // Staff record exists, get role_name from staff_roles
-                        const { data: roleData, error: roleError } = await supabase
-                            .from('staff_roles')
-                            .select('role_name')
-                            .eq('id', staff.role_id)
-                            .single();
-                        
-                        staffData = {
-                            ...staff,
-                            role_name: roleError ? 'waiter' : roleData.role_name
-                        };
                     }
                     
-                    // ✅ Step 4: Validate Existing Staff Account
+                    // ✅ STEP 3: Validate account status
                     if (!staffData.is_active) {
-                        alert('Account is disabled. Please contact administration.');
-                        setButtonLoading(submitBtn, false);
+                        showAlert('Your account has been deactivated. Please contact administration.', 'error');
                         await supabase.auth.signOut();
-                        return;
-                    }
-
-                    if (staffData.role_name === 'management' && !staffData.is_verified) {
-                        alert('Management account pending verification. Please wait for admin approval.');
                         setButtonLoading(submitBtn, false);
-                        await supabase.auth.signOut();
                         return;
                     }
                     
-                    // ✅ Step 5: Store User Info
-                    localStorage.setItem('AlCaponeClubStaff', JSON.stringify({
+                    // Check management verification
+                    const isManagement = staffData.staff_roles?.is_management || 
+                                        (staffData.staff_roles?.role_name?.toLowerCase().includes('manag') ||
+                                         staffData.staff_roles?.role_name?.toLowerCase().includes('admin'));
+                    
+                    if (isManagement && !staffData.is_verified) {
+                        showAlert('Management account pending verification. Please wait for admin approval.', 'warning');
+                        await supabase.auth.signOut();
+                        setButtonLoading(submitBtn, false);
+                        return;
+                    }
+                    
+                    // ✅ STEP 4: Store session
+                    const roleName = staffData.staff_roles?.role_name?.toLowerCase() || currentRole;
+                    
+                    const sessionInfo = {
                         username: staffData.full_name || email.split('@')[0],
                         email: email,
-                        phone: authData.user.user_metadata?.phone || '',
+                        phone: staffData.phone || '',
                         staffId: staffData.staff_id,
-                        role: staffData.role_name,
+                        role: roleName,
                         userId: authData.user.id,
                         sessionStart: new Date().toISOString()
-                    }));
+                    };
                     
-                    // ✅ Step 6: Update Last Login
-                    try {
-                        await supabase.rpc('update_last_login', {
-                            user_uuid: authData.user.id
-                        });
-                        console.log('Last login updated');
-                    } catch (updateError) {
-                        console.warn('Could not update last login:', updateError);
-                    }
+                    localStorage.setItem('AlCaponeClubStaff', JSON.stringify(sessionInfo));
                     
-                    // ✅ Step 7: Show Role Info
+                    // Update UI
                     const roleDisplay = document.getElementById('role-display');
-                    const displayRoleName = document.getElementById('display-role-name');
-                    const displayStaffInfo = document.getElementById('display-staff-info');
-                    const displayStaffId = document.getElementById('display-staff-id');
-                    
                     if (roleDisplay) {
-                        roleDisplay.className = 'role-display visible ' + staffData.role_name;
-                        displayRoleName.textContent = staffData.role_name === 'waiter' ? 'Waiter Portal' : 'Management Portal';
-                        displayStaffInfo.textContent = `Welcome, ${staffData.full_name || email.split('@')[0]}`;
-                        displayStaffId.textContent = `Staff ID: ${staffData.staff_id}`;
+                        const roleClass = roleName.includes('wait') ? 'waiter' : 'management';
+                        roleDisplay.className = 'role-display visible ' + roleClass;
+                        document.getElementById('display-role-name').textContent = 
+                            roleClass === 'waiter' ? 'Waiter Portal' : 'Management Portal';
+                        document.getElementById('display-staff-info').textContent = 
+                            `Welcome, ${staffData.full_name || email.split('@')[0]}`;
+                        document.getElementById('display-staff-id').textContent = 
+                            `Staff ID: ${staffData.staff_id}`;
                         
                         document.getElementById('role-text').innerHTML = 
-                            staffData.role_name === 'waiter' 
+                            roleClass === 'waiter' 
                             ? '<strong>Waiter Portal</strong> - Ready to manage orders and serve guests.'
                             : '<strong>Management Portal</strong> - Access administrative functions and analytics.';
                     }
                     
-                    // ✅ Step 8: Redirect Based on Role
+                    // ✅ FIXED: Determine correct redirect path
+                    const basePath = getBasePath();
+                    console.log("Base path determined:", basePath);
+                    
+                    let redirectPath;
+                    if (roleName.includes('wait')) {
+                        redirectPath = basePath + 'management/waiterbay.html';
+                    } else {
+                        redirectPath = basePath + 'admin_signup/admin.html';
+                    }
+                    
+                    console.log("📍 Redirecting to:", redirectPath);
+                    
+                    showAlert(`Welcome back, ${sessionInfo.username}!`, 'success');
+                    
                     setTimeout(() => {
-                        if (staffData.role_name === 'waiter') {
-                            window.location.href = './management/waiterbay.html';
-                        } else if (staffData.role_name === 'management') {
-                            window.location.href = './admin_signup/admin.html';
-                        }
-                    }, 1000);
+                        window.location.href = redirectPath;
+                    }, 1500);
 
                 } catch (error) {
-                    console.error("Unexpected error:", error);
-                    alert('Error: ' + error.message);
+                    console.error("❌ Unexpected error in sign in:", error);
+                    showAlert('Sign in failed due to system error. Please try again.', 'error');
                     setButtonLoading(submitBtn, false);
                 }
             });
 
-            // Demo mode for testing
+            // ============ UTILITY FUNCTIONS ============
+            
+            // Demo mode (for testing)
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('demo') === 'true') {
                 document.getElementById('signin-email').value = 'waiter@alcaponeclub.com';
@@ -1433,6 +1625,45 @@
                     }
                 }
             });
+
+            // Check for existing session on page load
+            async function checkExistingSession() {
+                try {
+                    const { data: { session } } = await supabase.auth.getSession();
+                    
+                    if (session) {
+                        console.log("🔄 Existing session found:", session.user.id);
+                        
+                        // Check if we have staff info
+                        const staffInfo = JSON.parse(localStorage.getItem('AlCaponeClubStaff') || 'null');
+                        
+                        if (staffInfo) {
+                            // Update UI with staff info
+                            const roleDisplay = document.getElementById('role-display');
+                            if (roleDisplay) {
+                                const roleClass = staffInfo.role.includes('wait') ? 'waiter' : 'management';
+                                roleDisplay.className = 'role-display visible ' + roleClass;
+                                document.getElementById('display-role-name').textContent = 
+                                    roleClass === 'waiter' ? 'Waiter Portal' : 'Management Portal';
+                                document.getElementById('display-staff-info').textContent = 
+                                    `Welcome back, ${staffInfo.username}`;
+                                document.getElementById('display-staff-id').textContent = 
+                                    `Staff ID: ${staffInfo.staffId}`;
+                                
+                                document.getElementById('role-text').innerHTML = 
+                                    roleClass === 'waiter' 
+                                    ? '<strong>Waiter Portal</strong> - Ready to manage orders and serve guests.'
+                                    : '<strong>Management Portal</strong> - Access administrative functions and analytics.';
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error checking session:", error);
+                }
+            }
+
+            // Run session check
+            checkExistingSession();
         });
     </script>
 </body>
