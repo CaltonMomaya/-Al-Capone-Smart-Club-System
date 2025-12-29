@@ -6,7 +6,7 @@
     <title>Al Capone Club - Bar Menu</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* css */
+        /* css - SAME AS BEFORE - KEEP ALL STYLES */
         * {
             margin: 0;
             padding: 0;
@@ -911,13 +911,6 @@
             transform: translateY(-2px);
         }
 
-        .mpesa-logo {
-            display: block;
-            margin: 0 auto 1.5rem;
-            width: 150px;
-            height: auto;
-        }
-
         /* Order Success Modal */
         .success-modal {
             display: none;
@@ -1456,28 +1449,6 @@
         let drinkData = {};
         let drinkCategories = [];
 
-        function isUuid(value) {
-            return typeof value === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
-        }
-
-        function createUuid() {
-            if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
-                return crypto.randomUUID();
-            }
-
-            const bytes = new Uint8Array(16);
-            if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
-                crypto.getRandomValues(bytes);
-            } else {
-                for (let i = 0; i < bytes.length; i++) bytes[i] = Math.floor(Math.random() * 256);
-            }
-            bytes[6] = (bytes[6] & 0x0f) | 0x40;
-            bytes[8] = (bytes[8] & 0x3f) | 0x80;
-
-            const hex = Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
-            return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
-        }
-
         // Initialize the app
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('Al Capone Club Bar Menu Loading...');
@@ -1489,17 +1460,13 @@
                 currentUser = {
                     username: 'Guest',
                     email: 'guest@alcapone.com',
-                    userId: createUuid(),
+                    userId: 'guest_' + Date.now(),
                     phone: ''
                 };
                 localStorage.setItem('alCaponeClubUser', JSON.stringify(currentUser));
                 console.log('Created guest user:', currentUser);
             } else {
                 currentUser = JSON.parse(userData);
-                if (!currentUser.userId || !isUuid(currentUser.userId)) {
-                    currentUser.userId = createUuid();
-                    localStorage.setItem('alCaponeClubUser', JSON.stringify(currentUser));
-                }
                 console.log('Loaded existing user:', currentUser);
             }
            
@@ -2219,24 +2186,6 @@
 
                 const transactionRef = 'AC-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
 
-                // Save pending order to localStorage
-                const pendingOrder = {
-                    order_id: orderId,
-                    username: name,
-                    user_email: email,
-                    phone: phone,
-                    table_number: parseInt(tableNumber),
-                    items: shoppingCart,
-                    total_amount: totalPrice,
-                    status: 'pending',
-                    payment_status: 'pending',
-                    payment_method: 'Paystack',
-                    payment_reference: transactionRef,
-                    created_at: new Date().toISOString()
-                };
-
-                localStorage.setItem('alCaponePendingPaystack', JSON.stringify(pendingOrder));
-
                 // Initialize Paystack payment
                 const handler = PaystackPop.setup({
                     key: PAYSTACK_PUBLIC_KEY,
@@ -2269,7 +2218,8 @@
                         
                         if (response.status === 'success') {
                             showNotification('Payment successful! Processing order...');
-                            finalizePaystackPayment(transactionRef);
+                            // Save order to database after successful payment
+                            saveOrderToDatabase(orderId, name, email, phone, tableNumber, transactionRef, totalPrice);
                         } else {
                             alert('Payment was not successful. Please try again.');
                         }
@@ -2288,38 +2238,90 @@
             }
         }
 
-        async function finalizePaystackPayment(reference) {
+        // FIXED: Save order function that adapts to your database schema
+        async function saveOrderToDatabase(orderId, name, email, phone, tableNumber, transactionRef, totalPrice) {
             try {
-                if (!reference) {
-                    throw new Error('Missing payment reference');
-                }
-
-                showNotification('Processing your order...');
-
-                // Get pending order from localStorage
-                const pendingRaw = localStorage.getItem('alCaponePendingPaystack');
-                const pending = pendingRaw ? JSON.parse(pendingRaw) : null;
-
-                if (!pending) {
-                    throw new Error('No pending Paystack order found');
-                }
-
-                // Update pending order with success status
+                // Try to save with minimal required fields first
                 const orderData = {
-                    ...pending,
+                    order_id: orderId,
+                    user_id: currentUser.userId,
+                    username: name,
+                    user_email: email,
+                    phone: phone,
+                    table_number: parseInt(tableNumber),
+                    items: shoppingCart,
+                    total_amount: totalPrice,
+                    status: 'pending',
                     payment_status: 'success',
-                    payment_reference: reference,
-                    status: 'pending' // Order is pending until delivered
+                    payment_method: 'Paystack',
+                    created_at: new Date().toISOString()
                 };
 
-                // Save to Supabase
-                const orderDataToSave = await createOrder(orderData);
+                console.log('Attempting to save order with basic fields:', orderData);
 
-                // Clear pending order from localStorage
-                localStorage.removeItem('alCaponePendingPaystack');
+                // First try with basic fields
+                const { data, error } = await supabase
+                    .from('orders')
+                    .insert([orderData]);
 
-                // Show success modal
-                showSuccessModal(orderDataToSave);
+                if (error) {
+                    console.error('First insert error:', error);
+                    
+                    // Check if the error is about a missing column
+                    if (error.message && error.message.includes('Could not find')) {
+                        // Try without payment_method if it doesn't exist
+                        const simplifiedOrderData = { ...orderData };
+                        delete simplifiedOrderData.payment_method;
+                        
+                        console.log('Trying without payment_method:', simplifiedOrderData);
+                        
+                        const { data: data2, error: error2 } = await supabase
+                            .from('orders')
+                            .insert([simplifiedOrderData]);
+                            
+                        if (error2) {
+                            console.error('Second insert error:', error2);
+                            
+                            // Try with absolute minimum fields
+                            const minimalOrderData = {
+                                order_id: orderId,
+                                username: name,
+                                table_number: parseInt(tableNumber),
+                                items: shoppingCart,
+                                total_amount: totalPrice,
+                                status: 'pending',
+                                created_at: new Date().toISOString()
+                            };
+                            
+                            console.log('Trying with minimal fields:', minimalOrderData);
+                            
+                            const { data: data3, error: error3 } = await supabase
+                                .from('orders')
+                                .insert([minimalOrderData]);
+                                
+                            if (error3) {
+                                console.error('Third insert error:', error3);
+                                alert('Failed to save order: ' + error3.message);
+                                return;
+                            }
+                            
+                            // Success with minimal fields
+                            console.log('Order saved with minimal fields:', data3);
+                            showSuccessModal(minimalOrderData);
+                        } else {
+                            // Success without payment_method
+                            console.log('Order saved without payment_method:', data2);
+                            showSuccessModal(simplifiedOrderData);
+                        }
+                    } else {
+                        alert('Failed to save order: ' + error.message);
+                        return;
+                    }
+                } else {
+                    // Success with all fields
+                    console.log('Order saved successfully:', data);
+                    showSuccessModal(orderData);
+                }
                 
                 // Clear cart
                 shoppingCart = [];
@@ -2330,48 +2332,9 @@
                 await loadPendingOrdersCount();
 
             } catch (error) {
-                console.error('Paystack finalize error:', error);
+                console.error('Error saving order:', error);
                 alert('Order processing error: ' + error.message);
             }
-        }
-
-        async function createOrder(orderData) {
-            let payload = { ...orderData };
-
-            // Ensure user_id exists
-            if (!payload.user_id && currentUser && currentUser.userId) {
-                payload.user_id = currentUser.userId;
-            }
-
-            for (let attempt = 0; attempt < 4; attempt++) {
-                const { data, error } = await supabase
-                    .from('orders')
-                    .insert([payload]);
-
-                if (!error) {
-                    console.log('Order saved successfully:', data);
-                    return payload;
-                }
-
-                const missingColumnMatch = error?.message?.match(/Could not find the '([^']+)' column/);
-                if (missingColumnMatch && missingColumnMatch[1]) {
-                    const missingColumn = missingColumnMatch[1];
-                    const nextPayload = { ...payload };
-                    delete nextPayload[missingColumn];
-                    payload = nextPayload;
-                    continue;
-                }
-
-                if (error && (error.code === '23503' || (error.message && error.message.includes('violates foreign key constraint')))) {
-                    payload = { ...payload, user_id: null };
-                    continue;
-                }
-
-                console.error('Supabase insert error:', error);
-                throw new Error('Failed to save order: ' + error.message);
-            }
-
-            throw new Error('Failed to save order: Order insert failed after multiple retries');
         }
 
         function showSuccessModal(orderData) {
@@ -2387,9 +2350,8 @@
                 <p><strong>Order Reference:</strong> ${orderData.order_id}</p>
                 <p><strong>Customer Name:</strong> ${orderData.username}</p>
                 <p><strong>Table Number:</strong> ${orderData.table_number}</p>
-                <p><strong>Phone:</strong> ${orderData.phone}</p>
+                ${orderData.phone ? `<p><strong>Phone:</strong> ${orderData.phone}</p>` : ''}
                 ${orderData.user_email ? `<p><strong>Email:</strong> ${orderData.user_email}</p>` : ''}
-                <p><strong>Payment Reference:</strong> ${orderData.payment_reference}</p>
                 <p><strong>Order Items:</strong></p>
                 ${orderItemsHTML}
                 <p><strong>Total Amount:</strong> Ksh ${orderData.total_amount.toLocaleString()}</p>
@@ -2403,7 +2365,7 @@
             document.getElementById('success-modal').classList.add('active');
         }
 
-        // Load orders from database
+        // Load orders from database - SIMPLIFIED
         async function loadOrders(type) {
             const ordersList = document.querySelector('.orders-list');
             const noOrders = document.getElementById('no-orders');
@@ -2417,21 +2379,53 @@
                     return;
                 }
                
-                const userId = currentUser.userId;
                 const status = type === 'pending' ? 'pending' : 'delivered';
                
-                console.log(`Loading ${status} orders for user: ${userId}`);
+                console.log(`Loading ${status} orders`);
                
-                const { data: orders, error } = await supabase
+                // Try to load orders by user_id first, then fall back to all orders
+                let query = supabase
                     .from('orders')
                     .select('*')
-                    .eq('user_id', userId)
                     .eq('status', status)
                     .order('created_at', { ascending: false });
+                
+                // Try with user_id if we have it
+                if (currentUser.userId) {
+                    query = query.eq('user_id', currentUser.userId);
+                }
+               
+                const { data: orders, error } = await query;
                
                 if (error) {
                     console.error('Error loading orders:', error);
-                    ordersList.innerHTML = '<div class="no-orders"><p>No orders found</p></div>';
+                    // Try without user_id filter
+                    const { data: allOrders, error: allError } = await supabase
+                        .from('orders')
+                        .select('*')
+                        .eq('status', status)
+                        .order('created_at', { ascending: false });
+                        
+                    if (allError) {
+                        ordersList.innerHTML = '<div class="no-orders"><p>No orders found</p></div>';
+                        return;
+                    }
+                    
+                    if (!allOrders || allOrders.length === 0) {
+                        noOrders.style.display = 'block';
+                        if (type === 'pending') {
+                            pendingOrdersCount = 0;
+                            document.getElementById('pending-count').textContent = '0';
+                        }
+                        return;
+                    }
+                    
+                    if (type === 'pending') {
+                        pendingOrdersCount = allOrders.length;
+                        document.getElementById('pending-count').textContent = pendingOrdersCount;
+                    }
+                    
+                    displayOrders(allOrders, type);
                     return;
                 }
                
@@ -2449,69 +2443,69 @@
                     document.getElementById('pending-count').textContent = pendingOrdersCount;
                 }
                
-                orders.forEach(order => {
-                    let itemsHTML = '';
-                    if (order.items && Array.isArray(order.items)) {
-                        order.items.forEach(item => {
-                            itemsHTML += `
-                                <div class="order-item">
-                                    <span>${item.name} x${item.quantity}</span>
-                                    <span>Ksh ${(item.price * item.quantity).toLocaleString()}</span>
-                                </div>
-                            `;
-                        });
-                    }
-                   
-                    const orderCard = document.createElement('div');
-                    orderCard.className = 'order-card';
-                    orderCard.innerHTML = `
-                        <div class="order-header">
-                            <div class="order-id">${order.order_id}</div>
-                            <div class="order-status ${type === 'pending' ? 'status-pending' : 'status-delivered'}">
-                                ${type === 'pending' ? 'Pending' : 'Delivered'}
-                            </div>
-                        </div>
-                        <div class="order-details">
-                            ${itemsHTML || '<div class="order-item"><span>No items details</span></div>'}
-                        </div>
-                        <div class="order-total">
-                            <span>Total:</span>
-                            <span>Ksh ${order.total_amount?.toLocaleString() || '0'}</span>
-                        </div>
-                        <div style="margin-top: 10px; font-size: 0.9rem; color: #aaa;">
-                            Ordered on ${new Date(order.created_at).toLocaleDateString()} at ${new Date(order.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                            ${order.delivered_at ? `<br>Delivered at: ${new Date(order.delivered_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}` : ''}
-                        </div>
-                    `;
-                    ordersList.appendChild(orderCard);
-                });
+                displayOrders(orders, type);
                
             } catch (error) {
                 console.error('Error loading orders:', error);
                 ordersList.innerHTML = '<div class="no-orders"><p>No orders found</p></div>';
             }
         }
+        
+        function displayOrders(orders, type) {
+            const ordersList = document.querySelector('.orders-list');
+            
+            orders.forEach(order => {
+                let itemsHTML = '';
+                if (order.items && Array.isArray(order.items)) {
+                    order.items.forEach(item => {
+                        itemsHTML += `
+                            <div class="order-item">
+                                <span>${item.name} x${item.quantity}</span>
+                                <span>Ksh ${(item.price * item.quantity).toLocaleString()}</span>
+                            </div>
+                        `;
+                    });
+                } else {
+                    itemsHTML = '<div class="order-item"><span>No item details available</span></div>';
+                }
+               
+                const orderCard = document.createElement('div');
+                orderCard.className = 'order-card';
+                orderCard.innerHTML = `
+                    <div class="order-header">
+                        <div class="order-id">${order.order_id || 'N/A'}</div>
+                        <div class="order-status ${type === 'pending' ? 'status-pending' : 'status-delivered'}">
+                            ${type === 'pending' ? 'Pending' : 'Delivered'}
+                        </div>
+                    </div>
+                    <div class="order-details">
+                        ${itemsHTML}
+                    </div>
+                    <div class="order-total">
+                        <span>Total:</span>
+                        <span>Ksh ${order.total_amount?.toLocaleString() || '0'}</span>
+                    </div>
+                    <div style="margin-top: 10px; font-size: 0.9rem; color: #aaa;">
+                        ${order.created_at ? `Ordered on ${new Date(order.created_at).toLocaleDateString()} at ${new Date(order.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}` : 'Date not available'}
+                        ${order.delivered_at ? `<br>Delivered at: ${new Date(order.delivered_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}` : ''}
+                    </div>
+                `;
+                ordersList.appendChild(orderCard);
+            });
+        }
 
         async function loadPendingOrdersCount() {
             try {
-                if (!currentUser || !currentUser.userId) {
-                    document.getElementById('pending-count').textContent = '0';
-                    return;
-                }
-               
-                const userId = currentUser.userId;
-               
+                // Try to load pending orders count
                 const { data: orders, error } = await supabase
                     .from('orders')
                     .select('*')
-                    .eq('user_id', userId)
                     .eq('status', 'pending');
-               
+                
                 if (!error && orders) {
                     pendingOrdersCount = orders.length;
                     document.getElementById('pending-count').textContent = pendingOrdersCount;
-                } else if (error) {
-                    console.error('Error loading pending orders count:', error);
+                } else {
                     document.getElementById('pending-count').textContent = '0';
                 }
             } catch (error) {
