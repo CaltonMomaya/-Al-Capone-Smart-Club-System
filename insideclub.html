@@ -33,7 +33,7 @@
             color: var(--secondary-color);
             min-height: 100vh;
             overflow-x: hidden;
-            background-image: 
+            background-image:
                 radial-gradient(circle at 15% 50%, rgba(139, 69, 19, 0.1) 0%, transparent 20%),
                 radial-gradient(circle at 85% 30%, rgba(212, 175, 55, 0.1) 0%, transparent 20%),
                 radial-gradient(circle at 50% 80%, rgba(139, 69, 19, 0.05) 0%, transparent 20%);
@@ -397,6 +397,12 @@
             margin-bottom: 1rem;
             background-color: rgba(255, 255, 255, 0.05);
             border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .cart-item.removing {
+            opacity: 0;
+            transform: translateX(50px);
         }
 
         .cart-item-info h4 {
@@ -428,6 +434,10 @@
             align-items: center;
         }
 
+        .quantity-btn:hover {
+            background-color: var(--button-hover);
+        }
+
         .quantity {
             font-weight: bold;
             min-width: 25px;
@@ -441,6 +451,14 @@
             cursor: pointer;
             font-size: 1.1rem;
             margin-left: 8px;
+            transition: all 0.3s ease;
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        .remove-item:hover {
+            background-color: rgba(198, 40, 40, 0.2);
+            transform: scale(1.1);
         }
 
         .cart-total {
@@ -1110,86 +1128,98 @@
             to { opacity: 1; }
         }
 
+        /* Cart item removal animation */
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100px);
+                opacity: 0;
+            }
+        }
+
         /* Responsive Styles */
         @media (max-width: 768px) {
             .container {
                 padding: 15px;
                 padding-top: 70px;
             }
-            
+           
             .header-title {
                 font-size: 1.8rem;
             }
-            
+           
             .header-subtitle {
                 font-size: 1rem;
             }
-            
+           
             .buttons-container {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 1rem;
             }
-            
+           
             .menu-button {
                 padding: 1rem 0.5rem;
                 min-height: 100px;
             }
-            
+           
             .menu-button i {
                 font-size: 1.5rem;
             }
-            
+           
             .drink-list {
                 grid-template-columns: 1fr;
             }
-            
+           
             .checkout-container {
                 padding: 1.5rem;
             }
-            
+           
             .cart-panel {
                 width: 100%;
                 right: -100%;
             }
-            
+           
             .cart-section {
                 top: 15px;
                 right: 15px;
             }
-            
+           
             .hamburger-menu {
                 top: 15px;
                 left: 15px;
                 width: 45px;
                 height: 45px;
             }
-            
+           
             .side-menu {
                 width: 85%;
                 left: -85%;
             }
-            
+           
             .success-content {
                 padding: 1.5rem;
             }
-            
+           
             .success-title {
                 font-size: 1.5rem;
             }
-            
+           
             .table-number-display {
                 max-width: 100%;
                 padding: 10px 15px;
             }
-            
+           
             .welcome-text {
                 font-size: 1rem;
             }
-            
+           
             .orders-tabs {
                 padding: 8px 0;
             }
-            
+           
             .orders-tab {
                 padding: 10px 16px;
                 font-size: 0.9rem;
@@ -1200,48 +1230,48 @@
             .buttons-container {
                 grid-template-columns: 1fr;
             }
-            
+           
             .header-title {
                 font-size: 1.6rem;
             }
-            
+           
             .section-title {
                 font-size: 1.6rem;
             }
-            
+           
             .menu-button {
                 padding: 0.8rem 0.5rem;
                 min-height: 90px;
             }
-            
+           
             .menu-button i {
                 font-size: 1.3rem;
             }
-            
+           
             .button-text {
                 font-size: 0.9rem;
             }
-            
+           
             .table-number {
                 font-size: 1.2rem;
             }
-            
+           
             .cart-button {
                 width: 50px;
                 height: 50px;
                 font-size: 1.2rem;
             }
-            
+           
             .hamburger-menu {
                 width: 40px;
                 height: 40px;
             }
-            
+           
             .hamburger-line {
                 width: 20px;
                 height: 2px;
             }
-            
+           
             .orders-tab {
                 padding: 8px 12px;
                 font-size: 0.85rem;
@@ -1263,23 +1293,23 @@
             <h3 class="menu-title">Menu</h3>
             <div class="username-display" id="menu-username"></div>
         </div>
-        
+       
         <button class="menu-item active" id="menu-drinks">
             <i class="fas fa-glass-cheers"></i>
             <span>Drinks Menu</span>
         </button>
-        
+       
         <button class="menu-item" id="menu-pending-orders">
             <i class="fas fa-clock"></i>
             <span>Pending Orders</span>
             <span class="cart-count" id="pending-count" style="margin-left: auto; margin-right: 10px;">0</span>
         </button>
-        
+       
         <button class="menu-item" id="menu-delivered-orders">
             <i class="fas fa-check-circle"></i>
             <span>Delivered Orders</span>
         </button>
-        
+       
         <button class="menu-item logout" id="menu-logout">
             <i class="fas fa-sign-out-alt"></i>
             <span>Logout</span>
@@ -1304,7 +1334,7 @@
             <i class="fas fa-shopping-cart"></i>
             <span class="cart-count" id="cart-count">0</span>
         </button>
-        
+       
         <div class="cart-panel" id="cart-panel">
             <div class="cart-header">
                 <h3 class="cart-title">Your Order</h3>
@@ -1312,17 +1342,17 @@
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            
+           
             <div class="cart-items" id="cart-items">
                 <div class="empty-cart" id="empty-cart">
                     <p>Your cart is empty</p>
                 </div>
             </div>
-            
+           
             <div class="cart-total" id="cart-total">
                 Total: Ksh 0
             </div>
-            
+           
             <button class="checkout-button" id="checkout-button">
                 <i class="fas fa-lock"></i> Proceed to Checkout
             </button>
@@ -1343,7 +1373,7 @@
                 <div class="logo-placeholder" id="logo-placeholder">AL CAPONE CLUB</div>
                 <img id="club-logo" class="club-logo" src="images/logo.png" alt="Al Capone Club Logo" style="display: none; max-width: 200px; height: auto;">
             </div>
-            
+           
             <!-- Table Number Display -->
             <div class="table-number-display">
                 <div class="table-label">You are ordering from</div>
@@ -1354,7 +1384,7 @@
                     </button>
                 </div>
             </div>
-            
+           
             <h1 class="header-title">Premium Bar Selection</h1>
             <p class="header-subtitle">Indulge in our exquisite collection of fine spirits, crafted cocktails, and premium beverages</p>
         </div>
@@ -1376,7 +1406,7 @@
                 <button class="orders-tab active" data-tab="pending">Pending Orders</button>
                 <button class="orders-tab" data-tab="delivered">Delivered Orders</button>
             </div>
-            
+           
             <div class="orders-list">
                 <div class="no-orders" id="no-orders">
                     <p>No orders found</p>
@@ -1405,9 +1435,12 @@
         </div>
     </div>
 
+    <!-- Paystack Inline (required for PaystackPop.setup) -->
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+
     <!-- Load Supabase from CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/dist/umd/supabase.min.js"></script>
-    
+   
     <script>
         // Initialize Supabase
         let supabase;
@@ -1415,15 +1448,40 @@
         let shoppingCart = [];
         let tableNumber = "12"; // Default table number
         let pendingOrdersCount = 0;
-        
+       
+        // Paystack configuration
+        const PAYSTACK_PUBLIC_KEY = "pk_live_e11c35bd52ae9dd8d100dedd022e3e9b7c434c7a";
+       
         // Database-loaded drink data structure
         let drinkData = {};
         let drinkCategories = [];
 
+        function isUuid(value) {
+            return typeof value === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+        }
+
+        function createUuid() {
+            if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+                return crypto.randomUUID();
+            }
+
+            const bytes = new Uint8Array(16);
+            if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+                crypto.getRandomValues(bytes);
+            } else {
+                for (let i = 0; i < bytes.length; i++) bytes[i] = Math.floor(Math.random() * 256);
+            }
+            bytes[6] = (bytes[6] & 0x0f) | 0x40;
+            bytes[8] = (bytes[8] & 0x3f) | 0x80;
+
+            const hex = Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
+            return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+        }
+
         // Initialize the app
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('Al Capone Club Bar Menu Loading...');
-            
+           
             // Load or create user data
             const userData = localStorage.getItem('alCaponeClubUser');
             if (!userData) {
@@ -1431,33 +1489,37 @@
                 currentUser = {
                     username: 'Guest',
                     email: 'guest@alcapone.com',
-                    userId: 'guest_' + Date.now(),
+                    userId: createUuid(),
                     phone: ''
                 };
                 localStorage.setItem('alCaponeClubUser', JSON.stringify(currentUser));
                 console.log('Created guest user:', currentUser);
             } else {
                 currentUser = JSON.parse(userData);
+                if (!currentUser.userId || !isUuid(currentUser.userId)) {
+                    currentUser.userId = createUuid();
+                    localStorage.setItem('alCaponeClubUser', JSON.stringify(currentUser));
+                }
                 console.log('Loaded existing user:', currentUser);
             }
-            
+           
             try {
                 const supabaseUrl = "https://tfuwozhljthmxxcztfws.supabase.co";
                 const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRmdXdvemhsanRobXh4Y3p0ZndzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5OTA0NjEsImV4cCI6MjA4MTU2NjQ2MX0.7stJZibmLvBk0-oEQk6XSfjsfXaqYf9_O3308ZBOTjc";
-                
+               
                 supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
                 console.log("Supabase initialized");
-                
+               
                 // Initialize UI first
                 initUI();
                 initEventListeners();
-                
+               
                 // Load drink data from database
                 await loadDrinkDataFromDatabase();
-                
+               
                 // Load pending orders count
                 await loadPendingOrdersCount();
-                
+               
             } catch (error) {
                 console.error("Failed to initialize:", error);
                 showNotification('Working in offline mode - some features limited');
@@ -1469,23 +1531,23 @@
             // Try to load logo
             const clubLogo = document.getElementById('club-logo');
             const logoPlaceholder = document.getElementById('logo-placeholder');
-            
+           
             clubLogo.onload = function() {
                 clubLogo.style.display = 'block';
                 logoPlaceholder.style.display = 'none';
             };
-            
+           
             clubLogo.onerror = function() {
                 console.log('Logo not found, using placeholder');
                 logoPlaceholder.style.display = 'flex';
             };
-            
+           
             clubLogo.src = 'images/logo.png';
         });
 
         function loadFallbackDrinkData() {
             console.log('Loading fallback drink data...');
-            
+           
             drinkData = {
                 cocktails: [
                     { id: 1, name: "Old Fashioned", description: "Classic bourbon cocktail with bitters and orange", price: 1200 },
@@ -1505,7 +1567,8 @@
                     { id: 2, name: "Sprite", description: "Lemon-lime soda", price: 200 },
                     { id: 3, name: "Fanta Orange", description: "Orange flavored soda", price: 200 },
                     { id: 4, name: "Bottled Water", description: "500ml mineral water", price: 150 },
-                    { id: 5, name: "Tonic Water", description: "For your gin and tonic", price: 250 }
+                    { id: 5, name: "Tonic Water", description: "For your gin and tonic", price: 250 },
+                    { id: 99, name: "Test Item (10 bob)", description: "Test payment item", price: 10 }
                 ],
                 champagne: [
                     { id: 1, name: "Moët & Chandon", description: "Premium French champagne", price: 15000 },
@@ -1521,7 +1584,7 @@
                     { id: 5, name: "Sambuca", description: "Italian anise-flavored liqueur", price: 750 }
                 ]
             };
-            
+           
             updateMenuCategories();
         }
 
@@ -1532,25 +1595,25 @@
                     .select('*')
                     .order('category')
                     .order('name');
-                
+               
                 if (error) {
                     console.error("Error loading drinks:", error);
                     loadFallbackDrinkData();
                     return;
                 }
-                
+               
                 if (!drinks || drinks.length === 0) {
                     loadFallbackDrinkData();
                     return;
                 }
-                
+               
                 drinkData = {};
                 drinkCategories = [];
-                
+               
                 drinks.forEach(drink => {
                     const category = drink.category.toLowerCase().trim();
                     let cleanCategory = category;
-                    
+                   
                     if (category.includes('cocktail')) {
                         cleanCategory = 'cocktails';
                     } else if (category.includes('mocktail')) {
@@ -1568,14 +1631,14 @@
                     } else if (category.includes('hot')) {
                         cleanCategory = 'hotdrinks';
                     }
-                    
+                   
                     if (!drinkData[cleanCategory]) {
                         drinkData[cleanCategory] = [];
                         drinkCategories.push(cleanCategory);
                     }
-                    
+                   
                     const price = drink.price || drink.price_glass || drink.price_bottle || 500;
-                    
+                   
                     drinkData[cleanCategory].push({
                         id: drink.id,
                         name: drink.name,
@@ -1585,9 +1648,25 @@
                         db_id: drink.id
                     });
                 });
-                
+
+                if (!drinkData['soft-drinks']) {
+                    drinkData['soft-drinks'] = [];
+                    drinkCategories.push('soft-drinks');
+                }
+
+                if (!drinkData['soft-drinks'].some(d => d && d.db_id === 'test-10')) {
+                    drinkData['soft-drinks'].push({
+                        id: 99999,
+                        name: 'Test Item (10 bob)',
+                        description: 'Test payment item',
+                        price: 10,
+                        category: 'soft-drinks',
+                        db_id: 'test-10'
+                    });
+                }
+               
                 updateMenuCategories();
-                
+               
             } catch (error) {
                 console.error("Failed to load drink data:", error);
                 loadFallbackDrinkData();
@@ -1597,21 +1676,21 @@
         function updateMenuCategories() {
             const buttonsContainer = document.querySelector('.buttons-container');
             if (!buttonsContainer) return;
-            
+           
             const loadingMessage = document.getElementById('loading-message');
             if (loadingMessage) {
                 loadingMessage.remove();
             }
-            
-            const availableCategories = Object.keys(drinkData).filter(category => 
+           
+            const availableCategories = Object.keys(drinkData).filter(category =>
                 drinkData[category].length > 0
             );
-            
+           
             if (availableCategories.length === 0) {
                 loadFallbackDrinkData();
                 return;
             }
-            
+           
             const categoryMetadata = {
                 'cocktails': { icon: 'fas fa-cocktail', text: 'Cocktails' },
                 'mocktails': { icon: 'fas fa-seedling', text: 'Mocktails' },
@@ -1624,14 +1703,14 @@
                 'spirits': { icon: 'fas fa-whiskey-glass', text: 'Spirits' },
                 'hotdrinks': { icon: 'fas fa-mug-hot', text: 'Hot Drinks' }
             };
-            
+           
             let buttonsHTML = '';
             availableCategories.forEach(category => {
-                const meta = categoryMetadata[category] || { 
-                    icon: 'fas fa-glass-cheers', 
+                const meta = categoryMetadata[category] || {
+                    icon: 'fas fa-glass-cheers',
                     text: category.charAt(0).toUpperCase() + category.slice(1).replace('-', ' ')
                 };
-                
+               
                 buttonsHTML += `
                     <button class="menu-button" data-category="${category}">
                         <i class="${meta.icon}"></i>
@@ -1639,9 +1718,9 @@
                     </button>
                 `;
             });
-            
+           
             buttonsContainer.innerHTML = buttonsHTML;
-            
+           
             document.querySelectorAll('.menu-button').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const category = btn.getAttribute('data-category');
@@ -1652,7 +1731,7 @@
 
         function showCategoryPage(category) {
             const menuSection = document.getElementById('menu-section');
-            
+           
             const categoryNames = {
                 'cocktails': 'Cocktails',
                 'mocktails': 'Mocktails',
@@ -1665,9 +1744,9 @@
                 'spirits': 'Spirits',
                 'hotdrinks': 'Hot Drinks'
             };
-            
+           
             const displayName = categoryNames[category] || category.charAt(0).toUpperCase() + category.slice(1).replace('-', ' ');
-            
+           
             if (!drinkData[category] || drinkData[category].length === 0) {
                 menuSection.innerHTML = `
                     <button class="back-button" id="back-button">
@@ -1679,13 +1758,13 @@
                         <p style="margin-top: 1rem; font-size: 0.9rem; color: #aaa;">Check back later or try another category</p>
                     </div>
                 `;
-                
+               
                 document.getElementById('back-button').addEventListener('click', () => {
                     location.reload();
                 });
                 return;
             }
-            
+           
             let drinksHTML = '';
             drinkData[category].forEach(drink => {
                 drinksHTML += `
@@ -1699,7 +1778,7 @@
                     </div>
                 `;
             });
-            
+           
             menuSection.innerHTML = `
                 <button class="back-button" id="back-button">
                     <i class="fas fa-arrow-left"></i> Back to Categories
@@ -1709,18 +1788,19 @@
                     ${drinksHTML}
                 </div>
             `;
-            
+           
             document.getElementById('back-button').addEventListener('click', () => {
                 location.reload();
             });
-            
+           
+            // Attach event listeners to add to cart buttons
             document.querySelectorAll('.add-to-cart-button').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const drinkId = parseInt(this.getAttribute('data-drink-id'));
                     const category = this.getAttribute('data-category');
                     const dbId = this.getAttribute('data-db-id');
                     const drink = drinkData[category].find(d => d.id === drinkId);
-                    
+                   
                     if (drink) {
                         addToCart(drink, category, dbId);
                     } else {
@@ -1731,10 +1811,10 @@
         }
 
         function addToCart(drink, category, dbId) {
-            const existingItem = shoppingCart.find(item => 
+            const existingItem = shoppingCart.find(item =>
                 item.db_id === dbId || (item.id === drink.id && item.category === category)
             );
-            
+           
             if (existingItem) {
                 existingItem.quantity++;
             } else {
@@ -1747,7 +1827,7 @@
                     quantity: 1
                 });
             }
-            
+           
             saveCart();
             updateCartDisplay();
             showNotification(`${drink.name} added to cart!`);
@@ -1757,13 +1837,13 @@
             const username = currentUser?.username || currentUser?.email?.split('@')[0] || 'Guest';
             document.getElementById('username-display').textContent = username;
             document.getElementById('menu-username').textContent = username;
-            
+           
             const savedTable = localStorage.getItem('alCaponeTableNumber');
             if (savedTable) {
                 tableNumber = savedTable;
             }
             document.getElementById('current-table-number').textContent = tableNumber;
-            
+           
             const savedCart = localStorage.getItem('alCaponeCart');
             if (savedCart) {
                 shoppingCart = JSON.parse(savedCart);
@@ -1773,39 +1853,39 @@
 
         function initEventListeners() {
             document.getElementById('hamburger-menu').addEventListener('click', toggleSideMenu);
-            
+           
             document.getElementById('menu-drinks').addEventListener('click', () => {
                 showDrinksMenu();
                 closeSideMenu();
             });
-            
+           
             document.getElementById('menu-pending-orders').addEventListener('click', () => {
                 showOrders('pending');
                 closeSideMenu();
             });
-            
+           
             document.getElementById('menu-delivered-orders').addEventListener('click', () => {
                 showOrders('delivered');
                 closeSideMenu();
             });
-            
-            // FIXED: Logout now redirects to index.html
+           
+            // Logout now redirects to index.html
             document.getElementById('menu-logout').addEventListener('click', logout);
-            
+           
             document.getElementById('edit-table-btn').addEventListener('click', showEditTableModal);
             document.getElementById('save-table-btn').addEventListener('click', saveTableNumber);
             document.getElementById('cancel-table-btn').addEventListener('click', hideEditTableModal);
-            
+           
             document.getElementById('cart-button').addEventListener('click', () => {
                 document.getElementById('cart-panel').classList.add('active');
             });
-            
+           
             document.getElementById('close-cart').addEventListener('click', () => {
                 document.getElementById('cart-panel').classList.remove('active');
             });
-            
+           
             document.getElementById('checkout-button').addEventListener('click', checkout);
-            
+           
             document.querySelectorAll('.orders-tab').forEach(tab => {
                 tab.addEventListener('click', function() {
                     const tabName = this.getAttribute('data-tab');
@@ -1814,7 +1894,7 @@
                     showOrders(tabName);
                 });
             });
-            
+           
             document.getElementById('close-success').addEventListener('click', () => {
                 document.getElementById('success-modal').classList.remove('active');
                 showDrinksMenu();
@@ -1847,13 +1927,13 @@
             document.getElementById('menu-drinks').classList.remove('active');
             document.getElementById('menu-pending-orders').classList.remove('active');
             document.getElementById('menu-delivered-orders').classList.remove('active');
-            
+           
             if (type === 'pending') {
                 document.getElementById('menu-pending-orders').classList.add('active');
             } else {
                 document.getElementById('menu-delivered-orders').classList.add('active');
             }
-            
+           
             await loadOrders(type);
         }
 
@@ -1885,24 +1965,34 @@
             const cartItems = document.getElementById('cart-items');
             const cartTotal = document.getElementById('cart-total');
             const emptyCart = document.getElementById('empty-cart');
-            
+
+            if (!cartCount || !cartItems || !cartTotal || !emptyCart) {
+                return;
+            }
+           
+            // Calculate total items in cart
             const totalItems = shoppingCart.reduce((sum, item) => sum + item.quantity, 0);
+            
+            // Update cart count badge
             cartCount.textContent = totalItems;
-            
+            cartCount.style.display = totalItems > 0 ? 'flex' : 'none';
+           
+            // Clear cart items display
             cartItems.innerHTML = '';
-            
+           
             if (shoppingCart.length === 0) {
                 emptyCart.style.display = 'block';
                 cartTotal.innerHTML = 'Total: Ksh 0';
                 return;
             }
-            
+           
             emptyCart.style.display = 'none';
             let totalPrice = 0;
-            
+           
+            // Display each cart item
             shoppingCart.forEach((item, index) => {
                 totalPrice += item.price * item.quantity;
-                
+               
                 const cartItem = document.createElement('div');
                 cartItem.className = 'cart-item';
                 cartItem.innerHTML = `
@@ -1914,16 +2004,18 @@
                         <button class="quantity-btn decrease-quantity" data-index="${index}">-</button>
                         <span class="quantity">${item.quantity}</span>
                         <button class="quantity-btn increase-quantity" data-index="${index}">+</button>
-                        <button class="remove-item" data-index="${index}">
+                        <button class="remove-item" data-index="${index}" title="Remove item">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
                 `;
                 cartItems.appendChild(cartItem);
             });
-            
+           
+            // Update total price
             cartTotal.innerHTML = `Total: Ksh ${totalPrice.toLocaleString()}`;
-            
+           
+            // Add event listeners for quantity buttons
             document.querySelectorAll('.decrease-quantity').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const index = parseInt(this.dataset.index);
@@ -1931,27 +2023,58 @@
                         shoppingCart[index].quantity--;
                         saveCart();
                         updateCartDisplay();
+                        showNotification(`${shoppingCart[index].name} quantity decreased`);
+                    } else {
+                        // If quantity is 1, remove the item completely
+                        removeCartItemWithAnimation(index);
                     }
                 });
             });
-            
+           
             document.querySelectorAll('.increase-quantity').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const index = parseInt(this.dataset.index);
                     shoppingCart[index].quantity++;
                     saveCart();
                     updateCartDisplay();
+                    showNotification(`${shoppingCart[index].name} quantity increased`);
                 });
             });
-            
+           
+            // Add event listeners for remove buttons (dustbin icons)
             document.querySelectorAll('.remove-item').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const index = parseInt(this.dataset.index);
+                    removeCartItemWithAnimation(index);
+                });
+            });
+        }
+
+        function removeCartItemWithAnimation(index) {
+            const cartItemElements = document.querySelectorAll('.cart-item');
+            
+            if (cartItemElements[index]) {
+                // Add removing class for animation
+                cartItemElements[index].classList.add('removing');
+                
+                // Get item name before removing for notification
+                const itemName = shoppingCart[index].name;
+                
+                // Wait for animation to complete, then remove from cart
+                setTimeout(() => {
                     shoppingCart.splice(index, 1);
                     saveCart();
                     updateCartDisplay();
-                });
-            });
+                    showNotification(`${itemName} removed from cart`);
+                }, 300); // Match the animation duration
+            } else {
+                // Fallback if animation element not found
+                const itemName = shoppingCart[index].name;
+                shoppingCart.splice(index, 1);
+                saveCart();
+                updateCartDisplay();
+                showNotification(`${itemName} removed from cart`);
+            }
         }
 
         function saveCart() {
@@ -1963,9 +2086,9 @@
                 alert('Your cart is empty!');
                 return;
             }
-            
+           
             const totalPrice = shoppingCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            
+           
             let cartSummaryHTML = '';
             shoppingCart.forEach(item => {
                 cartSummaryHTML += `
@@ -1975,15 +2098,15 @@
                     </div>
                 `;
             });
-            
+           
             const menuSection = document.getElementById('menu-section');
             menuSection.innerHTML = `
                 <button class="back-button" id="back-to-cart">
                     <i class="fas fa-arrow-left"></i> Back to Cart
                 </button>
                 <div class="checkout-container">
-                    <h2 class="checkout-title">Secure M-Pesa Checkout</h2>
-                    
+                    <h2 class="checkout-title">Secure Checkout</h2>
+                   
                     <div class="checkout-summary">
                         <div class="summary-header">Order Summary</div>
                         ${cartSummaryHTML}
@@ -1992,7 +2115,7 @@
                             <span>Ksh ${totalPrice.toLocaleString()}</span>
                         </div>
                     </div>
-                    
+                   
                     <div class="checkout-summary">
                         <div class="summary-header">Delivery Information</div>
                         <div class="summary-item">
@@ -2004,10 +2127,14 @@
                             <span>Table Delivery</span>
                         </div>
                     </div>
-                    
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/M-PESA_LOGO-01.svg/2560px-M-PESA_LOGO-01.svg.png" alt="M-Pesa Logo" class="mpesa-logo" height="40">
-                    
-                    <form id="mpesa-form">
+                   
+                    <div class="payment-methods">
+                        <div style="color: #aaa; font-size: 0.9rem; margin: 10px 0;">
+                            Payment options (M-Pesa, Card, Airtel Money, etc.) will be selected on the Paystack checkout page.
+                        </div>
+                    </div>
+
+                    <form id="payment-form">
                         <div class="form-group">
                             <label class="form-label" for="table-number">Table Number</label>
                             <div class="table-number-input">
@@ -2015,132 +2142,254 @@
                                 <input type="number" id="table-number" class="form-input" value="${tableNumber}" min="1" max="50" required>
                             </div>
                         </div>
-                        
+
                         <div class="form-group">
-                            <label class="form-label" for="phone">M-Pesa Phone Number</label>
-                            <input type="tel" id="phone" class="form-input" placeholder="07XX XXX XXX" value="${currentUser.phone || ''}" required>
+                            <label class="form-label" for="phone">Phone Number</label>
+                            <input type="tel" id="phone" class="form-input" placeholder="07XX XXX XXX" value="${currentUser.phone || '0746671216'}" required>
                         </div>
-                        
                         <div class="form-group">
                             <label class="form-label" for="name">Full Name</label>
                             <input type="text" id="name" class="form-input" value="${currentUser.username || currentUser.email.split('@')[0]}" required>
                         </div>
-                        
+
                         <div class="form-group">
                             <label class="form-label" for="email">Email Address</label>
-                            <input type="email" id="email" class="form-input" value="${currentUser.email || ''}">
+                            <input type="email" id="email" class="form-input" value="${currentUser.email || ''}" required>
                         </div>
-                        
-                        <button type="submit" class="pay-button">
-                            <i class="fas fa-lock"></i> Pay Ksh ${totalPrice.toLocaleString()} via M-Pesa
+
+                        <button type="submit" id="paystack-button" class="pay-button">
+                            <i class="fas fa-lock"></i> Pay Ksh ${totalPrice.toLocaleString()} with Paystack
                         </button>
                     </form>
                 </div>
             `;
-            
+
             document.getElementById('back-to-cart').addEventListener('click', () => {
                 location.reload();
             });
-            
+
             document.getElementById('cart-panel').classList.remove('active');
-            
-            document.getElementById('mpesa-form').addEventListener('submit', async (e) => {
+
+            document.getElementById('payment-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 await processPayment(totalPrice);
             });
         }
 
+        // Direct Paystack integration without API calls
         async function processPayment(totalPrice) {
-            const phone = document.getElementById('phone').value;
-            const name = document.getElementById('name').value;
-            const email = document.getElementById('email').value;
-            const tableNumberInput = document.getElementById('table-number').value;
-            
-            if (!phone.match(/^07[0-9]{8}$/)) {
-                alert('Please enter a valid M-Pesa phone number (format: 07XXXXXXXX)');
-                return;
-            }
-            
+            const phone = document.getElementById('phone')?.value || '';
+            const name = document.getElementById('name')?.value || '';
+            const email = document.getElementById('email')?.value || '';
+            const tableNumberInput = document.getElementById('table-number')?.value || '';
+
             if (!name.trim()) {
                 alert('Please enter your full name');
                 return;
             }
-            
+
+            if (!tableNumberInput) {
+                alert('Please enter your table number');
+                return;
+            }
+
+            if (!phone.match(/^07[0-9]{8}$/)) {
+                alert('Please enter a valid phone number (format: 07XXXXXXXX)');
+                return;
+            }
+
+            if (!email) {
+                alert('Please enter your email address');
+                return;
+            }
+
             tableNumber = tableNumberInput;
             localStorage.setItem('alCaponeTableNumber', tableNumber);
             document.getElementById('current-table-number').textContent = tableNumber;
-            
+
             currentUser.phone = phone;
             currentUser.username = name;
             if (email) currentUser.email = email;
             localStorage.setItem('alCaponeClubUser', JSON.stringify(currentUser));
-            
-            const orderId = 'AC-' + Date.now().toString().slice(-8);
-            
-            const orderData = {
-                order_id: orderId,
-                user_id: currentUser.userId,
-                username: name,
-                user_email: email,
-                phone: phone,
-                table_number: parseInt(tableNumber),
-                items: shoppingCart,
-                total_amount: totalPrice,
-                status: 'pending',
-                payment_status: 'success',
-                payment_method: 'M-Pesa',
-                created_at: new Date().toISOString()
-            };
-            
-            console.log('Saving order to database:', orderData);
-            
+
+            const orderId = 'AC-' + Date.now().toString().slice(-8) + '-' + Math.random().toString(36).substr(2, 5).toUpperCase();
+
             try {
+                showNotification('Initializing Paystack payment...');
+
+                const transactionRef = 'AC-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+
+                // Save pending order to localStorage
+                const pendingOrder = {
+                    order_id: orderId,
+                    username: name,
+                    user_email: email,
+                    phone: phone,
+                    table_number: parseInt(tableNumber),
+                    items: shoppingCart,
+                    total_amount: totalPrice,
+                    status: 'pending',
+                    payment_status: 'pending',
+                    payment_method: 'Paystack',
+                    payment_reference: transactionRef,
+                    created_at: new Date().toISOString()
+                };
+
+                localStorage.setItem('alCaponePendingPaystack', JSON.stringify(pendingOrder));
+
+                // Initialize Paystack payment
+                const handler = PaystackPop.setup({
+                    key: PAYSTACK_PUBLIC_KEY,
+                    email: email,
+                    amount: Math.round(totalPrice * 100), // Convert to kobo (smallest currency unit)
+                    currency: 'KES',
+                    ref: transactionRef,
+                    metadata: {
+                        custom_fields: [
+                            {
+                                display_name: 'Table Number',
+                                variable_name: 'table_number',
+                                value: tableNumber
+                            },
+                            {
+                                display_name: 'Customer Name',
+                                variable_name: 'customer_name',
+                                value: name
+                            },
+                            {
+                                display_name: 'Phone',
+                                variable_name: 'phone',
+                                value: phone
+                            }
+                        ]
+                    },
+                    callback: function(response) {
+                        // Payment was successful
+                        console.log('Paystack callback response:', response);
+                        
+                        if (response.status === 'success') {
+                            showNotification('Payment successful! Processing order...');
+                            finalizePaystackPayment(transactionRef);
+                        } else {
+                            alert('Payment was not successful. Please try again.');
+                        }
+                    },
+                    onClose: function() {
+                        // User closed the payment modal
+                        alert('Payment window closed. If you completed payment, your order will be processed shortly.');
+                    }
+                });
+
+                handler.openIframe();
+
+            } catch (error) {
+                console.error('Payment processing error:', error);
+                alert('Payment processing failed: ' + error.message);
+            }
+        }
+
+        async function finalizePaystackPayment(reference) {
+            try {
+                if (!reference) {
+                    throw new Error('Missing payment reference');
+                }
+
+                showNotification('Processing your order...');
+
+                // Get pending order from localStorage
+                const pendingRaw = localStorage.getItem('alCaponePendingPaystack');
+                const pending = pendingRaw ? JSON.parse(pendingRaw) : null;
+
+                if (!pending) {
+                    throw new Error('No pending Paystack order found');
+                }
+
+                // Update pending order with success status
+                const orderData = {
+                    ...pending,
+                    payment_status: 'success',
+                    payment_reference: reference,
+                    status: 'pending' // Order is pending until delivered
+                };
+
+                // Save to Supabase
+                const orderDataToSave = await createOrder(orderData);
+
+                // Clear pending order from localStorage
+                localStorage.removeItem('alCaponePendingPaystack');
+
+                // Show success modal
+                showSuccessModal(orderDataToSave);
+                
+                // Clear cart
+                shoppingCart = [];
+                saveCart();
+                updateCartDisplay();
+                
+                // Update pending orders count
+                await loadPendingOrdersCount();
+
+            } catch (error) {
+                console.error('Paystack finalize error:', error);
+                alert('Order processing error: ' + error.message);
+            }
+        }
+
+        async function createOrder(orderData) {
+            let payload = { ...orderData };
+
+            // Ensure user_id exists
+            if (!payload.user_id && currentUser && currentUser.userId) {
+                payload.user_id = currentUser.userId;
+            }
+
+            for (let attempt = 0; attempt < 4; attempt++) {
                 const { data, error } = await supabase
                     .from('orders')
-                    .insert([orderData]);
-                
-                if (error) {
-                    console.error('Supabase insert error:', error);
-                    alert('Failed to save order: ' + error.message);
-                    return;
+                    .insert([payload]);
+
+                if (!error) {
+                    console.log('Order saved successfully:', data);
+                    return payload;
                 }
-                
-                console.log('Order saved successfully:', data);
-                
-                showNotification(`Processing M-Pesa payment of Ksh ${totalPrice.toLocaleString()}...`);
-                
-                setTimeout(() => {
-                    showSuccessModal(orderData);
-                    
-                    shoppingCart = [];
-                    saveCart();
-                    updateCartDisplay();
-                    
-                    loadPendingOrdersCount();
-                    
-                }, 3000);
-                
-            } catch (error) {
-                console.error('Error in payment process:', error);
-                alert('Failed to process payment. Please try again.');
+
+                const missingColumnMatch = error?.message?.match(/Could not find the '([^']+)' column/);
+                if (missingColumnMatch && missingColumnMatch[1]) {
+                    const missingColumn = missingColumnMatch[1];
+                    const nextPayload = { ...payload };
+                    delete nextPayload[missingColumn];
+                    payload = nextPayload;
+                    continue;
+                }
+
+                if (error && (error.code === '23503' || (error.message && error.message.includes('violates foreign key constraint')))) {
+                    payload = { ...payload, user_id: null };
+                    continue;
+                }
+
+                console.error('Supabase insert error:', error);
+                throw new Error('Failed to save order: ' + error.message);
             }
+
+            throw new Error('Failed to save order: Order insert failed after multiple retries');
         }
 
         function showSuccessModal(orderData) {
             console.log('Showing success modal for order:', orderData);
-            
+           
             const successDetails = document.getElementById('success-details');
-            
-            let orderItemsHTML = orderData.items.map(item => 
+           
+            let orderItemsHTML = (orderData.items || []).map(item =>
                 `<p>• ${item.name} x${item.quantity} - Ksh ${(item.price * item.quantity).toLocaleString()}</p>`
             ).join('');
-            
+           
             successDetails.innerHTML = `
                 <p><strong>Order Reference:</strong> ${orderData.order_id}</p>
                 <p><strong>Customer Name:</strong> ${orderData.username}</p>
                 <p><strong>Table Number:</strong> ${orderData.table_number}</p>
-                <p><strong>M-Pesa Number:</strong> ${orderData.phone}</p>
+                <p><strong>Phone:</strong> ${orderData.phone}</p>
                 ${orderData.user_email ? `<p><strong>Email:</strong> ${orderData.user_email}</p>` : ''}
+                <p><strong>Payment Reference:</strong> ${orderData.payment_reference}</p>
                 <p><strong>Order Items:</strong></p>
                 ${orderItemsHTML}
                 <p><strong>Total Amount:</strong> Ksh ${orderData.total_amount.toLocaleString()}</p>
@@ -2150,42 +2399,42 @@
                     <i class="fas fa-check-circle"></i> Thank you for choosing Al-Capone Thika Road
                 </p>
             `;
-            
+           
             document.getElementById('success-modal').classList.add('active');
         }
 
-        // Load orders from database - SIMPLIFIED AND FIXED
+        // Load orders from database
         async function loadOrders(type) {
             const ordersList = document.querySelector('.orders-list');
             const noOrders = document.getElementById('no-orders');
-            
+           
             ordersList.innerHTML = '';
             noOrders.style.display = 'none';
-            
+           
             try {
                 if (!currentUser || !currentUser.userId) {
                     ordersList.innerHTML = '<div class="no-orders"><p>Please login to view orders</p></div>';
                     return;
                 }
-                
+               
                 const userId = currentUser.userId;
                 const status = type === 'pending' ? 'pending' : 'delivered';
-                
+               
                 console.log(`Loading ${status} orders for user: ${userId}`);
-                
+               
                 const { data: orders, error } = await supabase
                     .from('orders')
                     .select('*')
                     .eq('user_id', userId)
                     .eq('status', status)
                     .order('created_at', { ascending: false });
-                
+               
                 if (error) {
                     console.error('Error loading orders:', error);
                     ordersList.innerHTML = '<div class="no-orders"><p>No orders found</p></div>';
                     return;
                 }
-                
+               
                 if (!orders || orders.length === 0) {
                     noOrders.style.display = 'block';
                     if (type === 'pending') {
@@ -2194,12 +2443,12 @@
                     }
                     return;
                 }
-                
+               
                 if (type === 'pending') {
                     pendingOrdersCount = orders.length;
                     document.getElementById('pending-count').textContent = pendingOrdersCount;
                 }
-                
+               
                 orders.forEach(order => {
                     let itemsHTML = '';
                     if (order.items && Array.isArray(order.items)) {
@@ -2212,7 +2461,7 @@
                             `;
                         });
                     }
-                    
+                   
                     const orderCard = document.createElement('div');
                     orderCard.className = 'order-card';
                     orderCard.innerHTML = `
@@ -2236,7 +2485,7 @@
                     `;
                     ordersList.appendChild(orderCard);
                 });
-                
+               
             } catch (error) {
                 console.error('Error loading orders:', error);
                 ordersList.innerHTML = '<div class="no-orders"><p>No orders found</p></div>';
@@ -2249,15 +2498,15 @@
                     document.getElementById('pending-count').textContent = '0';
                     return;
                 }
-                
+               
                 const userId = currentUser.userId;
-                
+               
                 const { data: orders, error } = await supabase
                     .from('orders')
                     .select('*')
                     .eq('user_id', userId)
                     .eq('status', 'pending');
-                
+               
                 if (!error && orders) {
                     pendingOrdersCount = orders.length;
                     document.getElementById('pending-count').textContent = pendingOrdersCount;
@@ -2271,7 +2520,7 @@
             }
         }
 
-        // FIXED: Logout now redirects to index.html
+        // Logout function
         function logout() {
             // Clear all local storage
             localStorage.clear();
@@ -2297,14 +2546,14 @@
             `;
             notification.textContent = message;
             document.body.appendChild(notification);
-            
+           
             setTimeout(() => {
                 notification.style.animation = 'slideOut 0.3s ease';
                 setTimeout(() => {
                     document.body.removeChild(notification);
                 }, 300);
             }, 2000);
-            
+           
             if (!document.querySelector('#notification-styles')) {
                 const style = document.createElement('style');
                 style.id = 'notification-styles';

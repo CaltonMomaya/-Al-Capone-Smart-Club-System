@@ -1,0 +1,9 @@
+# Server Configuration
+PORT=3001
+
+# Paystack Configuration
+PAYSTACK_SECRET_KEY=sk_live_36a20138e5e8018ad76a3d54bb6e03fb74ec8957
+PAYSTACK_PUBLIC_KEY=pk_live_e11c35bd52ae9dd8d100dedd022e3e9b7c434c7a
+
+# Environment (development/production)
+NODE_ENV=development
