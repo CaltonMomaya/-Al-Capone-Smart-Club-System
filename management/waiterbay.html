@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>WaiterBay - Al Capone Club Orders</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -30,6 +35,7 @@
             --table-even: rgba(212, 175, 55, 0.05);
             --occupied-color: #8B4513;
             --vacant-color: #2e8b57;
+            --assigned-color: #1a73e8;
         }
 
         body {
@@ -51,6 +57,132 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+        }
+
+        /* User Profile Section */
+        .user-profile {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(30, 30, 30, 0.9);
+            padding: 8px 15px;
+            border-radius: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--accent-color), var(--highlight-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--highlight-color);
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            color: rgba(245, 245, 245, 0.7);
+        }
+
+        /* Online Waiters Badge */
+        .online-waiters {
+            position: fixed;
+            top: 15px;
+            right: 180px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(30, 30, 30, 0.9);
+            padding: 8px 15px;
+            border-radius: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .online-waiters .pulse {
+            width: 8px;
+            height: 8px;
+            background-color: #4CAF50;
+            border-radius: 50%;
+            animation: pulse-dot 1.5s infinite;
+        }
+
+        .online-waiters span {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #4CAF50;
+        }
+
+        .online-count {
+            background: #4CAF50;
+            color: white;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        /* Assigned Orders Badge */
+        .assigned-orders-badge {
+            position: fixed;
+            top: 15px;
+            right: 320px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(30, 30, 30, 0.9);
+            padding: 8px 15px;
+            border-radius: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(26, 115, 232, 0.3);
+        }
+
+        .assigned-orders-badge span {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--assigned-color);
+        }
+
+        .assigned-count {
+            background: var(--assigned-color);
+            color: white;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: bold;
         }
 
         /* Hamburger Menu */
@@ -131,6 +263,25 @@
             margin-bottom: 0.5rem;
         }
 
+        .menu-user-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .menu-user-name {
+            font-weight: 600;
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        .menu-user-role {
+            color: var(--highlight-color);
+            font-size: 0.85rem;
+        }
+
         .menu-item {
             display: flex;
             align-items: center;
@@ -207,7 +358,7 @@
         /* Real-time Status */
         .real-time-status {
             position: fixed;
-            top: 15px;
+            top: 80px;
             right: 15px;
             z-index: 1000;
             background-color: #4CAF50;
@@ -382,6 +533,17 @@
             animation: pulse 2s infinite;
         }
 
+        .assigned-badge {
+            display: inline-block;
+            background-color: var(--assigned-color);
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            margin-left: 0.5rem;
+        }
+
         @keyframes pulse {
             0% {
                 box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7);
@@ -441,6 +603,12 @@
         .status-success {
             color: var(--success-color);
             font-weight: 600;
+        }
+
+        .assigned-to {
+            color: var(--assigned-color);
+            font-weight: 600;
+            font-size: 0.9rem;
         }
 
         /* Action Buttons */
@@ -538,6 +706,74 @@
             color: rgba(245, 245, 245, 0.8);
             text-transform: uppercase;
             letter-spacing: 0.5px;
+        }
+
+        /* Online Waiters Section */
+        .online-waiters-section {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        .online-waiters-section h3 {
+            font-size: 1.1rem;
+            color: var(--highlight-color);
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .waiters-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .waiter-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.6rem 0.8rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .waiter-info {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .waiter-avatar {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #4CAF50, #8BC34A);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .waiter-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .waiter-orders {
+            background: var(--assigned-color);
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            min-width: 24px;
+            text-align: center;
         }
 
         /* Table Arrangement with Pagination */
@@ -690,12 +926,6 @@
             background-color: #b8860b;
         }
 
-        /* Chair positions */
-        .chair-1 { top: 0; left: 50%; transform: translateX(-50%); }
-        .chair-2 { top: 50%; right: 0; transform: translateY(-50%); }
-        .chair-3 { bottom: 0; left: 50%; transform: translateX(-50%); }
-        .chair-4 { top: 50%; left: 0; transform: translateY(-50%); }
-
         /* Table Info */
         .table-info {
             margin-top: 0.5rem;
@@ -812,6 +1042,7 @@
         .legend-vip { background-color: var(--gold-color); }
         .legend-order { background-color: var(--pending-color); }
         .legend-vip-request { background-color: var(--gold-color); }
+        .legend-assigned { background-color: var(--assigned-color); }
 
         /* Footer */
         .footer {
@@ -839,6 +1070,27 @@
 
         /* Responsive adjustments */
         @media (max-width: 768px) {
+            .user-profile {
+                top: 70px;
+                right: 15px;
+                padding: 6px 12px;
+            }
+            
+            .online-waiters,
+            .assigned-orders-badge {
+                display: none; /* Hide on mobile to save space */
+            }
+            
+            .user-avatar {
+                width: 30px;
+                height: 30px;
+                font-size: 0.9rem;
+            }
+            
+            .user-name {
+                font-size: 0.85rem;
+            }
+            
             .orders-table {
                 display: block;
                 overflow-x: auto;
@@ -902,6 +1154,22 @@
                 padding: 0.75rem;
             }
             
+            .user-profile {
+                position: relative;
+                top: 0;
+                right: 0;
+                margin: 0 auto 1rem;
+                width: fit-content;
+            }
+            
+            .real-time-status {
+                top: 60px;
+            }
+            
+            .header {
+                margin-top: 0;
+            }
+            
             .orders-section,
             .overview-section {
                 padding: 1rem;
@@ -935,6 +1203,28 @@
     </style>
 </head>
 <body>
+    <!-- User Profile Section -->
+    <div class="user-profile" id="user-profile">
+        <div class="user-avatar" id="user-avatar">W</div>
+        <div class="user-info">
+            <div class="user-name" id="user-name">Waiter</div>
+            <div class="user-role">Al Capone Club</div>
+        </div>
+    </div>
+
+    <!-- Online Waiters Badge -->
+    <div class="online-waiters" id="online-waiters">
+        <div class="pulse"></div>
+        <span>ONLINE</span>
+        <div class="online-count" id="online-count">0</div>
+    </div>
+
+    <!-- Assigned Orders Badge -->
+    <div class="assigned-orders-badge" id="assigned-orders-badge">
+        <span>ASSIGNED</span>
+        <div class="assigned-count" id="assigned-count">0</div>
+    </div>
+
     <!-- Real-time Status -->
     <div class="real-time-status" id="realTimeStatus">
         <div class="pulse"></div>
@@ -952,23 +1242,33 @@
     <div class="side-menu" id="side-menu">
         <div class="menu-header">
             <h3 class="menu-title">WaiterBay Menu</h3>
-            <div class="username-display" id="menu-username">Waiter</div>
+            <div class="menu-user-info">
+                <div class="menu-user-name" id="menu-username">Waiter</div>
+                <div class="menu-user-role" id="menu-userrole">Al Capone Club</div>
+                <div class="menu-user-role" id="menu-staffid" style="font-size: 0.75rem; color: rgba(255,255,255,0.5);">ID: Loading...</div>
+            </div>
         </div>
         
         <button class="menu-item active" id="menu-orders">
             <i class="fas fa-concierge-bell"></i>
-            <span>Current Orders</span>
+            <span>My Assigned Orders</span>
         </button>
         
         <button class="menu-item" id="menu-pending-orders">
             <i class="fas fa-clock"></i>
-            <span>Pending Orders</span>
+            <span>All Pending Orders</span>
             <span class="cart-count" id="pending-count" style="margin-left: auto; margin-right: 10px;">0</span>
         </button>
         
         <button class="menu-item" id="menu-delivered-orders">
             <i class="fas fa-check-circle"></i>
             <span>Delivered Orders</span>
+        </button>
+        
+        <button class="menu-item" id="menu-online-waiters">
+            <i class="fas fa-users"></i>
+            <span>Online Waiters</span>
+            <span class="cart-count" id="online-waiters-count" style="margin-left: auto; margin-right: 10px;">0</span>
         </button>
         
         <button class="menu-item logout" id="menu-logout">
@@ -980,8 +1280,8 @@
     <div class="container">
         <!-- Header Section -->
         <div class="header">
-            <h1 class="header-title">WaiterBay - Order Management</h1>
-            <p class="header-subtitle">Track and manage all club orders in real-time. New orders appear automatically without refresh.</p>
+            <h1 class="header-title">WaiterBay - Intelligent Order Management</h1>
+            <p class="header-subtitle">Orders are automatically distributed to online waiters. If a waiter logs out, orders are redistributed to remaining waiters.</p>
         </div>
 
         <!-- Main Content -->
@@ -989,7 +1289,7 @@
             <!-- Orders Section -->
             <div class="orders-section">
                 <div class="section-title">
-                    <span>Current Orders</span>
+                    <span>My Assigned Orders</span>
                     <div class="orders-count" id="orders-count">0 Orders</div>
                 </div>
                 
@@ -1010,8 +1310,8 @@
                     
                     <div id="empty-orders-message" class="empty-orders" style="display: none;">
                         <i class="fas fa-glass-cheers"></i>
-                        <h3>No Pending Orders</h3>
-                        <p>All orders have been delivered. New orders will appear automatically.</p>
+                        <h3>No Assigned Orders</h3>
+                        <p>You have no assigned orders. New orders will be automatically assigned to you.</p>
                     </div>
                 </div>
             </div>
@@ -1038,6 +1338,20 @@
                     <div class="stat-card">
                         <div class="stat-value" id="delivered-today">0</div>
                         <div class="stat-label">Delivered Today</div>
+                    </div>
+                </div>
+                
+                <!-- Online Waiters Section -->
+                <div class="online-waiters-section">
+                    <h3><i class="fas fa-users"></i> Online Waiters</h3>
+                    <div class="waiters-list" id="waiters-list">
+                        <div class="waiter-item">
+                            <div class="waiter-info">
+                                <div class="waiter-avatar">W</div>
+                                <div class="waiter-name">Loading...</div>
+                            </div>
+                            <div class="waiter-orders">0</div>
+                        </div>
                     </div>
                 </div>
                 
@@ -1075,8 +1389,8 @@
                             <span>Has Order</span>
                         </div>
                         <div class="legend-item">
-                            <div class="legend-color legend-vip-request"></div>
-                            <span>VIP Request</span>
+                            <div class="legend-color legend-assigned"></div>
+                            <span>Assigned</span>
                         </div>
                     </div>
                 </div>
@@ -1085,7 +1399,7 @@
 
         <!-- Footer -->
         <div class="footer">
-            <p>Al Capone Club &copy; 2025 | WaiterBay Order Management System v3.0 - REAL-TIME</p>
+            <p>Al Capone Club &copy; 2025 | Intelligent Order Distribution System v4.0</p>
         </div>
     </div>
 
@@ -1093,8 +1407,25 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/dist/umd/supabase.min.js"></script>
     
     <script>
+        // ============ FIREBASE INITIALIZATION ============
+        const firebaseConfig = {
+            apiKey: "AIzaSyDjtf0aVTQlf_sfYLUqpATuvVl5BJhz5ZM",
+            authDomain: "al-capone-b93f1.firebaseapp.com",
+            projectId: "al-capone-b93f1",
+            storageBucket: "al-capone-b93f1.firebasestorage.app",
+            messagingSenderId: "1043332301864",
+            appId: "1:1043332301864:web:1ff119a70a78646768611d",
+            measurementId: "G-GQSC3HHXLL"
+        };
+
+        // Initialize Firebase
+        const firebaseApp = firebase.initializeApp(firebaseConfig);
+        const auth = firebaseApp.auth();
+
+        // ============ MAIN VARIABLES ============
         let supabase;
         let orders = [];
+        let myOrders = [];
         let tables = [];
         let deliveredToday = 0;
         let currentPage = 1;
@@ -1102,8 +1433,15 @@
         const vipTables = [1, 6, 7];
         let newOrderIds = new Set();
         let refreshInterval;
-        const REFRESH_INTERVAL = 3000;
+        const REFRESH_INTERVAL = 5000; // 5 seconds for better distribution
+        let userSession = null;
+        let onlineWaiters = [];
+        let heartbeatInterval;
+        const HEARTBEAT_INTERVAL = 30000; // 30 seconds heartbeat
+        let distributionInterval;
+        const DISTRIBUTION_INTERVAL = 10000; // 10 seconds for distribution check
         
+        // ============ DOM ELEMENTS ============
         const ordersBody = document.getElementById('orders-body');
         const emptyOrdersMessage = document.getElementById('empty-orders-message');
         const ordersCount = document.getElementById('orders-count');
@@ -1115,34 +1453,798 @@
         const nextPageBtn = document.getElementById('next-page');
         const pageInfo = document.getElementById('page-info');
         const realTimeStatus = document.getElementById('realTimeStatus');
-        
+        const userNameElement = document.getElementById('user-name');
+        const userAvatarElement = document.getElementById('user-avatar');
+        const menuUserNameElement = document.getElementById('menu-username');
+        const menuUserRoleElement = document.getElementById('menu-userrole');
+        const menuStaffIdElement = document.getElementById('menu-staffid');
+        const onlineCountElement = document.getElementById('online-count');
+        const assignedCountElement = document.getElementById('assigned-count');
+        const onlineWaitersCountElement = document.getElementById('online-waiters-count');
+        const waitersListElement = document.getElementById('waiters-list');
+
         document.addEventListener('DOMContentLoaded', async function() {
-            console.log("🚀 Initializing WaiterBay REAL-TIME System...");
+            console.log("🚀 Initializing Intelligent Order Distribution System...");
+            
+            // Check authentication first
+            const isAuthenticated = await checkAuthentication();
+            
+            if (!isAuthenticated) {
+                // Redirect to login page
+                window.location.href = 'index.html';
+                return;
+            }
             
             try {
+                // Load user session from localStorage
+                loadUserSession();
+                
+                // Initialize Supabase
                 const supabaseUrl = "https://tfuwozhljthmxxcztfws.supabase.co";
                 const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRmdXdvemhsanRobXh4Y3p0ZndzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5OTA0NjEsImV4cCI6MjA4MTU2NjQ2MX0.7stJZibmLvBk0-oEQk6XSfjsfXaqYf9_O3308ZBOTjc";
                 
                 supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
                 console.log("✅ Supabase initialized");
                 
+                // Register waiter as online
+                await registerWaiterOnline();
+                
+                // Update UI with user info
+                updateUserDisplay();
+                
+                // Initialize the rest of the system
                 initUI();
                 initEventListeners();
+                await loadOnlineWaiters();
                 await loadOrdersFromDatabase();
                 initializeTables();
                 renderTableMockups();
                 updateStats();
                 startAutoRefresh();
+                startHeartbeat();
+                startDistributionSystem();
                 tryWebSocketConnection();
                 
-                console.log("✅ System ready - Auto-refresh every 3 seconds");
+                console.log("✅ Intelligent distribution system ready!");
                 
             } catch (error) {
                 console.error("❌ Failed to initialize:", error);
-                showNotification('Service temporarily unavailable. Please try again later.');
+                showNotification('Service temporarily unavailable. Please try again later.', 'error');
             }
         });
 
+        // ============ AUTHENTICATION FUNCTIONS ============
+        async function checkAuthentication() {
+            return new Promise((resolve) => {
+                auth.onAuthStateChanged(async (firebaseUser) => {
+                    if (firebaseUser) {
+                        console.log("✅ User authenticated:", firebaseUser.email);
+                        
+                        // Check if session exists in localStorage
+                        const sessionData = localStorage.getItem('AlCaponeClubStaff');
+                        if (sessionData) {
+                            userSession = JSON.parse(sessionData);
+                            console.log("✅ Session loaded:", userSession);
+                            resolve(true);
+                        } else {
+                            console.log("❌ No session found, redirecting to login");
+                            resolve(false);
+                        }
+                    } else {
+                        console.log("❌ No Firebase user, checking localStorage");
+                        
+                        // Check localStorage for session
+                        const sessionData = localStorage.getItem('AlCaponeClubStaff');
+                        if (sessionData) {
+                            try {
+                                userSession = JSON.parse(sessionData);
+                                console.log("✅ Session found in localStorage:", userSession);
+                                
+                                // Try to sign in with Firebase using stored credentials
+                                // For security, we'll just use the session data
+                                resolve(true);
+                            } catch (error) {
+                                console.error("❌ Invalid session data:", error);
+                                resolve(false);
+                            }
+                        } else {
+                            console.log("❌ No session data found");
+                            resolve(false);
+                        }
+                    }
+                });
+                
+                // Timeout after 3 seconds
+                setTimeout(() => {
+                    const sessionData = localStorage.getItem('AlCaponeClubStaff');
+                    if (sessionData) {
+                        userSession = JSON.parse(sessionData);
+                        resolve(true);
+                    } else {
+                        resolve(false);
+                    }
+                }, 3000);
+            });
+        }
+
+        function loadUserSession() {
+            try {
+                const sessionData = localStorage.getItem('AlCaponeClubStaff');
+                if (sessionData) {
+                    userSession = JSON.parse(sessionData);
+                    console.log("✅ User session loaded:", userSession);
+                    return true;
+                }
+            } catch (error) {
+                console.error("❌ Error loading user session:", error);
+            }
+            return false;
+        }
+
+        function updateUserDisplay() {
+            if (userSession) {
+                // Extract initials for avatar
+                const initials = userSession.username 
+                    ? userSession.username.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
+                    : 'W';
+                
+                // Update user profile
+                userNameElement.textContent = userSession.username || 'Waiter';
+                userAvatarElement.textContent = initials;
+                menuUserNameElement.textContent = userSession.username || 'Waiter';
+                menuUserRoleElement.textContent = userSession.roleName || 'Waiter';
+                menuStaffIdElement.textContent = `ID: ${userSession.staffId || 'N/A'}`;
+                
+                console.log("✅ User display updated:", userSession.username);
+            }
+        }
+
+        // ============ WAITER ONLINE MANAGEMENT ============
+        async function registerWaiterOnline() {
+            try {
+                if (!userSession) {
+                    console.error("❌ No user session found");
+                    return;
+                }
+                
+                const waiterData = {
+                    waiter_id: userSession.firebaseUserId,
+                    staff_id: userSession.staffId,
+                    waiter_name: userSession.username,
+                    email: userSession.email,
+                    is_online: true,
+                    last_seen: new Date().toISOString()
+                };
+                
+                console.log("📝 Registering waiter as online:", waiterData);
+                
+                // FIRST: Delete any duplicate sessions for this waiter
+                const { error: deleteError } = await supabase
+                    .from('waiter_sessions')
+                    .delete()
+                    .eq('waiter_id', userSession.firebaseUserId);
+                
+                if (deleteError) {
+                    console.warn("⚠️ Could not delete previous sessions:", deleteError);
+                }
+                
+                // THEN: Insert new session
+                const { error } = await supabase
+                    .from('waiter_sessions')
+                    .insert([waiterData]);
+                
+                if (error) throw error;
+                console.log("✅ New waiter session created");
+                
+            } catch (error) {
+                console.error("❌ Error registering waiter online:", error);
+            }
+        }
+
+        async function updateWaiterHeartbeat() {
+            try {
+                if (!userSession) return;
+                
+                // Clean up old sessions first
+                const { error: cleanupError } = await supabase
+                    .from('waiter_sessions')
+                    .delete()
+                    .lt('last_seen', new Date(Date.now() - 60000).toISOString()) // Delete sessions older than 1 minute
+                    .neq('waiter_id', userSession.firebaseUserId); // Don't delete current user
+                
+                if (cleanupError) {
+                    console.warn("⚠️ Could not cleanup old sessions:", cleanupError);
+                }
+                
+                // Update current session
+                const { error } = await supabase
+                    .from('waiter_sessions')
+                    .update({
+                        last_seen: new Date().toISOString(),
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('waiter_id', userSession.firebaseUserId);
+                
+                if (error) {
+                    console.error("❌ Error updating heartbeat:", error);
+                    // Re-register if session was deleted
+                    if (error.code === 'PGRST116') { // Record not found
+                        console.log("🔄 Session not found, re-registering...");
+                        await registerWaiterOnline();
+                    }
+                }
+                
+            } catch (error) {
+                console.error("❌ Heartbeat error:", error);
+            }
+        }
+
+        async function markWaiterOffline() {
+            try {
+                if (!userSession) {
+                    console.log("⚠️ No user session, skipping offline marking");
+                    return;
+                }
+                
+                console.log("🚪 Marking waiter as offline:", userSession.username);
+                
+                // Delete the session entirely (better than marking offline)
+                const { error } = await supabase
+                    .from('waiter_sessions')
+                    .delete()
+                    .eq('waiter_id', userSession.firebaseUserId);
+                
+                if (error) {
+                    console.error("❌ Error deleting waiter session:", error);
+                    // Fallback to marking as offline
+                    const { error: updateError } = await supabase
+                        .from('waiter_sessions')
+                        .update({
+                            is_online: false,
+                            updated_at: new Date().toISOString()
+                        })
+                        .eq('waiter_id', userSession.firebaseUserId);
+                    
+                    if (updateError) throw updateError;
+                }
+                
+                console.log("✅ Waiter session removed");
+                
+                // Trigger redistribution of orders
+                setTimeout(() => {
+                    redistributeOrders().catch(err => console.error("Redistribution error:", err));
+                }, 1000);
+                
+            } catch (error) {
+                console.error("❌ Error marking waiter offline:", error);
+            }
+        }
+
+        async function loadOnlineWaiters() {
+            try {
+                console.log("👥 Loading online waiters...");
+                
+                const { data: waiters, error } = await supabase
+                    .from('waiter_sessions')
+                    .select('*')
+                    .eq('is_online', true)
+                    .order('last_seen', { ascending: false });
+                
+                if (error) throw error;
+                
+                // DEDUPLICATE waiters by waiter_id (keep only the most recent)
+                const uniqueWaiters = [];
+                const waiterMap = new Map();
+                
+                if (waiters) {
+                    waiters.forEach(waiter => {
+                        // Only add if not already in map (keeps first/oldest entry)
+                        // Or keep the most recent entry
+                        if (!waiterMap.has(waiter.waiter_id)) {
+                            waiterMap.set(waiter.waiter_id, waiter);
+                            uniqueWaiters.push(waiter);
+                        } else {
+                            console.log(`⚠️ Duplicate waiter found: ${waiter.waiter_name} (${waiter.waiter_id})`);
+                        }
+                    });
+                }
+                
+                onlineWaiters = uniqueWaiters;
+                console.log(`✅ Found ${onlineWaiters.length} unique online waiters (${waiters ? waiters.length : 0} total entries)`);
+                
+                // Update UI
+                updateOnlineWaitersDisplay();
+                
+                return onlineWaiters;
+                
+            } catch (error) {
+                console.error("❌ Error loading online waiters:", error);
+                return [];
+            }
+        }
+
+        function updateOnlineWaitersDisplay() {
+            // Update count badges
+            onlineCountElement.textContent = onlineWaiters.length;
+            onlineWaitersCountElement.textContent = onlineWaiters.length;
+            
+            // Update waiters list
+            let waitersHTML = '';
+            
+            if (onlineWaiters.length === 0) {
+                waitersHTML = `
+                    <div class="waiter-item">
+                        <div class="waiter-info">
+                            <div class="waiter-avatar">!</div>
+                            <div class="waiter-name">No waiters online</div>
+                        </div>
+                        <div class="waiter-orders">0</div>
+                    </div>
+                `;
+            } else {
+                onlineWaiters.forEach(waiter => {
+                    // Get assigned orders count for this waiter
+                    const assignedOrders = orders.filter(order => order.assigned_to === waiter.waiter_id);
+                    const initials = waiter.waiter_name 
+                        ? waiter.waiter_name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
+                        : 'W';
+                    
+                    waitersHTML += `
+                    <div class="waiter-item ${waiter.waiter_id === userSession?.firebaseUserId ? 'current-waiter' : ''}">
+                        <div class="waiter-info">
+                            <div class="waiter-avatar">${initials}</div>
+                            <div class="waiter-name">
+                                ${waiter.waiter_name}
+                                ${waiter.waiter_id === userSession?.firebaseUserId ? ' (You)' : ''}
+                            </div>
+                        </div>
+                        <div class="waiter-orders">${assignedOrders.length}</div>
+                    </div>
+                    `;
+                });
+            }
+            
+            waitersListElement.innerHTML = waitersHTML;
+        }
+
+        // ============ INTELLIGENT ORDER DISTRIBUTION ============
+        async function distributeOrders() {
+            try {
+                console.log("🤖 Starting intelligent order distribution...");
+                
+                // Get all pending orders without assignment
+                const { data: unassignedOrders, error: unassignedError } = await supabase
+                    .from('orders')
+                    .select('*')
+                    .eq('status', 'pending')
+                    .is('assigned_to', null)
+                    .order('created_at', { ascending: true });
+                
+                if (unassignedError) throw unassignedError;
+                
+                // Get online waiters
+                const { data: onlineWaitersList, error: waitersError } = await supabase
+                    .from('waiter_sessions')
+                    .select('*')
+                    .eq('is_online', true);
+                
+                if (waitersError) throw waitersError;
+                
+                if (!onlineWaitersList || onlineWaitersList.length === 0) {
+                    console.log("⚠️ No online waiters to distribute orders to");
+                    return;
+                }
+                
+                // Get currently assigned orders count per waiter
+                const { data: assignedOrders, error: assignedError } = await supabase
+                    .from('orders')
+                    .select('assigned_to')
+                    .eq('status', 'pending')
+                    .not('assigned_to', 'is', null);
+                
+                if (assignedError) throw assignedError;
+                
+                // Calculate current load per waiter
+                const waiterLoad = {};
+                onlineWaitersList.forEach(waiter => {
+                    waiterLoad[waiter.waiter_id] = 0;
+                });
+                
+                assignedOrders.forEach(order => {
+                    if (order.assigned_to && waiterLoad[order.assigned_to] !== undefined) {
+                        waiterLoad[order.assigned_to]++;
+                    }
+                });
+                
+                console.log("📊 Current waiter load:", waiterLoad);
+                
+                // Distribute unassigned orders
+                if (unassignedOrders && unassignedOrders.length > 0) {
+                    console.log(`📦 Distributing ${unassignedOrders.length} unassigned orders`);
+                    
+                    for (const order of unassignedOrders) {
+                        // Find waiter with least load
+                        let minWaiterId = null;
+                        let minLoad = Infinity;
+                        
+                        for (const waiter of onlineWaitersList) {
+                            if (waiterLoad[waiter.waiter_id] < minLoad) {
+                                minLoad = waiterLoad[waiter.waiter_id];
+                                minWaiterId = waiter.waiter_id;
+                            }
+                        }
+                        
+                        if (minWaiterId) {
+                            // Assign order to waiter with least load
+                            const { error: assignError } = await supabase
+                                .from('orders')
+                                .update({
+                                    assigned_to: minWaiterId,
+                                    assignment_time: new Date().toISOString()
+                                })
+                                .eq('order_id', order.order_id);
+                            
+                            if (assignError) {
+                                console.error("❌ Error assigning order:", assignError);
+                            } else {
+                                waiterLoad[minWaiterId]++;
+                                console.log(`✅ Order ${order.order_id} assigned to waiter ${minWaiterId}`);
+                            }
+                        }
+                    }
+                }
+                
+                // Balance load across waiters (if one has significantly more orders)
+                await balanceWaiterLoad(onlineWaitersList, waiterLoad);
+                
+                // Reload orders after distribution
+                await loadOrdersFromDatabase();
+                
+            } catch (error) {
+                console.error("❌ Error in order distribution:", error);
+            }
+        }
+
+        async function balanceWaiterLoad(waiters, currentLoad) {
+            try {
+                console.log("⚖️ Checking load balance...");
+                
+                // Calculate average load
+                const totalOrders = Object.values(currentLoad).reduce((sum, load) => sum + load, 0);
+                const averageLoad = totalOrders / waiters.length;
+                
+                console.log(`📈 Average load: ${averageLoad.toFixed(1)} orders per waiter`);
+                
+                // Check if any waiter has significantly more than average
+                for (const waiter of waiters) {
+                    const waiterId = waiter.waiter_id;
+                    const currentWaiterLoad = currentLoad[waiterId] || 0;
+                    
+                    if (currentWaiterLoad > averageLoad + 2) { // If 2+ orders above average
+                        console.log(`⚠️ Waiter ${waiter.waiter_name} has ${currentWaiterLoad} orders (above average)`);
+                        
+                        // Find orders to reassign
+                        const { data: waiterOrders, error } = await supabase
+                            .from('orders')
+                            .select('*')
+                            .eq('assigned_to', waiterId)
+                            .eq('status', 'pending')
+                            .order('created_at', { ascending: true })
+                            .limit(Math.floor(currentWaiterLoad - averageLoad));
+                        
+                        if (error) throw error;
+                        
+                        if (waiterOrders && waiterOrders.length > 0) {
+                            // Find waiter with least load
+                            let minWaiterId = null;
+                            let minLoad = Infinity;
+                            
+                            for (const w of waiters) {
+                                if (w.waiter_id !== waiterId && (currentLoad[w.waiter_id] || 0) < minLoad) {
+                                    minLoad = currentLoad[w.waiter_id] || 0;
+                                    minWaiterId = w.waiter_id;
+                                }
+                            }
+                            
+                            if (minWaiterId) {
+                                // Reassign orders
+                                for (const order of waiterOrders) {
+                                    const { error: reassignError } = await supabase
+                                        .from('orders')
+                                        .update({
+                                            assigned_to: minWaiterId,
+                                            assignment_time: new Date().toISOString()
+                                        })
+                                        .eq('order_id', order.order_id);
+                                    
+                                    if (!reassignError) {
+                                        console.log(`🔄 Reassigned order ${order.order_id} from ${waiter.waiter_name} to ${minWaiterId}`);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+            } catch (error) {
+                console.error("❌ Error balancing waiter load:", error);
+            }
+        }
+
+        async function redistributeOrders() {
+            try {
+                console.log("🔄 Redistributing orders due to waiter logout...");
+                
+                // First, clean up any stale waiter sessions
+                const { data: allSessions, error: sessionsError } = await supabase
+                    .from('waiter_sessions')
+                    .select('*');
+                
+                if (sessionsError) throw sessionsError;
+                
+                // Identify stale sessions (older than 2 minutes)
+                const staleSessions = allSessions?.filter(session => {
+                    const lastSeen = new Date(session.last_seen);
+                    const now = new Date();
+                    return (now - lastSeen) > 120000; // 2 minutes
+                }) || [];
+                
+                if (staleSessions.length > 0) {
+                    console.log(`🗑️ Cleaning up ${staleSessions.length} stale sessions`);
+                    for (const session of staleSessions) {
+                        await supabase
+                            .from('waiter_sessions')
+                            .delete()
+                            .eq('waiter_id', session.waiter_id);
+                    }
+                }
+                
+                // Get current online waiters after cleanup
+                const { data: onlineWaitersList, error: waitersError } = await supabase
+                    .from('waiter_sessions')
+                    .select('waiter_id')
+                    .eq('is_online', true);
+                
+                if (waitersError) throw waitersError;
+                
+                const onlineWaiterIds = onlineWaitersList?.map(w => w.waiter_id) || [];
+                
+                // Find orders assigned to offline/nonexistent waiters
+                const { data: orphanedOrders, error: ordersError } = await supabase
+                    .from('orders')
+                    .select('*')
+                    .eq('status', 'pending')
+                    .not('assigned_to', 'is', null);
+                
+                if (ordersError) throw ordersError;
+                
+                if (orphanedOrders && orphanedOrders.length > 0) {
+                    const ordersToRedistribute = orphanedOrders.filter(order => 
+                        !onlineWaiterIds.includes(order.assigned_to)
+                    );
+                    
+                    if (ordersToRedistribute.length > 0) {
+                        console.log(`📦 Found ${ordersToRedistribute.length} orders to redistribute`);
+                        
+                        // Unassign these orders
+                        for (const order of ordersToRedistribute) {
+                            const { error: unassignError } = await supabase
+                                .from('orders')
+                                .update({
+                                    assigned_to: null,
+                                    assignment_time: null
+                                })
+                                .eq('order_id', order.order_id);
+                            
+                            if (!unassignError) {
+                                console.log(`✅ Unassigned order ${order.order_id}`);
+                            }
+                        }
+                        
+                        // Trigger new distribution
+                        await distributeOrders();
+                    }
+                }
+                
+            } catch (error) {
+                console.error("❌ Error redistributing orders:", error);
+            }
+        }
+
+        // ============ ORDER MANAGEMENT ============
+        async function loadOrdersFromDatabase() {
+            try {
+                console.log("📥 Loading orders from database...");
+                
+                // Load online waiters first
+                await loadOnlineWaiters();
+                
+                // Get all pending orders
+                const { data: ordersData, error } = await supabase
+                    .from('orders')
+                    .select('*')
+                    .eq('status', 'pending')
+                    .order('created_at', { ascending: true });
+                
+                if (error) {
+                    console.error("❌ Error loading orders:", error);
+                    showNotification('Error loading orders', 'error');
+                    return;
+                }
+                
+                orders = ordersData || [];
+                
+                // Filter orders assigned to current waiter
+                if (userSession) {
+                    myOrders = orders.filter(order => order.assigned_to === userSession.firebaseUserId);
+                } else {
+                    myOrders = [];
+                }
+                
+                console.log(`✅ Loaded ${orders.length} total orders, ${myOrders.length} assigned to me`);
+                
+                // Update assigned orders count
+                const assignedOrdersCount = orders.filter(order => order.assigned_to !== null).length;
+                assignedCountElement.textContent = assignedOrdersCount;
+                
+                orders.forEach(order => {
+                    newOrderIds.add(order.order_id);
+                });
+                
+                renderOrders();
+                updateTableStatusFromOrders();
+                
+            } catch (error) {
+                console.error("❌ Failed to load orders:", error);
+                showNotification('Failed to load orders', 'error');
+            }
+        }
+
+        function renderOrders() {
+            // Show only orders assigned to current waiter
+            const ordersToShow = myOrders;
+            
+            if (ordersToShow.length === 0) {
+                ordersBody.innerHTML = '';
+                emptyOrdersMessage.style.display = 'block';
+                ordersCount.textContent = '0 Orders';
+                return;
+            }
+            
+            emptyOrdersMessage.style.display = 'none';
+            ordersCount.textContent = `${ordersToShow.length} Order${ordersToShow.length !== 1 ? 's' : ''}`;
+            
+            const sortedOrders = [...ordersToShow].sort((a, b) => {
+                const aIsVip = vipTables.includes(a.table_number);
+                const bIsVip = vipTables.includes(b.table_number);
+                
+                if (aIsVip && !bIsVip) return -1;
+                if (!aIsVip && bIsVip) return 1;
+                
+                return new Date(a.created_at) - new Date(b.created_at);
+            });
+            
+            let ordersHTML = '';
+            sortedOrders.forEach(order => {
+                const itemsHTML = order.items.map(item => 
+                    `<div class="order-item">
+                        <span class="item-name">${item.name}</span>
+                        <span class="item-quantity">x${item.quantity}</span>
+                    </div>`
+                ).join('');
+                
+                const isVipTable = vipTables.includes(order.table_number);
+                const vipBadge = isVipTable ? '<span class="vip-table-badge">VIP</span>' : '';
+                
+                // Show who it's assigned to (if not current waiter)
+                let assignedBadge = '';
+                if (order.assigned_to && order.assigned_to !== userSession?.firebaseUserId) {
+                    const assignedWaiter = onlineWaiters.find(w => w.waiter_id === order.assigned_to);
+                    if (assignedWaiter) {
+                        assignedBadge = `<span class="assigned-badge">${assignedWaiter.waiter_name}</span>`;
+                    }
+                }
+                
+                const isNewOrder = newOrderIds.has(order.order_id);
+                const newOrderClass = isNewOrder ? 'new-order-row' : '';
+                
+                ordersHTML += `
+                <tr class="${newOrderClass}" id="order-${order.order_id}">
+                    <td class="order-id" data-label="Order ID">${order.order_id}</td>
+                    <td data-label="Table">
+                        <div class="table-number">${order.table_number}</div>
+                        ${vipBadge}
+                        ${assignedBadge}
+                    </td>
+                    <td class="order-items" data-label="Items">${itemsHTML}</td>
+                    <td class="status-pending" data-label="Status">${order.status.toUpperCase()}</td>
+                    <td class="status-success" data-label="Payment">${(order.payment_status || 'success').toUpperCase()}</td>
+                    <td data-label="Actions">
+                        <div class="action-buttons">
+                            <button class="btn btn-deliver" onclick="deliverOrder('${order.order_id}')">
+                                <i class="fas fa-check-circle"></i> Mark Delivered
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                `;
+            });
+            
+            ordersBody.innerHTML = ordersHTML;
+            
+            if (newOrderIds.size > 0) {
+                setTimeout(() => {
+                    const newRows = document.querySelectorAll('.new-order-row');
+                    newRows.forEach(row => {
+                        row.classList.remove('new-order-row');
+                    });
+                    newOrderIds.clear();
+                }, 3000);
+            }
+        }
+
+        async function deliverOrder(orderId) {
+            console.log("🚚 Delivering order:", orderId);
+            
+            try {
+                const orderIndex = orders.findIndex(order => order.order_id === orderId);
+                
+                if (orderIndex === -1) {
+                    console.error("Order not found in local array:", orderId);
+                    showNotification('Order not found', 'error');
+                    return;
+                }
+                
+                const order = orders[orderIndex];
+                const currentTime = new Date().toISOString();
+                
+                console.log("Updating order in database:", orderId, "to status: delivered");
+                
+                const { data, error } = await supabase
+                    .from('orders')
+                    .update({ 
+                        status: 'delivered',
+                        delivered_at: currentTime,
+                        assigned_to: null // Unassign when delivered
+                    })
+                    .eq('order_id', orderId);
+                
+                if (error) {
+                    console.error("Error delivering order:", error);
+                    throw error;
+                }
+                
+                console.log("Database update successful");
+                
+                // Remove from local arrays
+                orders.splice(orderIndex, 1);
+                const myOrderIndex = myOrders.findIndex(o => o.order_id === orderId);
+                if (myOrderIndex !== -1) {
+                    myOrders.splice(myOrderIndex, 1);
+                }
+                newOrderIds.delete(orderId);
+                
+                deliveredToday++;
+                localStorage.setItem('waiterbayDeliveredToday', deliveredToday);
+                deliveredTodayElement.textContent = deliveredToday;
+                
+                updateTableStatusFromOrders();
+                renderOrders();
+                renderTableMockups();
+                updateStats();
+                
+                showNotification(`✅ Order ${orderId} from Table ${order.table_number} delivered!`, 'success');
+                
+                // Trigger redistribution since this waiter now has fewer orders
+                await distributeOrders();
+                
+            } catch (error) {
+                console.error('❌ Failed to deliver order:', error);
+                showNotification('Failed to mark order as delivered. Please check your connection.', 'error');
+            }
+        }
+
+        // ============ SYSTEM MANAGEMENT ============
         function initUI() {
             const savedDelivered = localStorage.getItem('waiterbayDeliveredToday');
             if (savedDelivered) {
@@ -1158,15 +2260,33 @@
                 closeSideMenu();
             });
             
-            document.getElementById('menu-pending-orders').addEventListener('click', () => {
+            document.getElementById('menu-pending-orders').addEventListener('click', async () => {
                 closeSideMenu();
+                // Show all pending orders temporarily
+                const tempOrders = [...orders];
+                renderAllOrders(tempOrders);
             });
             
             document.getElementById('menu-delivered-orders').addEventListener('click', () => {
                 closeSideMenu();
+                showNotification('Delivered orders feature coming soon!', 'info');
             });
             
-            document.getElementById('menu-logout').addEventListener('click', logout);
+            document.getElementById('menu-online-waiters').addEventListener('click', () => {
+                closeSideMenu();
+                // Already showing in overview
+            });
+            
+            // FIXED LOGOUT HANDLER - Immediate response
+            document.getElementById('menu-logout').addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Show confirmation dialog
+                if (confirm('Are you sure you want to logout? Your orders will be redistributed to other waiters.')) {
+                    logout();
+                }
+            });
             
             prevPageBtn.addEventListener('click', () => {
                 if (currentPage > 1) {
@@ -1193,6 +2313,17 @@
                     closeSideMenu();
                 }
             });
+            
+            // Handle page visibility change
+            document.addEventListener('visibilitychange', function() {
+                if (document.hidden) {
+                    console.log("📱 Page is hidden");
+                } else {
+                    console.log("📱 Page is visible");
+                    // Update heartbeat when user comes back
+                    updateWaiterHeartbeat();
+                }
+            });
         }
 
         function toggleSideMenu() {
@@ -1207,56 +2338,6 @@
             document.getElementById('hamburger-menu').classList.remove('active');
         }
 
-        function initializeTables() {
-            tables = [];
-            for (let i = 1; i <= 12; i++) {
-                const isVip = vipTables.includes(i);
-                tables.push({
-                    id: i,
-                    status: 'vacant',
-                    type: isVip ? 'vip' : 'regular',
-                    seats: isVip ? 4 : (i % 2 === 0 ? 2 : 4),
-                    hasOrder: false,
-                    orderCount: 0,
-                    hasVipRequest: false
-                });
-            }
-            
-            updateTableStatusFromOrders();
-        }
-
-        async function loadOrdersFromDatabase() {
-            try {
-                console.log("📥 Loading orders from database...");
-                
-                const { data: ordersData, error } = await supabase
-                    .from('orders')
-                    .select('*')
-                    .eq('status', 'pending')
-                    .order('created_at', { ascending: true });
-                
-                if (error) {
-                    console.error("❌ Error loading orders:", error);
-                    showNotification('Error loading orders');
-                    return;
-                }
-                
-                orders = ordersData || [];
-                console.log(`✅ Loaded ${orders.length} orders`);
-                
-                orders.forEach(order => {
-                    newOrderIds.add(order.order_id);
-                });
-                
-                renderOrders();
-                updateTableStatusFromOrders();
-                
-            } catch (error) {
-                console.error("❌ Failed to load orders:", error);
-                showNotification('Failed to load orders');
-            }
-        }
-
         function startAutoRefresh() {
             console.log(`🔄 Starting auto-refresh every ${REFRESH_INTERVAL/1000} seconds`);
             
@@ -1267,12 +2348,41 @@
             refreshInterval = setInterval(async () => {
                 try {
                     await checkForNewOrders();
+                    await loadOnlineWaiters();
                 } catch (error) {
                     console.error('❌ Auto-refresh error:', error);
                     realTimeStatus.classList.add('disconnected');
                     realTimeStatus.innerHTML = '<div class="pulse"></div><span>DISCONNECTED</span>';
                 }
             }, REFRESH_INTERVAL);
+        }
+
+        function startHeartbeat() {
+            console.log(`💓 Starting heartbeat every ${HEARTBEAT_INTERVAL/1000} seconds`);
+            
+            if (heartbeatInterval) {
+                clearInterval(heartbeatInterval);
+            }
+            
+            heartbeatInterval = setInterval(async () => {
+                await updateWaiterHeartbeat();
+            }, HEARTBEAT_INTERVAL);
+        }
+
+        function startDistributionSystem() {
+            console.log(`🤖 Starting distribution system every ${DISTRIBUTION_INTERVAL/1000} seconds`);
+            
+            if (distributionInterval) {
+                clearInterval(distributionInterval);
+            }
+            
+            // Run immediately
+            distributeOrders();
+            
+            // Then run on interval
+            distributionInterval = setInterval(async () => {
+                await distributeOrders();
+            }, DISTRIBUTION_INTERVAL);
         }
 
         async function checkForNewOrders() {
@@ -1329,6 +2439,7 @@
             try {
                 console.log('🔔 Attempting WebSocket connection...');
                 
+                // Listen for new orders
                 const channel = supabase.channel('orders-channel')
                     .on('postgres_changes', 
                         { 
@@ -1337,22 +2448,33 @@
                             table: 'orders',
                             filter: 'status=eq.pending'
                         }, 
-                        (payload) => {
+                        async (payload) => {
                             console.log('🎯 WebSocket: New order!', payload.new);
                             
                             newOrderIds.add(payload.new.order_id);
                             orders.unshift(payload.new);
                             
-                            renderOrders();
-                            updateTableStatusFromOrders();
-                            renderTableMockups();
-                            updateStats();
+                            // Trigger distribution for new order
+                            await distributeOrders();
                             
                             showNotification(`🆕 New order from Table ${payload.new.table_number}!`);
                             
                             if (vipTables.includes(payload.new.table_number)) {
                                 showNotification(`👑 VIP ORDER! Table ${payload.new.table_number}`, 'vip');
                             }
+                        }
+                    )
+                    // Listen for order updates (deliveries)
+                    .on('postgres_changes',
+                        {
+                            event: 'UPDATE',
+                            schema: 'public',
+                            table: 'orders',
+                            filter: 'status=eq.delivered'
+                        },
+                        (payload) => {
+                            console.log('✅ Order delivered:', payload.new.order_id);
+                            // Order will be redistributed on next distribution cycle
                         }
                     )
                     .subscribe((status) => {
@@ -1367,12 +2489,87 @@
             }
         }
 
+        // ============ LOGOUT FUNCTION (FIXED) ============
+        async function logout() {
+            console.log("🚪 Logging out...");
+            
+            // Clear all intervals immediately
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+                refreshInterval = null;
+            }
+            if (heartbeatInterval) {
+                clearInterval(heartbeatInterval);
+                heartbeatInterval = null;
+            }
+            if (distributionInterval) {
+                clearInterval(distributionInterval);
+                distributionInterval = null;
+            }
+            
+            // Disable the logout button to prevent multiple clicks
+            const logoutBtn = document.getElementById('menu-logout');
+            if (logoutBtn) {
+                logoutBtn.disabled = true;
+                logoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Logging out...</span>';
+            }
+            
+            // Show immediate feedback
+            showNotification('Logging out...', 'info');
+            
+            try {
+                // Mark waiter as offline
+                await markWaiterOffline();
+                
+                // Clear local storage
+                localStorage.removeItem('waiterbayDeliveredToday');
+                localStorage.removeItem('AlCaponeClubStaff');
+                
+                // Sign out from Firebase
+                await auth.signOut();
+                console.log("✅ Firebase sign out successful");
+                
+                // Immediate redirect (no delay)
+                window.location.href = 'index.html';
+                
+            } catch (error) {
+                console.error("❌ Logout error:", error);
+                showNotification('Logout failed, redirecting...', 'error');
+                
+                // Force redirect even if there's an error
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+            }
+        }
+
+        // ============ UI FUNCTIONS ============
+        function initializeTables() {
+            tables = [];
+            for (let i = 1; i <= 12; i++) {
+                const isVip = vipTables.includes(i);
+                tables.push({
+                    id: i,
+                    status: 'vacant',
+                    type: isVip ? 'vip' : 'regular',
+                    seats: isVip ? 4 : (i % 2 === 0 ? 2 : 4),
+                    hasOrder: false,
+                    orderCount: 0,
+                    hasVipRequest: false,
+                    assignedTo: null
+                });
+            }
+            
+            updateTableStatusFromOrders();
+        }
+
         function updateTableStatusFromOrders() {
             tables.forEach(table => {
                 table.status = 'vacant';
                 table.hasOrder = false;
                 table.orderCount = 0;
                 table.hasVipRequest = false;
+                table.assignedTo = null;
             });
             
             orders.forEach(order => {
@@ -1383,82 +2580,13 @@
                     tables[tableIndex].status = 'occupied';
                     tables[tableIndex].hasOrder = true;
                     tables[tableIndex].orderCount++;
+                    tables[tableIndex].assignedTo = order.assigned_to;
                     
                     if (vipTables.includes(tableNumber)) {
                         tables[tableIndex].hasVipRequest = true;
                     }
                 }
             });
-        }
-
-        function renderOrders() {
-            if (orders.length === 0) {
-                ordersBody.innerHTML = '';
-                emptyOrdersMessage.style.display = 'block';
-                ordersCount.textContent = '0 Orders';
-                return;
-            }
-            
-            emptyOrdersMessage.style.display = 'none';
-            ordersCount.textContent = `${orders.length} Order${orders.length !== 1 ? 's' : ''}`;
-            
-            const sortedOrders = [...orders].sort((a, b) => {
-                const aIsVip = vipTables.includes(a.table_number);
-                const bIsVip = vipTables.includes(b.table_number);
-                
-                if (aIsVip && !bIsVip) return -1;
-                if (!aIsVip && bIsVip) return 1;
-                
-                return new Date(a.created_at) - new Date(b.created_at);
-            });
-            
-            let ordersHTML = '';
-            sortedOrders.forEach(order => {
-                const itemsHTML = order.items.map(item => 
-                    `<div class="order-item">
-                        <span class="item-name">${item.name}</span>
-                        <span class="item-quantity">x${item.quantity}</span>
-                    </div>`
-                ).join('');
-                
-                const isVipTable = vipTables.includes(order.table_number);
-                const vipBadge = isVipTable ? '<span class="vip-table-badge">VIP</span>' : '';
-                
-                const isNewOrder = newOrderIds.has(order.order_id);
-                const newOrderClass = isNewOrder ? 'new-order-row' : '';
-                
-                ordersHTML += `
-                <tr class="${newOrderClass}" id="order-${order.order_id}">
-                    <td class="order-id" data-label="Order ID">${order.order_id}</td>
-                    <td data-label="Table">
-                        <div class="table-number">${order.table_number}</div>
-                        ${vipBadge}
-                    </td>
-                    <td class="order-items" data-label="Items">${itemsHTML}</td>
-                    <td class="status-pending" data-label="Status">${order.status.toUpperCase()}</td>
-                    <td class="status-success" data-label="Payment">${(order.payment_status || 'success').toUpperCase()}</td>
-                    <td data-label="Actions">
-                        <div class="action-buttons">
-                            <button class="btn btn-deliver" onclick="deliverOrder('${order.order_id}')">
-                                <i class="fas fa-check-circle"></i> Mark Delivered
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                `;
-            });
-            
-            ordersBody.innerHTML = ordersHTML;
-            
-            if (newOrderIds.size > 0) {
-                setTimeout(() => {
-                    const newRows = document.querySelectorAll('.new-order-row');
-                    newRows.forEach(row => {
-                        row.classList.remove('new-order-row');
-                    });
-                    newOrderIds.clear();
-                }, 3000);
-            }
         }
 
         function renderTableMockups() {
@@ -1482,8 +2610,12 @@
             
             let tableHTML = '';
             currentTables.forEach(table => {
+                // Check if table is assigned to current waiter
+                const isAssignedToMe = table.assignedTo === userSession?.firebaseUserId;
+                const assignedClass = isAssignedToMe ? 'assigned-to-me' : '';
+                
                 tableHTML += `
-                <div class="table-mockup ${table.status} ${table.type}-table ${table.hasOrder ? 'has-order' : ''}" 
+                <div class="table-mockup ${table.status} ${table.type}-table ${table.hasOrder ? 'has-order' : ''} ${assignedClass}" 
                      onclick="showTableDetails(${table.id})">
                     ${table.hasOrder ? `<div class="order-indicator">${table.orderCount}</div>` : ''}
                     ${table.hasVipRequest ? `<div class="vip-request-indicator" title="VIP Request"><i class="fas fa-crown"></i></div>` : ''}
@@ -1499,6 +2631,7 @@
                     <div class="table-info">
                         <div class="table-status ${table.status}-status">
                             ${table.status.toUpperCase()}
+                            ${isAssignedToMe ? ' (Yours)' : ''}
                         </div>
                         <div class="table-details">
                             ${table.type === 'vip' ? 'VIP' : 'Regular'} • ${table.seats} seats
@@ -1518,6 +2651,76 @@
             nextPageBtn.disabled = currentPage === totalPages || totalPages === 0;
         }
 
+        function updateStats() {
+            pendingOrdersElement.textContent = orders.length;
+            
+            const occupiedTables = tables.filter(table => table.status === 'occupied').length;
+            occupiedTablesElement.textContent = occupiedTables;
+            
+            document.getElementById('total-tables').textContent = tables.length;
+            deliveredTodayElement.textContent = deliveredToday;
+            document.getElementById('pending-count').textContent = orders.length;
+        }
+
+        function renderAllOrders(allOrders) {
+            // Temporary function to show all orders
+            if (allOrders.length === 0) {
+                ordersBody.innerHTML = '';
+                emptyOrdersMessage.style.display = 'block';
+                ordersCount.textContent = 'All Orders: 0';
+                return;
+            }
+            
+            emptyOrdersMessage.style.display = 'none';
+            ordersCount.textContent = `All Orders: ${allOrders.length}`;
+            
+            let ordersHTML = '';
+            allOrders.forEach(order => {
+                const itemsHTML = order.items.map(item => 
+                    `<div class="order-item">
+                        <span class="item-name">${item.name}</span>
+                        <span class="item-quantity">x${item.quantity}</span>
+                    </div>`
+                ).join('');
+                
+                const isVipTable = vipTables.includes(order.table_number);
+                const vipBadge = isVipTable ? '<span class="vip-table-badge">VIP</span>' : '';
+                
+                // Show assignment info
+                let assignmentInfo = '';
+                if (order.assigned_to) {
+                    const assignedWaiter = onlineWaiters.find(w => w.waiter_id === order.assigned_to);
+                    if (assignedWaiter) {
+                        const isAssignedToMe = order.assigned_to === userSession?.firebaseUserId;
+                        assignmentInfo = `<div class="assigned-to">Assigned to: ${assignedWaiter.waiter_name} ${isAssignedToMe ? '(You)' : ''}</div>`;
+                    }
+                } else {
+                    assignmentInfo = `<div class="assigned-to" style="color: var(--pending-color);">Unassigned</div>`;
+                }
+                
+                ordersHTML += `
+                <tr id="order-${order.order_id}">
+                    <td class="order-id" data-label="Order ID">${order.order_id}</td>
+                    <td data-label="Table">
+                        <div class="table-number">${order.table_number}</div>
+                        ${vipBadge}
+                    </td>
+                    <td class="order-items" data-label="Items">${itemsHTML}</td>
+                    <td class="status-pending" data-label="Status">${order.status.toUpperCase()}</td>
+                    <td class="status-success" data-label="Payment">${(order.payment_status || 'success').toUpperCase()}</td>
+                    <td data-label="Assignment">${assignmentInfo}</td>
+                </tr>
+                `;
+            });
+            
+            ordersBody.innerHTML = ordersHTML;
+            
+            // Set timeout to switch back to my orders
+            setTimeout(async () => {
+                await loadOrdersFromDatabase();
+            }, 10000); // Switch back after 10 seconds
+        }
+
         function showTableDetails(tableId) {
             const table = tables.find(t => t.id === tableId);
             if (!table) return;
@@ -1530,8 +2733,19 @@
                 tableOrders.forEach(order => {
                     const items = order.items.map(item => `${item.name} (x${item.quantity})`).join(', ');
                     const time = new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    
+                    // Show assignment info
+                    let assignment = '';
+                    if (order.assigned_to) {
+                        const assignedWaiter = onlineWaiters.find(w => w.waiter_id === order.assigned_to);
+                        if (assignedWaiter) {
+                            const isAssignedToMe = order.assigned_to === userSession?.firebaseUserId;
+                            assignment = ` - Assigned to: ${assignedWaiter.waiter_name} ${isAssignedToMe ? '(You)' : ''}`;
+                        }
+                    }
+                    
                     const isNew = newOrderIds.has(order.order_id) ? '<span style="color: #4CAF50; font-size: 0.8rem;"> 🆕</span>' : '';
-                    orderDetails += `<li>${order.order_id} - ${items} (${time})${isNew}</li>`;
+                    orderDetails += `<li>${order.order_id} - ${items} (${time})${assignment}${isNew}</li>`;
                 });
                 orderDetails += `</ul>`;
             } else {
@@ -1545,7 +2759,7 @@
                     <p><strong>Type:</strong> ${table.type === 'vip' ? 'VIP <i class="fas fa-crown" style="color: var(--gold-color);"></i>' : 'Regular'}</p>
                     <p><strong>Seats:</strong> ${table.seats}</p>
                     <p><strong>Has Order:</strong> ${table.hasOrder ? 'Yes' : 'No'}</p>
-                    <p><strong>VIP Request:</strong> ${table.hasVipRequest ? 'Yes <i class="fas fa-exclamation-triangle" style="color: var(--gold-color);"></i>' : 'No'}</p>
+                    <p><strong>Assigned To:</strong> ${table.assignedTo ? (table.assignedTo === userSession?.firebaseUserId ? 'You' : 'Another waiter') : 'Not assigned'}</p>
                     ${orderDetails}
                     ${table.hasVipRequest ? '<p style="margin-top: 10px; color: var(--gold-color);"><i class="fas fa-star"></i> VIP attention required!</p>' : ''}
                 </div>
@@ -1655,75 +2869,18 @@
             modalContent.style.animation = 'slideIn 0.3s ease';
         }
 
-        function updateStats() {
-            pendingOrdersElement.textContent = orders.length;
-            
-            const occupiedTables = tables.filter(table => table.status === 'occupied').length;
-            occupiedTablesElement.textContent = occupiedTables;
-            
-            document.getElementById('total-tables').textContent = tables.length;
-            deliveredTodayElement.textContent = deliveredToday;
-            document.getElementById('pending-count').textContent = orders.length;
-        }
-
-        async function deliverOrder(orderId) {
-            console.log("🚚 Delivering order:", orderId);
-            
-            try {
-                const orderIndex = orders.findIndex(order => order.order_id === orderId);
-                
-                if (orderIndex === -1) {
-                    console.error("Order not found in local array:", orderId);
-                    showNotification('Order not found');
-                    return;
-                }
-                
-                const order = orders[orderIndex];
-                const currentTime = new Date().toISOString();
-                
-                console.log("Updating order in database:", orderId, "to status: delivered");
-                
-                const { data, error } = await supabase
-                    .from('orders')
-                    .update({ 
-                        status: 'delivered',
-                        delivered_at: currentTime
-                    })
-                    .eq('order_id', orderId);
-                
-                if (error) {
-                    console.error("Error delivering order:", error);
-                    throw error;
-                }
-                
-                console.log("Database update successful");
-                
-                orders.splice(orderIndex, 1);
-                newOrderIds.delete(orderId);
-                
-                deliveredToday++;
-                localStorage.setItem('waiterbayDeliveredToday', deliveredToday);
-                deliveredTodayElement.textContent = deliveredToday;
-                
-                updateTableStatusFromOrders();
-                renderOrders();
-                renderTableMockups();
-                updateStats();
-                
-                showNotification(`✅ Order ${orderId} from Table ${order.table_number} delivered!`);
-                
-            } catch (error) {
-                console.error('❌ Failed to deliver order:', error);
-                showNotification('Failed to mark order as delivered. Please check your connection.');
-            }
-        }
-
         function showNotification(message, type = 'info') {
             const notification = document.createElement('div');
             
-            let bgColor = type === 'vip' ? 'var(--gold-color)' : 'var(--accent-color)';
+            let bgColor = type === 'vip' ? 'var(--gold-color)' : 
+                         type === 'success' ? '#4CAF50' : 
+                         type === 'error' ? '#f44336' : 
+                         'var(--accent-color)';
             let textColor = type === 'vip' ? '#000' : 'white';
-            let icon = type === 'vip' ? 'fas fa-crown' : 'fas fa-bell';
+            let icon = type === 'vip' ? 'fas fa-crown' : 
+                      type === 'success' ? 'fas fa-check-circle' :
+                      type === 'error' ? 'fas fa-exclamation-triangle' :
+                      'fas fa-bell';
             
             notification.style.cssText = `
                 position: fixed;
@@ -1772,14 +2929,10 @@
             }
         }
 
-        function logout() {
-            if (refreshInterval) {
-                clearInterval(refreshInterval);
-            }
-            
-            localStorage.removeItem('waiterbayDeliveredToday');
-            window.location.href = 'index.html';
-        }
+        // Make functions available globally
+        window.deliverOrder = deliverOrder;
+        window.showTableDetails = showTableDetails;
+        window.logout = logout;
     </script>
 </body>
 </html>
